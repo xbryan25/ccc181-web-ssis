@@ -17,5 +17,9 @@ export default defineNuxtConfig({
               preset: Aura
           }
       }
+  },
+  icon: {
+    mode: 'css',
+    cssLayer: 'base'
   }
 })
