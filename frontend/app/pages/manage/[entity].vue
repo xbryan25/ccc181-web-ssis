@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import SearchAndSortHeader from "~/components/SearchAndSortHeader.vue";
+import { capitalizeWords } from "~/utils/stringUtils";
+
 // definePageMeta validate only decides whether the page is valid to be shown
 definePageMeta({
   validate: (route) => {
@@ -16,8 +19,8 @@ const entity = route.params.entity;
 </script>
 
 <template>
-  <div>
-    <h1>Welcome to the {{ entity }} page</h1>
-    <NuxtLink to="/about" class="font-bold">Link</NuxtLink>
+  <div class="flex flex-col gap-10">
+    <h1 class="font-bold text-5xl">{{ capitalizeWords(entity) }}</h1>
+    <SearchAndSortHeader :entity-type="entity" />
   </div>
 </template>

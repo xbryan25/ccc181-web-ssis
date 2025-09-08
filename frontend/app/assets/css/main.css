@@ -10,6 +10,7 @@
   font-display: swap;
 }
 
+/* This sets the global font to be RethinkSans, if planning to change global font, edit the line below */
 @layer base {
   body {
     font-family: 'RethinkSans', sans-serif;
