@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { capitalizeWords } from "#imports";
-
 const props = defineProps<{
   entityType: string;
 }>();
 
 console.log("imports " + props.entityType);
+
+const isVisibleFilterSortDialog = ref(false);
+const dialogType = ref("sort");
+
+const showFilterSortDialog = (chosenDialogType: string) => {
+  isVisibleFilterSortDialog.value = true;
+  dialogType.value = chosenDialogType;
+};
 </script>
 
 <template>
@@ -20,15 +26,21 @@ console.log("imports " + props.entityType);
       </FloatLabel>
     </IconField>
 
-    <Button>
+    <Button @click="showFilterSortDialog('filter')">
       <Icon name="solar:filter-linear" class="h-6 w-6" />
-      <p class="font-medium">Profile</p>
+      <p class="font-medium">Filters</p>
     </Button>
 
-    <Button>
+    <Button @click="showFilterSortDialog('sort')">
       <Icon name="solar:sort-linear" class="h-6 w-6" />
       <p class="font-medium">Sort Options</p>
     </Button>
+
+    <FilterSortDialog
+      v-model="isVisibleFilterSortDialog"
+      :entity-type="props.entityType"
+      :dialog-type="dialogType"
+    />
 
     <Button class="w-44 ml-auto">
       <Icon name="solar:add-circle-linear" class="h-6 w-6" />
