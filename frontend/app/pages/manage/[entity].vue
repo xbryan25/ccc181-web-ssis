@@ -13,8 +13,6 @@ definePageMeta({
 
 const route = useRoute();
 const entity = route.params.entity;
-
-console.log(entity);
 </script>
 
 <template>
