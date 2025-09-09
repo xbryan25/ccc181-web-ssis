@@ -1,6 +1,23 @@
 <script setup lang="ts">
 const props = defineProps<{
   entityType: string;
+  searchAndSortState: {
+    searchBy: string;
+    searchType: string;
+    sortField: string;
+    sortOrder: string;
+  };
+}>();
+
+const emit = defineEmits<{
+  (
+    e:
+      | "update:searchBy"
+      | "update:searchType"
+      | "update:sortField"
+      | "update:sortOrder",
+    value: string
+  ): void;
 }>();
 
 console.log("imports " + props.entityType);
@@ -40,6 +57,11 @@ const showFilterSortDialog = (chosenDialogType: string) => {
       v-model="isVisibleFilterSortDialog"
       :entity-type="props.entityType"
       :dialog-type="dialogType"
+      :search-and-sort-state="props.searchAndSortState"
+      @update:search-by="(value: string) => emit('update:searchBy', value)"
+      @update:search-type="(value: string) => emit('update:searchType', value)"
+      @update:sort-field="(value: string) => emit('update:sortField', value)"
+      @update:sort-order="(value: string) => emit('update:sortOrder', value)"
     />
 
     <Button class="w-44 ml-auto">

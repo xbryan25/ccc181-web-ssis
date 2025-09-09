@@ -3,10 +3,24 @@ const props = defineProps<{
   modelValue: boolean;
   entityType: string;
   dialogType: string;
+  searchAndSortState: {
+    searchBy: string;
+    searchType: string;
+    sortField: string;
+    sortOrder: string;
+  };
 }>();
 
 const emit = defineEmits<{
   (e: "update:modelValue", value: boolean): void;
+  (
+    e:
+      | "update:searchBy"
+      | "update:searchType"
+      | "update:sortField"
+      | "update:sortOrder",
+    value: string
+  ): void;
 }>();
 
 const visible = computed({
@@ -24,7 +38,7 @@ const entityPropertiesOptions = {
     "Program Code",
   ],
   programs: ["Program Code", "Program Name", "College Code"],
-  colleges: ["College Name", "College Code"],
+  colleges: ["College Code", "College Name"],
 };
 
 const filterTypes = ["Starts With", "Ends With", "Contains"];
@@ -62,12 +76,40 @@ const sortTypes = ["Ascending", "Descending"];
           <div class="w-full flex gap-4 mb-4">
             <RadioSelectButtons
               :options="entityPropertiesOptions[props.entityType]"
+              :dialog-type="props.dialogType"
+              :column-position="'first'"
+              :search-and-sort-state="props.searchAndSortState"
+              @update:search-by="
+                (value: string) => emit('update:searchBy', value)
+              "
+              @update:search-type="
+                (value: string) => emit('update:searchType', value)
+              "
+              @update:sort-field="
+                (value: string) => emit('update:sortField', value)
+              "
+              @update:sort-order="
+                (value: string) => emit('update:sortOrder', value)
+              "
             />
             <RadioSelectButtons
-              v-if="props.dialogType === 'filter'"
-              :options="filterTypes"
+              :options="props.dialogType === 'filter' ? filterTypes : sortTypes"
+              :dialog-type="props.dialogType"
+              :column-position="'second'"
+              :search-and-sort-state="props.searchAndSortState"
+              @update:search-by="
+                (value: string) => emit('update:searchBy', value)
+              "
+              @update:search-type="
+                (value: string) => emit('update:searchType', value)
+              "
+              @update:sort-field="
+                (value: string) => emit('update:sortField', value)
+              "
+              @update:sort-order="
+                (value: string) => emit('update:sortOrder', value)
+              "
             />
-            <RadioSelectButtons v-else :options="sortTypes" />
           </div>
         </div>
       </div>

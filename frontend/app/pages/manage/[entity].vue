@@ -16,11 +16,42 @@ definePageMeta({
 
 const route = useRoute();
 const entity = route.params.entity;
+
+const fieldMap: Record<string, string> = {
+  students: "ID Number",
+  programs: "Program Code",
+  colleges: "College Code",
+};
+
+const defaultField = fieldMap[entity as keyof typeof fieldMap] || "Unknown";
+
+const searchAndSortState = reactive({
+  searchBy: defaultField,
+  searchType: "Starts With",
+  sortField: defaultField,
+  sortOrder: "Ascending",
+});
 </script>
 
 <template>
   <div class="flex flex-col gap-10">
     <h1 class="font-bold text-5xl">{{ capitalizeWords(entity) }}</h1>
-    <SearchAndSortHeader :entity-type="entity" />
+
+    <SearchAndSortHeader
+      :entity-type="entity"
+      :search-and-sort-state="searchAndSortState"
+      @update:search-by="
+        (value: string) => (searchAndSortState.searchBy = value)
+      "
+      @update:search-type="
+        (value: string) => (searchAndSortState.searchType = value)
+      "
+      @update:sort-field="
+        (value: string) => (searchAndSortState.sortField = value)
+      "
+      @update:sort-order="
+        (value: string) => (searchAndSortState.sortOrder = value)
+      "
+    />
   </div>
 </template>
