@@ -54,5 +54,16 @@ const emit = defineEmits<{
       <Icon name="solar:add-circle-linear" class="h-6 w-6" />
       <p class="font-medium">Add {{ props.entityType.slice(0, -1) }}</p>
     </Button> -->
+
+    <!-- <UButton
+      icon="solar:filter-linear"
+      size="md"
+      color="primary"
+      variant="solid"
+      class="cursor-pointer ml-auto"
+      :label="`Add ${capitalizeWords(entityType).slice(0, -1)}`"
+    /> -->
+
+    <AddEditEntityDialog class="ml-auto" :entity-type="props.entityType" />
   </div>
 </template>

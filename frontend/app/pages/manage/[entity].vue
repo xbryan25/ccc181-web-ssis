@@ -168,17 +168,27 @@ const columns: TableColumn<Student>[] = [
     meta: {
       class: {
         th: "w-28",
-        td: "w-28",
+        td: "w-28 text-md",
       },
     },
   },
   {
     accessorKey: "firstName",
     header: "First Name",
+    meta: {
+      class: {
+        td: "text-md",
+      },
+    },
   },
   {
     accessorKey: "lastName",
     header: "Last Name",
+    meta: {
+      class: {
+        td: "text-md",
+      },
+    },
   },
   {
     accessorKey: "yearLevel",
@@ -186,7 +196,7 @@ const columns: TableColumn<Student>[] = [
     meta: {
       class: {
         th: "w-24",
-        td: "w-24",
+        td: "w-24 text-md",
       },
     },
   },
@@ -196,7 +206,7 @@ const columns: TableColumn<Student>[] = [
     meta: {
       class: {
         th: "w-24",
-        td: "w-24",
+        td: "w-24 text-md",
       },
     },
   },
@@ -206,7 +216,7 @@ const columns: TableColumn<Student>[] = [
     meta: {
       class: {
         th: "w-42",
-        td: "w-42",
+        td: "w-42 text-md",
       },
     },
   },
@@ -276,7 +286,6 @@ const calculateRows = () => {
   const row = document.querySelector("table tbody tr");
   const rowHeight = row ? row.clientHeight + 1 : 64;
 
-  console.log(rowHeight);
   const availableHeight = window.innerHeight - reservedHeight;
 
   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
