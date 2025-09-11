@@ -19,6 +19,12 @@ const emit = defineEmits<{
     value: string
   ): void;
 }>();
+
+const isOpenAddDialog = ref(false);
+
+const openAddDialog = () => {
+  isOpenAddDialog.value = true;
+};
 </script>
 
 <template>
@@ -64,6 +70,21 @@ const emit = defineEmits<{
       :label="`Add ${capitalizeWords(entityType).slice(0, -1)}`"
     /> -->
 
-    <AddEditEntityDialog class="ml-auto" :entity-type="props.entityType" />
+    <UButton
+      class="ml-auto cursor-pointer justify-center w-36"
+      icon="solar:add-circle-linear"
+      size="md"
+      color="primary"
+      variant="solid"
+      @click="openAddDialog"
+      >{{ "Add " + capitalizeWords(props.entityType).slice(0, -1) }}</UButton
+    >
+
+    <AddEditEntityDialog
+      v-model:is-open="isOpenAddDialog"
+      class="ml-auto hidden"
+      :entity-type="props.entityType"
+      :dialog-type="'add'"
+    />
   </div>
 </template>

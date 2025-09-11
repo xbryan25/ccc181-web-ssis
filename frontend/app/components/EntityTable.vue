@@ -29,6 +29,12 @@ type College = {
 const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 
+const isOpenEditDialog = ref(false);
+
+const openEditDialog = () => {
+  isOpenEditDialog.value = true;
+};
+
 const studentData = ref<Student[]>([
   {
     idNumber: "2023-0022",
@@ -493,7 +499,7 @@ function getRowItemsStudent(row: Row<Student>) {
     {
       label: "Edit",
       onSelect() {
-        console.log(`Edit ${row.original.idNumber}`);
+        openEditDialog();
       },
     },
     {
@@ -517,7 +523,7 @@ function getRowItemsProgram(row: Row<Program>) {
     {
       label: "Edit",
       onSelect() {
-        console.log(`Edit ${row.original.programCode}`);
+        openEditDialog();
       },
     },
     {
@@ -541,7 +547,7 @@ function getRowItemsCollege(row: Row<College>) {
     {
       label: "Edit",
       onSelect() {
-        console.log(`Edit ${row.original.collegeCode}`);
+        openEditDialog();
       },
     },
     {
@@ -573,6 +579,13 @@ onMounted(() => {
 </script>
 
 <template>
+  <AddEditEntityDialog
+    v-model:is-open="isOpenEditDialog"
+    class="ml-auto hidden"
+    :entity-type="props.entityType"
+    :dialog-type="'edit'"
+  />
+
   <UTable
     v-if="entityType === 'students'"
     loading

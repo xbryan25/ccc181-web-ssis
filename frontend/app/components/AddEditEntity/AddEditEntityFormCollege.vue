@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "@nuxt/ui";
 
+const props = defineProps<{
+  dialogType: string;
+}>();
+
 interface CollegeFormState {
   collegeCode: string;
   collegeName: string;
 }
 
-const state = reactive({
+const state = reactive<CollegeFormState>({
   collegeCode: "",
   collegeName: "",
 });
@@ -15,6 +19,10 @@ const collegeCodeRegex = /^[A-Z-]+$/;
 const collegeNameRegex = /^[A-Za-z- ]+$/;
 
 const validate = (state: CollegeFormState): FormError[] => {
+  if (!hasCalled) return [];
+
+  console.log(isMounted);
+
   const errors = [];
   if (!state.collegeCode) {
     errors.push({ name: "collegeCode", message: "Required." });
@@ -46,6 +54,32 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
   });
   console.log(event.data);
 }
+
+let hasCalled = false;
+let isMounted = false;
+
+// Simulate API GET
+function fetchCollege() {
+  return new Promise<CollegeFormState>((resolve) => {
+    setTimeout(() => {
+      resolve({
+        collegeCode: "CCS",
+        collegeName: "College of Computer Studies",
+      });
+    }, 100); // simulate 1 second delay
+  });
+}
+
+onMounted(async () => {
+  if (props.dialogType === "edit") {
+    const data = await fetchCollege();
+    Object.assign(state, data);
+    console.log("Data loaded", state);
+  }
+
+  hasCalled = true;
+  isMounted = true;
+});
 </script>
 
 <template>
