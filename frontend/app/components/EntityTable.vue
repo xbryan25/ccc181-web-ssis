@@ -30,9 +30,23 @@ const UButton = resolveComponent("UButton");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 
 const isOpenEditDialog = ref(false);
+const isOpenConfirmDeleteDialog = ref(false);
+const selectedEntity = ref("");
 
 const openEditDialog = () => {
   isOpenEditDialog.value = true;
+};
+
+const openConfirmDeleteDialog = (row: Student | Program | College) => {
+  isOpenConfirmDeleteDialog.value = true;
+
+  if (props.entityType === "students") {
+    selectedEntity.value = (row as Student).idNumber;
+  } else if (props.entityType === "programs") {
+    selectedEntity.value = (row as Program).programCode;
+  } else {
+    selectedEntity.value = (row as College).collegeCode;
+  }
 };
 
 const studentData = ref<Student[]>([
@@ -219,8 +233,8 @@ const collegeData = ref<College[]>([
     collegeName: "College of Computer Studies",
   },
   {
-    collegeCode: "CCS",
-    collegeName: "College of Computer Studies",
+    collegeCode: "COE",
+    collegeName: "College of Engineering",
   },
   {
     collegeCode: "CCS",
@@ -346,7 +360,7 @@ const studentColumns: TableColumn<Student>[] = [
             content: {
               align: "end",
             },
-            items: getRowItemsStudent(row),
+            items: getRowItems(row),
             "aria-label": "Actions dropdown",
           },
           () =>
@@ -410,7 +424,7 @@ const programColumns: TableColumn<Program>[] = [
             content: {
               align: "end",
             },
-            items: getRowItemsProgram(row),
+            items: getRowItems(row),
             "aria-label": "Actions dropdown",
           },
           () =>
@@ -464,7 +478,7 @@ const collegeColumns: TableColumn<College>[] = [
             content: {
               align: "end",
             },
-            items: getRowItemsCollege(row),
+            items: getRowItems(row),
             "aria-label": "Actions dropdown",
           },
           () =>
@@ -487,7 +501,7 @@ const collegeColumns: TableColumn<College>[] = [
   },
 ];
 
-function getRowItemsStudent(row: Row<Student>) {
+function getRowItems(row: Row<Student> | Row<Program> | Row<College>) {
   return [
     {
       type: "label",
@@ -505,55 +519,7 @@ function getRowItemsStudent(row: Row<Student>) {
     {
       label: "Delete",
       onSelect() {
-        console.log(`Delete ${row.original.idNumber}`);
-      },
-    },
-  ];
-}
-
-function getRowItemsProgram(row: Row<Program>) {
-  return [
-    {
-      type: "label",
-      label: "Actions",
-    },
-    {
-      type: "separator",
-    },
-    {
-      label: "Edit",
-      onSelect() {
-        openEditDialog();
-      },
-    },
-    {
-      label: "Delete",
-      onSelect() {
-        console.log(`Delete ${row.original.programCode}`);
-      },
-    },
-  ];
-}
-
-function getRowItemsCollege(row: Row<College>) {
-  return [
-    {
-      type: "label",
-      label: "Actions",
-    },
-    {
-      type: "separator",
-    },
-    {
-      label: "Edit",
-      onSelect() {
-        openEditDialog();
-      },
-    },
-    {
-      label: "Delete",
-      onSelect() {
-        console.log(`Delete ${row.original.collegeCode}`);
+        openConfirmDeleteDialog(row.original);
       },
     },
   ];
@@ -584,6 +550,13 @@ onMounted(() => {
     class="ml-auto hidden"
     :entity-type="props.entityType"
     :dialog-type="'edit'"
+  />
+
+  <ConfirmDeleteEntityDialog
+    v-model:is-open="isOpenConfirmDeleteDialog"
+    class="ml-auto hidden"
+    :entity-type="props.entityType"
+    :selected-entity="selectedEntity"
   />
 
   <UTable

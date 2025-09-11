@@ -52,7 +52,7 @@ const isOpen = computed({
       </template>
 
       <template #footer>
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2 w-full">
           <UButton
             size="md"
             color="error"
