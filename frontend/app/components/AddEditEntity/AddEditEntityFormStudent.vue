@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent, SelectMenuItem } from "@nuxt/ui";
 
+const props = defineProps<{
+  dialogType: string;
+}>();
+
 interface StudentFormState {
   idNumber: string;
   firstName: string;
@@ -10,7 +14,7 @@ interface StudentFormState {
   programCode: { label: string };
 }
 
-const state = reactive({
+const state = reactive<StudentFormState>({
   idNumber: "",
   firstName: "",
   lastName: "",
@@ -29,6 +33,8 @@ const idNumberRegex = /^\d{4}-\d{4}$/;
 const nameRegex = /^[A-Za-z- ]+$/;
 
 const validate = (state: StudentFormState): FormError[] => {
+  if (!hasCalled) return [];
+
   const errors = [];
   if (!state.idNumber) {
     errors.push({ name: "idNumber", message: "Required." });
@@ -131,6 +137,36 @@ const programCodeOptions = ref<SelectMenuItem[]>([
     label: "BSCE",
   },
 ]);
+
+let hasCalled = false;
+
+// Simulate API GET
+function fetchStudent() {
+  return new Promise<StudentFormState>((resolve) => {
+    setTimeout(() => {
+      resolve({
+        idNumber: "2025-1234",
+        firstName: "John",
+        lastName: "Doe",
+        yearLevel: { label: "3rd" },
+        gender: { label: "Male" },
+        programCode: { label: "BSCS" },
+      });
+    }, 100); // simulate 1 second delay
+  });
+}
+
+onMounted(async () => {
+  if (props.dialogType === "edit") {
+    const data = await fetchStudent();
+    Object.assign(state, data);
+    console.log("Data loaded", state);
+  }
+
+  console.log(`dialog type: ${props.dialogType}`);
+
+  hasCalled = true;
+});
 </script>
 
 <template>
