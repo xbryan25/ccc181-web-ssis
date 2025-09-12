@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { FormError, FormSubmitEvent, SelectMenuItem } from "@nuxt/ui";
+import type { FormError, FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
+  selectedEntity?: string;
 }>();
 
 interface StudentFormState {
@@ -15,17 +16,17 @@ interface StudentFormState {
 }
 
 const state = reactive<StudentFormState>({
-  idNumber: "",
-  firstName: "",
-  lastName: "",
+  idNumber: '',
+  firstName: '',
+  lastName: '',
   yearLevel: {
-    label: "1st",
+    label: '1st',
   },
   gender: {
-    label: "Male",
+    label: 'Male',
   },
   programCode: {
-    label: "BSCS",
+    label: 'BSCS',
   },
 });
 
@@ -37,29 +38,29 @@ const validate = (state: StudentFormState): FormError[] => {
 
   const errors = [];
   if (!state.idNumber) {
-    errors.push({ name: "idNumber", message: "Required." });
+    errors.push({ name: 'idNumber', message: 'Required.' });
   } else if (state.idNumber && !idNumberRegex.test(state.idNumber)) {
     errors.push({
-      name: "idNumber",
-      message: "ID number format is XXXX-XXXX.",
+      name: 'idNumber',
+      message: 'ID number format is XXXX-XXXX.',
     });
   }
 
   if (!state.firstName) {
-    errors.push({ name: "firstName", message: "Required." });
+    errors.push({ name: 'firstName', message: 'Required.' });
   } else if (state.firstName && !nameRegex.test(state.firstName)) {
     errors.push({
-      name: "firstName",
-      message: "Letters, spaces, and dashes only.",
+      name: 'firstName',
+      message: 'Letters, spaces, and dashes only.',
     });
   }
 
   if (!state.lastName) {
-    errors.push({ name: "lastName", message: "Required." });
+    errors.push({ name: 'lastName', message: 'Required.' });
   } else if (state.lastName && !nameRegex.test(state.lastName)) {
     errors.push({
-      name: "lastName",
-      message: "Letters, spaces, and dashes only.",
+      name: 'lastName',
+      message: 'Letters, spaces, and dashes only.',
     });
   }
 
@@ -69,124 +70,108 @@ const validate = (state: StudentFormState): FormError[] => {
 const toast = useToast();
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
   toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
+    title: 'Success',
+    description: 'The form has been submitted.',
+    color: 'success',
   });
   console.log(event.data);
 }
 
 const yearLevelOptions = ref([
   {
-    label: "1st",
+    label: '1st',
   },
   {
-    label: "2nd",
+    label: '2nd',
   },
   {
-    label: "3rd",
+    label: '3rd',
   },
   {
-    label: "4th",
+    label: '4th',
   },
   {
-    label: "4th+",
+    label: '4th+',
   },
 ]);
 
 const genderOptions = ref([
   {
-    label: "Male",
+    label: 'Male',
   },
   {
-    label: "Female",
+    label: 'Female',
   },
   {
-    label: "Others",
+    label: 'Others',
   },
   {
-    label: "Prefer not to say",
+    label: 'Prefer not to say',
   },
 ]);
 
 const programCodeOptions = ref<SelectMenuItem[]>([
   {
-    type: "label",
-    label: "CCS",
+    type: 'label',
+    label: 'CCS',
   },
   {
-    label: "BSCS",
+    label: 'BSCS',
   },
   {
-    label: "BSCA",
+    label: 'BSCA',
   },
   {
-    label: "BSIS",
+    label: 'BSIS',
   },
   {
-    label: "BSIT",
+    label: 'BSIT',
   },
   {
-    type: "separator",
+    type: 'separator',
   },
   {
-    type: "label",
-    label: "COE",
+    type: 'label',
+    label: 'COE',
   },
   {
-    label: "BSCE",
+    label: 'BSCE',
   },
 ]);
 
 let hasCalled = false;
 
-// Simulate API GET
-function fetchStudent() {
-  return new Promise<StudentFormState>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        idNumber: "2025-1234",
-        firstName: "John",
-        lastName: "Doe",
-        yearLevel: { label: "3rd" },
-        gender: { label: "Male" },
-        programCode: { label: "BSCS" },
-      });
-    }, 100); // simulate 1 second delay
+const apiUrl = import.meta.env.VITE_API_URL;
+
+const getStudentDetails = () => {
+  return useFetch(`${apiUrl}/api/college/`, {
+    method: 'GET',
+    params: {
+      studentIdNumber: props.selectedEntity,
+    },
   });
-}
+};
 
-onMounted(async () => {
-  if (props.dialogType === "edit") {
-    const data = await fetchStudent();
-    Object.assign(state, data);
-    console.log("Data loaded", state);
+onMounted(() => {
+  if (props.dialogType === 'edit') {
+    // const { data: collegeData, pending, error } = getStudentDetails();
+    // Object.assign(state, collegeData);
+    console.log('Data loaded', state);
   }
-
-  console.log(`dialog type: ${props.dialogType}`);
 
   hasCalled = true;
 });
 </script>
 
 <template>
-  <UForm
-    :validate="validate"
-    :state="state"
-    class="flex flex-col space-y-4"
-    @submit="onSubmit"
-  >
+  <UForm :validate="validate" :state="state" class="flex flex-col space-y-4" @submit="onSubmit">
     <div class="flex gap-4 w-full">
       <UFormField label="ID Number" name="idNumber" class="flex-1">
         <UInput v-model="state.idNumber" />
       </UFormField>
 
       <UFormField label="Year Level" name="yearLevel" class="flex-1">
-        <USelectMenu
-          v-model="state.yearLevel"
-          :items="yearLevelOptions"
-          class="w-full"
-        />
+        <USelectMenu v-model="state.yearLevel" :items="yearLevelOptions" class="w-full" />
       </UFormField>
     </div>
 
@@ -202,11 +187,7 @@ onMounted(async () => {
 
     <div class="flex gap-4">
       <UFormField label="Gender" name="gender" class="flex-1">
-        <USelectMenu
-          v-model="state.gender"
-          :items="genderOptions"
-          class="w-full"
-        />
+        <USelectMenu v-model="state.gender" :items="genderOptions" class="w-full" />
       </UFormField>
 
       <UFormField label="Program Code" name="programCode" class="flex-1">
@@ -215,8 +196,7 @@ onMounted(async () => {
           :items="programCodeOptions"
           class="w-full"
           :ui="{
-            trailingIcon:
-              'group-data-[state=open]:rotate-180 transition-transform duration-200',
+            trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
             label: 'text-green-400 ',
           }"
         />

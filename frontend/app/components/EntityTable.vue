@@ -19,6 +19,20 @@ const selectedEntity = ref('');
 const openConfirmDeleteDialog = (row: Student | Program | College) => {
   isOpenConfirmDeleteDialog.value = true;
 
+  console.log(`rowwwwwwwwwwwwwwwwwwwwDD ${(row as College).collegeCode}`);
+
+  if (props.entityType === 'students') {
+    selectedEntity.value = (row as Student).idNumber;
+  } else if (props.entityType === 'programs') {
+    selectedEntity.value = (row as Program).programCode;
+  } else {
+    selectedEntity.value = (row as College).collegeCode;
+  }
+};
+
+const openConfirmEditDialog = (row: Student | Program | College) => {
+  isOpenEditDialog.value = true;
+
   if (props.entityType === 'students') {
     selectedEntity.value = (row as Student).idNumber;
   } else if (props.entityType === 'programs') {
@@ -276,30 +290,24 @@ const tableButtons = { UButton, UDropdownMenu };
 
 const studentTableColumns = getStudentsTableColumns(
   {
-    openEditDialog: () => (isOpenEditDialog.value = true),
-    openConfirmDeleteDialog: (row: Student) => {
-      openConfirmDeleteDialog(row);
-    },
+    openEditDialog: (row: Student) => openConfirmEditDialog(row),
+    openConfirmDeleteDialog: (row: Student) => openConfirmDeleteDialog(row),
   },
   tableButtons,
 );
 
 const programsTableColumns = getProgramsTableColumns(
   {
-    openEditDialog: () => (isOpenEditDialog.value = true),
-    openConfirmDeleteDialog: (row: Program) => {
-      openConfirmDeleteDialog(row);
-    },
+    openEditDialog: (row: Program) => openConfirmEditDialog(row),
+    openConfirmDeleteDialog: (row: Program) => openConfirmDeleteDialog(row),
   },
   tableButtons,
 );
 
 const collegesTableColumns = getCollegesTableColumns(
   {
-    openEditDialog: () => (isOpenEditDialog.value = true),
-    openConfirmDeleteDialog: (row: College) => {
-      openConfirmDeleteDialog(row);
-    },
+    openEditDialog: (row: College) => openConfirmEditDialog(row),
+    openConfirmDeleteDialog: (row: College) => openConfirmDeleteDialog(row),
   },
   tableButtons,
 );
@@ -329,6 +337,7 @@ onMounted(() => {
     class="ml-auto hidden"
     :entity-type="props.entityType"
     :dialog-type="'edit'"
+    :selected-entity="selectedEntity"
   />
 
   <ConfirmDeleteEntityDialog

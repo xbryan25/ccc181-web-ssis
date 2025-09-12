@@ -5,7 +5,7 @@ import type { College } from "~/types";
 import { getRowItems } from "#imports";
 
 export function getCollegesTableColumns(callbacks :{
-  openEditDialog: () => void;
+  openEditDialog: (row: College) => void;
   openConfirmDeleteDialog: (row: College) => void;
  }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent }) { 
 

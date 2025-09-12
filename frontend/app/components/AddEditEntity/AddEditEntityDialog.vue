@@ -3,17 +3,17 @@ const props = defineProps<{
   entityType: string;
   dialogType: string;
   isOpen: boolean;
+  selectedEntity?: string;
 }>();
 
 const emit = defineEmits<{
-  (e: "update:isOpen", value: boolean): void;
+  (e: 'update:isOpen', value: boolean): void;
 }>();
 
 const isOpen = computed({
   get: () => props.isOpen,
   set: (val: boolean) => {
-    console.log("close dialog");
-    emit("update:isOpen", val);
+    emit('update:isOpen', val);
   },
 });
 </script>
@@ -28,26 +28,34 @@ const isOpen = computed({
     >
       <template #header>
         <h2 v-if="props.dialogType === 'add'" class="text-3xl font-semibold">
-          {{ "Add " + capitalizeWords(props.entityType).slice(0, -1) }}
+          {{ 'Add ' + capitalizeWords(props.entityType).slice(0, -1) }}
         </h2>
 
-        <h2 v-else class="text-3xl font-semibold">
-          {{ "Edit " + capitalizeWords(props.entityType).slice(0, -1) }}
-        </h2>
+        <div v-else>
+          <h2 class="text-3xl font-semibold">
+            {{ 'Edit ' + capitalizeWords(props.entityType).slice(0, -1) }}
+          </h2>
+          <h3 class="text-md font-semibold text-stone-500">
+            {{ `${capitalizeWords(props.entityType.slice(0, -1))}: ${props.selectedEntity}` }}
+          </h3>
+        </div>
       </template>
 
       <template #body>
         <AddEditEntityFormStudent
           v-if="entityType === 'students'"
           :dialog-type="props.dialogType"
+          :selected-entity="props.selectedEntity"
         />
         <AddEditEntityFormProgram
           v-if="entityType === 'programs'"
           :dialog-type="props.dialogType"
+          :selected-entity="props.selectedEntity"
         />
         <AddEditEntityFormCollege
           v-if="entityType === 'colleges'"
           :dialog-type="props.dialogType"
+          :selected-entity="props.selectedEntity"
         />
       </template>
 
@@ -72,16 +80,5 @@ const isOpen = computed({
         </div>
       </template>
     </UModal>
-
-    <!-- <Dialog v-model:visible="visible" modal class="w-[30rem]">
-      <template #header>
-        <h2 v-if="props.dialogType === 'filter'" class="text-3xl font-semibold">
-          Search Filters
-        </h2>
-
-        <h2 v-else class="text-3xl font-semibold">Sort Options</h2>
-      </template>
-      
-    </Dialog> -->
   </div>
 </template>
