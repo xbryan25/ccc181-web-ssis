@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from '@nuxt/ui';
 
-import { useEntityDetails } from '~/composables';
+import { useEntityDetails, useEditEntityDetails } from '~/composables';
 
 const props = defineProps<{
   dialogType: string;
@@ -52,13 +52,30 @@ const validate = (state: ProgramFormState): FormError[] => {
 };
 
 const toast = useToast();
+
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
-  toast.add({
-    title: 'Success',
-    description: 'The form has been submitted.',
-    color: 'success',
-  });
-  console.log(event.data);
+  const newEntity = {
+    programCode: event.data.programCode,
+    programName: event.data.programName,
+    collegeCode: event.data.collegeCode.label,
+  };
+
+  const { data: messageData, error } = await useEditEntityDetails(props.dialogType, newEntity);
+
+  if (error.value) {
+    toast.add({
+      title: 'Error',
+      description: 'Something went wrong!',
+      color: 'error',
+    });
+    return;
+  } else if (!error.value && messageData.value) {
+    toast.add({
+      title: 'Success',
+      description: messageData.value.message,
+      color: 'success',
+    });
+  }
 }
 
 const collegeCodeOptions = ref([
@@ -81,13 +98,13 @@ const collegeCodeOptions = ref([
 
 let hasCalled = false;
 
-onMounted(() => {
+onMounted(async () => {
   if (props.dialogType === 'edit') {
-    const {
-      data: programData,
-      pending,
-      error,
-    } = useEntityDetails(props.dialogType, props.selectedEntity as string);
+    const { data: programData } = await useEntityDetails(
+      props.dialogType,
+      props.selectedEntity as string,
+    );
+
     Object.assign(state, programData);
     console.log('Data loaded', state);
   }

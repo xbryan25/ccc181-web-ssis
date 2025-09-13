@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
+import type { Gender, YearLevel } from '~/types';
 
-import { useEntityDetails } from '~/composables';
+import { useEntityDetails, useEditEntityDetails } from '~/composables';
 
 const props = defineProps<{
   dialogType: string;
@@ -12,8 +13,8 @@ interface StudentFormState {
   idNumber: string;
   firstName: string;
   lastName: string;
-  yearLevel: { label: string };
-  gender: { label: string };
+  yearLevel: { label: YearLevel };
+  gender: { label: Gender };
   programCode: { label: string };
 }
 
@@ -70,13 +71,33 @@ const validate = (state: StudentFormState): FormError[] => {
 };
 
 const toast = useToast();
+
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
-  toast.add({
-    title: 'Success',
-    description: 'The form has been submitted.',
-    color: 'success',
-  });
-  console.log(event.data);
+  const newEntity = {
+    idNumber: event.data.idNumber,
+    firstName: event.data.firstName,
+    lastName: event.data.lastName,
+    yearLevel: event.data.yearLevel.label,
+    gender: event.data.gender.label,
+    programCode: event.data.programCode.label,
+  };
+
+  const { data: messageData, error } = await useEditEntityDetails(props.dialogType, newEntity);
+
+  if (error.value) {
+    toast.add({
+      title: 'Error',
+      description: 'Something went wrong!',
+      color: 'error',
+    });
+    return;
+  } else if (!error.value && messageData.value) {
+    toast.add({
+      title: 'Success',
+      description: messageData.value.message,
+      color: 'success',
+    });
+  }
 }
 
 const yearLevelOptions = ref([
@@ -145,11 +166,10 @@ let hasCalled = false;
 
 onMounted(() => {
   if (props.dialogType === 'edit') {
-    const {
-      data: studentData,
-      pending,
-      error,
-    } = useEntityDetails(props.dialogType, props.selectedEntity as string);
+    const { data: studentData } = useEntityDetails(
+      props.dialogType,
+      props.selectedEntity as string,
+    );
     Object.assign(state, studentData);
     console.log('Data loaded', state);
   }
