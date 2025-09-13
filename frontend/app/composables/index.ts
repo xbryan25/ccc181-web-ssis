@@ -1,0 +1,1 @@
+export { useEntityDetails } from "./useEntityDetails";

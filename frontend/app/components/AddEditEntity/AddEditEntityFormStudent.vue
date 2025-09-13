@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
 
+import { useEntityDetails } from '~/composables';
+
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
@@ -141,21 +143,14 @@ const programCodeOptions = ref<SelectMenuItem[]>([
 
 let hasCalled = false;
 
-const apiUrl = import.meta.env.VITE_API_URL;
-
-const getStudentDetails = () => {
-  return useFetch(`${apiUrl}/api/college/`, {
-    method: 'GET',
-    params: {
-      studentIdNumber: props.selectedEntity,
-    },
-  });
-};
-
 onMounted(() => {
   if (props.dialogType === 'edit') {
-    // const { data: collegeData, pending, error } = getStudentDetails();
-    // Object.assign(state, collegeData);
+    const {
+      data: studentData,
+      pending,
+      error,
+    } = useEntityDetails(props.dialogType, props.selectedEntity as string);
+    Object.assign(state, studentData);
     console.log('Data loaded', state);
   }
 
