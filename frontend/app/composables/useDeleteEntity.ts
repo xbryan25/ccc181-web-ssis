@@ -6,7 +6,7 @@ type DeleteEntityResponse = {
 export function useDeleteEntity(entityType: string, entityId: string){
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  return useFetch<DeleteEntityResponse>(`${apiUrl}/api/${entityType.slice(0, -1)}`, {
+  return useFetch<DeleteEntityResponse>(`${apiUrl}/api/${entityType}`, {
     method: 'DELETE',
     body: {
       entityId

@@ -10,6 +10,11 @@ import {
 
 const props = defineProps<{
   entityType: string;
+  searchValue: string;
+  searchBy: string;
+  searchType: string;
+  sortField: string;
+  sortOrder: string;
 }>();
 
 const isOpenEditDialog = ref(false);
@@ -18,8 +23,6 @@ const selectedEntity = ref('');
 
 const openConfirmDeleteDialog = (row: Student | Program | College) => {
   isOpenConfirmDeleteDialog.value = true;
-
-  console.log(`rowwwwwwwwwwwwwwwwwwwwDD ${(row as College).collegeCode}`);
 
   if (props.entityType === 'students') {
     selectedEntity.value = (row as Student).idNumber;
@@ -283,6 +286,8 @@ const collegeData = ref<College[]>([
   },
 ]);
 
+const entitiesData = ref<Student[] | Program[] | College[]>([]);
+
 const UButton = resolveComponent('UButton') as DefineComponent;
 const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
 
@@ -312,13 +317,33 @@ const collegesTableColumns = getCollegesTableColumns(
   tableButtons,
 );
 
-const page = ref(5);
+const loadEntities = () => {
+  const options = {
+    rowsPerPage: rowsPerPage.value,
+    pageNumber: pageNumber.value,
+    searchValue: props.searchValue,
+    searchBy: props.searchBy,
+    searchType: props.searchType,
+    sortField: props.sortField,
+    sortOrder: props.sortOrder,
+  };
+
+  // const { data, error } = useEntities(props.entityType, options);
+
+  // if (data.value) {
+  //   entitiesData.value = data.value.entities;
+  // }
+
+  console.log(options);
+};
+
+const pageNumber = ref(5);
 const reservedHeight = 300;
 const rowsPerPage = ref(5);
 
 const calculateRows = () => {
   const row = document.querySelector('table tbody tr');
-  const rowHeight = row ? row.clientHeight + 1 : 64;
+  const rowHeight = row?.clientHeight ? row?.clientHeight + 1 : 64;
 
   const availableHeight = window.innerHeight - reservedHeight;
 
@@ -327,7 +352,28 @@ const calculateRows = () => {
 
 onMounted(() => {
   calculateRows();
+
+  watch(
+    [
+      () => rowsPerPage.value,
+      () => pageNumber.value,
+      () => props.searchValue,
+      () => props.searchBy,
+      () => props.searchType,
+      () => props.sortField,
+      () => props.sortOrder,
+    ],
+    () => {
+      loadEntities();
+    },
+    { immediate: true },
+  );
+
   window.addEventListener('resize', calculateRows);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', calculateRows);
 });
 </script>
 
@@ -378,6 +424,6 @@ onMounted(() => {
   />
 
   <div class="flex justify-center">
-    <UPagination v-model:page="page" show-edges size="xl" :sibling-count="1" :total="100" />
+    <UPagination v-model:page="pageNumber" show-edges size="xl" :sibling-count="1" :total="100" />
   </div>
 </template>

@@ -13,12 +13,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (
-    e:
-      | "update:searchBy"
-      | "update:searchType"
-      | "update:sortField"
-      | "update:sortOrder",
-    value: string
+    e: 'update:searchBy' | 'update:searchType' | 'update:sortField' | 'update:sortOrder',
+    value: string,
   ): void;
 }>();
 
@@ -28,14 +24,14 @@ const selectedOption = computed({
 });
 
 const determineValueToGet = () => {
-  if (props.dialogType === "filter") {
-    if (props.columnPosition === "first") {
+  if (props.dialogType === 'filter') {
+    if (props.columnPosition === 'first') {
       return props.searchAndSortState.searchBy;
     } else {
       return props.searchAndSortState.searchType;
     }
   } else {
-    if (props.columnPosition === "first") {
+    if (props.columnPosition === 'first') {
       return props.searchAndSortState.sortField;
     } else {
       return props.searchAndSortState.sortOrder;
@@ -44,24 +40,23 @@ const determineValueToGet = () => {
 };
 
 const determineEmitToReturn = (value: string) => {
-  if (props.dialogType === "filter") {
-    if (props.columnPosition === "first") {
-      emit("update:searchBy", value);
+  if (props.dialogType === 'filter') {
+    if (props.columnPosition === 'first') {
+      emit('update:searchBy', value);
     } else {
-      emit("update:searchType", value);
+      emit('update:searchType', value);
     }
   } else {
-    if (props.columnPosition === "first") {
-      emit("update:sortField", value);
+    if (props.columnPosition === 'first') {
+      emit('update:sortField', value);
     } else {
-      emit("update:sortOrder", value);
+      emit('update:sortOrder', value);
     }
   }
 };
 
 const handleClick = (option: string) => {
   selectedOption.value = option;
-  console.log(props.searchAndSortState);
 };
 </script>
 
@@ -72,9 +67,7 @@ const handleClick = (option: string) => {
       :key="index"
       :class="[
         'w-full h-10 rounded-lg transition-colors duration-100',
-        selectedOption === option
-          ? 'bg-zinc-700 text-white'
-          : 'text-white hover:bg-zinc-700',
+        selectedOption === option ? 'bg-zinc-700 text-white' : 'text-white hover:bg-zinc-700',
       ]"
       @click="handleClick(option)"
     >
