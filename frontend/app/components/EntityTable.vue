@@ -17,6 +17,9 @@ const props = defineProps<{
   sortOrder: string;
 }>();
 
+const router = useRouter();
+const route = useRoute();
+
 const isOpenEditDialog = ref(false);
 const isOpenConfirmDeleteDialog = ref(false);
 const selectedEntity = ref('');
@@ -317,6 +320,28 @@ const collegesTableColumns = getCollegesTableColumns(
   tableButtons,
 );
 
+const updateUrl = () => {
+  // Copy existing query, but remove search keys if empty
+  const newQuery = { ...route.query };
+
+  if (props.searchValue === '') {
+    delete newQuery.search;
+    delete newQuery.searchBy;
+    delete newQuery.searchType;
+  } else {
+    newQuery.search = props.searchValue;
+    newQuery.searchBy = props.searchBy;
+    newQuery.searchType = props.searchType;
+  }
+
+  newQuery.page = String(pageNumber.value);
+  newQuery.rows = String(rowsPerPage.value);
+  newQuery.sortField = props.sortField;
+  newQuery.sortOrder = props.sortOrder;
+
+  return newQuery;
+};
+
 const loadEntities = () => {
   const options = {
     rowsPerPage: rowsPerPage.value,
@@ -328,11 +353,11 @@ const loadEntities = () => {
     sortOrder: props.sortOrder,
   };
 
-  // const { data, error } = useEntities(props.entityType, options);
+  const { data, error } = useEntities(props.entityType, options);
 
-  // if (data.value) {
-  //   entitiesData.value = data.value.entities;
-  // }
+  if (data.value) {
+    entitiesData.value = data.value.entities;
+  }
 
   console.log(options);
 };
@@ -364,6 +389,10 @@ onMounted(() => {
       () => props.sortOrder,
     ],
     () => {
+      router.replace({
+        query: updateUrl(),
+      });
+
       loadEntities();
     },
     { immediate: true },
