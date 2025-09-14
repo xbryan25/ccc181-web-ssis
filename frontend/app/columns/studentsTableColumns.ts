@@ -5,7 +5,7 @@ import { getRowItems } from "#imports";
 
 
 export function getStudentsTableColumns(callbacks :{
-  openEditDialog: () => void;
+  openEditDialog: (row: Student) => void;
   openConfirmDeleteDialog: (row: Student) => void;
  }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent }) { 
 

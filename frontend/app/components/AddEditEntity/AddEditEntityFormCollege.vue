@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { FormError, FormSubmitEvent } from "@nuxt/ui";
+import type { FormError, FormSubmitEvent } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
+  selectedEntity?: string;
 }>();
 
 interface CollegeFormState {
@@ -11,8 +12,8 @@ interface CollegeFormState {
 }
 
 const state = reactive<CollegeFormState>({
-  collegeCode: "",
-  collegeName: "",
+  collegeCode: '',
+  collegeName: '',
 });
 
 const collegeCodeRegex = /^[A-Z-]+$/;
@@ -25,20 +26,20 @@ const validate = (state: CollegeFormState): FormError[] => {
 
   const errors = [];
   if (!state.collegeCode) {
-    errors.push({ name: "collegeCode", message: "Required." });
+    errors.push({ name: 'collegeCode', message: 'Required.' });
   } else if (state.collegeCode && !collegeCodeRegex.test(state.collegeCode)) {
     errors.push({
-      name: "collegeCode",
-      message: "Uppercase letters & dashes only.",
+      name: 'collegeCode',
+      message: 'Uppercase letters & dashes only.',
     });
   }
 
   if (!state.collegeName) {
-    errors.push({ name: "collegeName", message: "Required." });
+    errors.push({ name: 'collegeName', message: 'Required.' });
   } else if (state.collegeName && !collegeNameRegex.test(state.collegeName)) {
     errors.push({
-      name: "collegeName",
-      message: "Letters, spaces, and dashes only.",
+      name: 'collegeName',
+      message: 'Letters, spaces, and dashes only.',
     });
   }
 
@@ -46,35 +47,45 @@ const validate = (state: CollegeFormState): FormError[] => {
 };
 
 const toast = useToast();
+
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
-  toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
-  });
-  console.log(event.data);
+  const newEntity = {
+    collegeCode: event.data.collegeCode,
+    collegeName: event.data.collegeName,
+  };
+
+  const fn = props.dialogType === 'add' ? useCreateEntity : useEditEntityDetails;
+
+  const { data: messageData, error } = await fn(props.dialogType, newEntity);
+
+  if (error.value) {
+    toast.add({
+      title: 'Error',
+      description: 'Something went wrong!',
+      color: 'error',
+    });
+    return;
+  } else if (!error.value && messageData.value) {
+    toast.add({
+      title: 'Success',
+      description: messageData.value.message,
+      color: 'success',
+    });
+  }
 }
 
 let hasCalled = false;
 let isMounted = false;
 
-// Simulate API GET
-function fetchCollege() {
-  return new Promise<CollegeFormState>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        collegeCode: "CCS",
-        collegeName: "College of Computer Studies",
-      });
-    }, 100); // simulate 1 second delay
-  });
-}
+onMounted(() => {
+  if (props.dialogType === 'edit') {
+    const { data: collegeData } = useEntityDetails(
+      props.dialogType,
+      props.selectedEntity as string,
+    );
 
-onMounted(async () => {
-  if (props.dialogType === "edit") {
-    const data = await fetchCollege();
-    Object.assign(state, data);
-    console.log("Data loaded", state);
+    Object.assign(state, collegeData);
+    console.log('Data loaded', state);
   }
 
   hasCalled = true;
@@ -83,12 +94,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UForm
-    :validate="validate"
-    :state="state"
-    class="flex flex-col space-y-4"
-    @submit="onSubmit"
-  >
+  <UForm :validate="validate" :state="state" class="flex flex-col space-y-4" @submit="onSubmit">
     <UFormField label="College Code" name="collegeCode" class="flex-1">
       <UInput v-model="state.collegeCode" class="w-full" />
     </UFormField>

@@ -5,7 +5,7 @@ import type { Program } from "~/types";
 import { getRowItems } from "#imports";
 
 export function getProgramsTableColumns(callbacks :{
-  openEditDialog: () => void;
+  openEditDialog: (row: Program) => void;
   openConfirmDeleteDialog: (row: Program) => void;
  }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent }) { 
 

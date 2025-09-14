@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import type { FormError, FormSubmitEvent } from "@nuxt/ui";
+import type { FormError, FormSubmitEvent } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
+  selectedEntity?: string;
 }>();
 
 interface ProgramFormState {
@@ -12,10 +13,10 @@ interface ProgramFormState {
 }
 
 const state = reactive<ProgramFormState>({
-  programCode: "",
-  programName: "",
+  programCode: '',
+  programName: '',
   collegeCode: {
-    label: "CCS",
+    label: 'CCS',
   },
 });
 
@@ -27,21 +28,21 @@ const validate = (state: ProgramFormState): FormError[] => {
 
   const errors = [];
   if (!state.programCode) {
-    errors.push({ name: "programCode", message: "Required." });
+    errors.push({ name: 'programCode', message: 'Required.' });
   } else if (state.programCode && !programCodeRegex.test(state.programCode)) {
     errors.push({
-      name: "programCode",
-      message: "Uppercase letters & dashes only.",
+      name: 'programCode',
+      message: 'Uppercase letters & dashes only.',
     });
   }
 
   if (!state.programName) {
-    errors.push({ name: "programName", message: "Required." });
+    errors.push({ name: 'programName', message: 'Required.' });
   } else if (state.programName && !programNameRegex.test(state.programName)) {
-    console.log("reach here");
+    console.log('reach here');
     errors.push({
-      name: "programName",
-      message: "Letters, spaces, and dashes only.",
+      name: 'programName',
+      message: 'Letters, spaces, and dashes only.',
     });
   }
 
@@ -49,53 +50,63 @@ const validate = (state: ProgramFormState): FormError[] => {
 };
 
 const toast = useToast();
+
 async function onSubmit(event: FormSubmitEvent<typeof state>) {
-  toast.add({
-    title: "Success",
-    description: "The form has been submitted.",
-    color: "success",
-  });
-  console.log(event.data);
+  const newEntity = {
+    programCode: event.data.programCode,
+    programName: event.data.programName,
+    collegeCode: event.data.collegeCode.label,
+  };
+
+  const fn = props.dialogType === 'add' ? useCreateEntity : useEditEntityDetails;
+
+  const { data: messageData, error } = await fn(props.dialogType, newEntity);
+
+  if (error.value) {
+    toast.add({
+      title: 'Error',
+      description: 'Something went wrong!',
+      color: 'error',
+    });
+    return;
+  } else if (!error.value && messageData.value) {
+    toast.add({
+      title: 'Success',
+      description: messageData.value.message,
+      color: 'success',
+    });
+  }
 }
 
 const collegeCodeOptions = ref([
   {
-    label: "CCS",
+    label: 'CCS',
   },
   {
-    label: "COE",
+    label: 'COE',
   },
   {
-    label: "CHS",
+    label: 'CHS',
   },
   {
-    label: "CEBA",
+    label: 'CEBA',
   },
   {
-    label: "CSM",
+    label: 'CSM',
   },
 ]);
 
 let hasCalled = false;
 
-// Simulate API GET
-function fetchProgram() {
-  return new Promise<ProgramFormState>((resolve) => {
-    setTimeout(() => {
-      resolve({
-        programCode: "BSCS",
-        programName: "Bachelor of Science in Computer Science",
-        collegeCode: { label: "CCS" },
-      });
-    }, 100); // simulate 1 second delay
-  });
-}
-
 onMounted(async () => {
-  if (props.dialogType === "edit") {
-    const data = await fetchProgram();
-    Object.assign(state, data);
-    console.log("Data loaded", state);
+  if (props.dialogType === 'edit') {
+    const { data: programData } = await useEntityDetails(
+      props.dialogType,
+      props.selectedEntity as string,
+    );
+
+    Object.assign(state, programData);
+    console.log('Data loaded', state);
   }
 
   hasCalled = true;
@@ -103,12 +114,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UForm
-    :validate="validate"
-    :state="state"
-    class="flex flex-col space-y-4"
-    @submit="onSubmit"
-  >
+  <UForm :validate="validate" :state="state" class="flex flex-col space-y-4" @submit="onSubmit">
     <UFormField label="Program Code" name="programCode" class="flex-1">
       <UInput v-model="state.programCode" class="w-full" />
     </UFormField>
@@ -118,11 +124,7 @@ onMounted(async () => {
     </UFormField>
 
     <UFormField label="College Code" name="collegeCode" class="flex-1">
-      <USelectMenu
-        v-model="state.collegeCode"
-        :items="collegeCodeOptions"
-        class="w-full"
-      />
+      <USelectMenu v-model="state.collegeCode" :items="collegeCodeOptions" class="w-full" />
     </UFormField>
   </UForm>
 </template>

@@ -10,14 +10,14 @@ export interface RowItem {
 export function getRowItems<T extends Student | Program | College>(
   row: Row<T>,
   callbacks: {
-    openEditDialog: () => void;
+    openEditDialog: (row: T) => void;
     openConfirmDeleteDialog: (row: T) => void;
   }
 ) {
   return [
     { type: "label", label: "Actions" },
     { type: "separator" },
-    { label: "Edit", onSelect: callbacks.openEditDialog },
+    { label: "Edit", onSelect: () => callbacks.openEditDialog(row.original) },
     { label: "Delete", onSelect: () => callbacks.openConfirmDeleteDialog(row.original) },
   ];
 }
