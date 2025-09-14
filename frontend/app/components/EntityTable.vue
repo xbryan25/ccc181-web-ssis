@@ -24,6 +24,24 @@ const isOpenEditDialog = ref(false);
 const isOpenConfirmDeleteDialog = ref(false);
 const selectedEntity = ref('');
 
+const internalSearchValue = ref(props.searchValue);
+const internalSearchBy = ref(props.searchBy);
+const internalSearchType = ref(props.searchType);
+const internalSortField = ref(props.sortField);
+const internalSortOrder = ref(props.sortOrder);
+
+const emit = defineEmits<{
+  (
+    e:
+      | 'update:searchValue'
+      | 'update:searchBy'
+      | 'update:searchType'
+      | 'update:sortField'
+      | 'update:sortOrder',
+    value: string,
+  ): void;
+}>();
+
 const openConfirmDeleteDialog = (row: Student | Program | College) => {
   isOpenConfirmDeleteDialog.value = true;
 
@@ -321,23 +339,17 @@ const collegesTableColumns = getCollegesTableColumns(
 );
 
 const updateUrl = () => {
-  // Copy existing query, but remove search keys if empty
-  const newQuery = { ...route.query };
-
-  if (props.searchValue === '') {
-    delete newQuery.search;
-    delete newQuery.searchBy;
-    delete newQuery.searchType;
-  } else {
-    newQuery.search = props.searchValue;
-    newQuery.searchBy = props.searchBy;
-    newQuery.searchType = props.searchType;
-  }
+  const newQuery: Record<string, string> = {};
 
   newQuery.page = String(pageNumber.value);
-  newQuery.rows = String(rowsPerPage.value);
-  newQuery.sortField = props.sortField;
-  newQuery.sortOrder = props.sortOrder;
+  newQuery.sortField = internalSortField.value;
+  newQuery.sortOrder = internalSortOrder.value;
+
+  if (internalSearchValue.value !== '') {
+    newQuery.search = internalSearchValue.value;
+    newQuery.searchBy = internalSearchBy.value;
+    newQuery.searchType = internalSearchType.value;
+  }
 
   return newQuery;
 };
@@ -353,18 +365,18 @@ const loadEntities = () => {
     sortOrder: props.sortOrder,
   };
 
-  const { data, error } = useEntities(props.entityType, options);
+  // const { data, error } = useEntities(props.entityType, options);
 
-  if (data.value) {
-    entitiesData.value = data.value.entities;
-  }
+  // if (data.value) {
+  //   entitiesData.value = data.value.entities;
+  // }
 
   console.log(options);
 };
 
-const pageNumber = ref(5);
+const pageNumber = ref(1);
 const reservedHeight = 300;
-const rowsPerPage = ref(5);
+const rowsPerPage = ref(0);
 
 const calculateRows = () => {
   const row = document.querySelector('table tbody tr');
@@ -375,18 +387,82 @@ const calculateRows = () => {
   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
 };
 
+// This watch function emits changes to [entity.vue]
+
+watch(
+  [internalSearchValue, internalSearchBy, internalSearchType, internalSortField, internalSortOrder],
+  ([newSearchValue, newSearchBy, newSearchType, newSortField, newSortOrder]) => {
+    emit('update:searchValue', newSearchValue);
+    emit('update:searchBy', newSearchBy);
+    emit('update:searchType', newSearchType);
+    emit('update:sortField', newSortField);
+    emit('update:sortOrder', newSortOrder);
+  },
+);
+
+// These watches 'watch' any changes from [entity].vue
+
+watch(
+  () => props.searchValue,
+  (newValue) => {
+    internalSearchValue.value = newValue;
+    emit('update:searchValue', newValue);
+  },
+);
+
+watch(
+  () => props.searchBy,
+  (newValue) => {
+    internalSearchBy.value = newValue;
+    emit('update:searchBy', newValue);
+  },
+);
+
+watch(
+  () => props.searchType,
+  (newValue) => {
+    internalSearchType.value = newValue;
+    emit('update:searchType', newValue);
+  },
+);
+
+watch(
+  () => props.sortField,
+  (newValue) => {
+    console.log(`YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO`);
+    internalSortField.value = newValue;
+    emit('update:sortField', newValue);
+  },
+);
+
+watch(
+  () => props.sortOrder,
+  (newValue) => {
+    internalSortOrder.value = newValue;
+    emit('update:sortOrder', newValue);
+  },
+);
+
 onMounted(() => {
+  pageNumber.value = Number(route.query.page) || pageNumber.value;
+
+  internalSearchValue.value = String(route.query.search || internalSearchValue.value);
+  internalSearchBy.value = String(route.query.searchBy || internalSearchBy.value);
+  internalSearchType.value = String(route.query.searchType || internalSearchType.value);
+  internalSortField.value = String(route.query.sortField || internalSortField.value);
+  internalSortOrder.value = String(route.query.sortOrder || internalSortOrder.value);
+
   calculateRows();
 
+  // This watch function 'watches' any changes in table filters and pagination, doesn't include parent changes
   watch(
     [
-      () => rowsPerPage.value,
       () => pageNumber.value,
-      () => props.searchValue,
-      () => props.searchBy,
-      () => props.searchType,
-      () => props.sortField,
-      () => props.sortOrder,
+      () => internalSearchValue.value,
+      () => internalSearchBy.value,
+      () => internalSearchType.value,
+      () => internalSortField.value,
+      () => internalSortOrder.value,
     ],
     () => {
       router.replace({

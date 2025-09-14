@@ -55,6 +55,11 @@ const searchAndSortState = reactive({
       :search-type="searchAndSortState.searchType"
       :sort-field="searchAndSortState.sortField"
       :sort-order="searchAndSortState.sortOrder"
+      @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
+      @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
+      @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
+      @update:sort-field="(value: string) => (searchAndSortState.sortField = value)"
+      @update:sort-order="(value: string) => (searchAndSortState.sortOrder = value)"
     />
   </div>
 </template>
