@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import type { FormError, FormSubmitEvent } from '@nuxt/ui';
+import type { FormSubmitEvent } from '@nuxt/ui';
+
+import { validateForm } from '#imports';
 
 const props = defineProps<{
   dialogType: string;
@@ -19,35 +21,6 @@ const state = reactive<ProgramFormState>({
     label: 'CCS',
   },
 });
-
-const programCodeRegex = /^[A-Z-]+$/;
-const programNameRegex = /^[A-Za-z- ]+$/;
-
-const validate = (state: ProgramFormState): FormError[] => {
-  if (!hasCalled) return [];
-
-  const errors = [];
-  if (!state.programCode) {
-    errors.push({ name: 'programCode', message: 'Required.' });
-  } else if (state.programCode && !programCodeRegex.test(state.programCode)) {
-    errors.push({
-      name: 'programCode',
-      message: 'Uppercase letters & dashes only.',
-    });
-  }
-
-  if (!state.programName) {
-    errors.push({ name: 'programName', message: 'Required.' });
-  } else if (state.programName && !programNameRegex.test(state.programName)) {
-    console.log('reach here');
-    errors.push({
-      name: 'programName',
-      message: 'Letters, spaces, and dashes only.',
-    });
-  }
-
-  return errors;
-};
 
 const toast = useToast();
 
@@ -114,7 +87,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <UForm :validate="validate" :state="state" class="flex flex-col space-y-4" @submit="onSubmit">
+  <UForm
+    :validate="(state) => validateForm(state, 'program', hasCalled)"
+    :state="state"
+    class="flex flex-col space-y-4"
+    @submit="onSubmit"
+  >
     <UFormField label="Program Code" name="programCode" class="flex-1">
       <UInput v-model="state.programCode" class="w-full" />
     </UFormField>
