@@ -374,9 +374,15 @@ const loadEntities = () => {
   console.log(options);
 };
 
+const totalPages = ref(1);
 const pageNumber = ref(1);
 const reservedHeight = 300;
 const rowsPerPage = ref(0);
+
+const updatePagination = () => {
+  calculateRows();
+  getMaxPages();
+};
 
 const calculateRows = () => {
   const row = document.querySelector('table tbody tr');
@@ -385,6 +391,28 @@ const calculateRows = () => {
   const availableHeight = window.innerHeight - reservedHeight;
 
   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
+};
+
+const getMaxPages = () => {
+  const options = {
+    searchValue: props.searchValue,
+    searchBy: props.searchBy,
+    searchType: props.searchType,
+  };
+
+  totalPages.value = 5;
+
+  // const { data, error } = useEntitiesCount(props.entityType, options);
+
+  // if (!error.value && data.value) {
+  //   totalPages.value = Math.ceil(data.value.entitiesCount / rowsPerPage.value)
+  // }
+
+  if (pageNumber.value > totalPages.value) {
+    pageNumber.value = totalPages.value;
+  } else if (pageNumber.value < 1) {
+    pageNumber.value = 1;
+  }
 };
 
 // This watch function emits changes to [entity.vue]
@@ -429,7 +457,6 @@ watch(
 watch(
   () => props.sortField,
   (newValue) => {
-    console.log(`YOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO`);
     internalSortField.value = newValue;
     emit('update:sortField', newValue);
   },
@@ -452,7 +479,7 @@ onMounted(() => {
   internalSortField.value = String(route.query.sortField || internalSortField.value);
   internalSortOrder.value = String(route.query.sortOrder || internalSortOrder.value);
 
-  calculateRows();
+  updatePagination();
 
   // This watch function 'watches' any changes in table filters and pagination, doesn't include parent changes
   watch(
@@ -474,11 +501,11 @@ onMounted(() => {
     { immediate: true },
   );
 
-  window.addEventListener('resize', calculateRows);
+  window.addEventListener('resize', updatePagination);
 });
 
 onBeforeUnmount(() => {
-  window.removeEventListener('resize', calculateRows);
+  window.removeEventListener('resize', updatePagination);
 });
 </script>
 
@@ -529,6 +556,13 @@ onBeforeUnmount(() => {
   />
 
   <div class="flex justify-center">
-    <UPagination v-model:page="pageNumber" show-edges size="xl" :sibling-count="1" :total="100" />
+    <UPagination
+      v-model:page="pageNumber"
+      :items-per-page="rowsPerPage"
+      show-edges
+      size="xl"
+      :sibling-count="1"
+      :total="30"
+    />
   </div>
 </template>
