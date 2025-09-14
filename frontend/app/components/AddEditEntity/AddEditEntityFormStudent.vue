@@ -1,20 +1,13 @@
 <script setup lang="ts">
-import type { FormError, FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
-import type { Gender, YearLevel } from '~/types';
+import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
+import type { StudentFormState } from '~/types';
+
+import { validateForm } from '#imports';
 
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
 }>();
-
-interface StudentFormState {
-  idNumber: string;
-  firstName: string;
-  lastName: string;
-  yearLevel: { label: YearLevel };
-  gender: { label: Gender };
-  programCode: { label: string };
-}
 
 const state = reactive<StudentFormState>({
   idNumber: '',
@@ -30,43 +23,6 @@ const state = reactive<StudentFormState>({
     label: 'BSCS',
   },
 });
-
-const idNumberRegex = /^\d{4}-\d{4}$/;
-const nameRegex = /^[A-Za-z- ]+$/;
-
-const validate = (state: StudentFormState): FormError[] => {
-  if (!hasCalled) return [];
-
-  const errors = [];
-  if (!state.idNumber) {
-    errors.push({ name: 'idNumber', message: 'Required.' });
-  } else if (state.idNumber && !idNumberRegex.test(state.idNumber)) {
-    errors.push({
-      name: 'idNumber',
-      message: 'ID number format is XXXX-XXXX.',
-    });
-  }
-
-  if (!state.firstName) {
-    errors.push({ name: 'firstName', message: 'Required.' });
-  } else if (state.firstName && !nameRegex.test(state.firstName)) {
-    errors.push({
-      name: 'firstName',
-      message: 'Letters, spaces, and dashes only.',
-    });
-  }
-
-  if (!state.lastName) {
-    errors.push({ name: 'lastName', message: 'Required.' });
-  } else if (state.lastName && !nameRegex.test(state.lastName)) {
-    errors.push({
-      name: 'lastName',
-      message: 'Letters, spaces, and dashes only.',
-    });
-  }
-
-  return errors;
-};
 
 const toast = useToast();
 
@@ -179,7 +135,12 @@ onMounted(() => {
 </script>
 
 <template>
-  <UForm :validate="validate" :state="state" class="flex flex-col space-y-4" @submit="onSubmit">
+  <UForm
+    :validate="(state) => validateForm(state, 'student', hasCalled)"
+    :state="state"
+    class="flex flex-col space-y-4"
+    @submit="onSubmit"
+  >
     <div class="flex gap-4 w-full">
       <UFormField label="ID Number" name="idNumber" class="flex-1">
         <UInput v-model="state.idNumber" />
