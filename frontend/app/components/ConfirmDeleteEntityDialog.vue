@@ -6,16 +6,42 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update:isOpen", value: boolean): void;
+  (e: 'update:isOpen', value: boolean): void;
 }>();
 
 const isOpen = computed({
   get: () => props.isOpen,
   set: (val: boolean) => {
-    console.log("close dialog");
-    emit("update:isOpen", val);
+    console.log('close dialog');
+    emit('update:isOpen', val);
   },
 });
+
+const toast = useToast();
+
+async function onSubmit() {
+  isOpen.value = false;
+
+  const { data: messageData, error } = await useDeleteEntity(
+    props.entityType,
+    props.selectedEntity,
+  );
+
+  if (error.value) {
+    toast.add({
+      title: 'Error',
+      description: 'Something went wrong!',
+      color: 'error',
+    });
+    return;
+  } else if (!error.value && messageData.value) {
+    toast.add({
+      title: 'Success',
+      description: messageData.value.message,
+      color: 'success',
+    });
+  }
+}
 </script>
 
 <template>
@@ -30,9 +56,7 @@ const isOpen = computed({
         <div class="flex flex-col">
           <h2 class="text-3xl font-semibold">Confirm delete</h2>
           <h3 class="text-md font-semibold text-stone-500">
-            {{
-              `${capitalizeWords(props.entityType.slice(0, -1))}: ${props.selectedEntity}`
-            }}
+            {{ `${capitalizeWords(props.entityType.slice(0, -1))}: ${props.selectedEntity}` }}
           </h3>
         </div>
       </template>
@@ -45,9 +69,7 @@ const isOpen = computed({
           />
           <div>
             <p>
-              {{
-                `Are you sure you want to delete this ${props.entityType.slice(0, -1)}?`
-              }}
+              {{ `Are you sure you want to delete this ${props.entityType.slice(0, -1)}?` }}
             </p>
           </div>
         </div>
@@ -68,7 +90,7 @@ const isOpen = computed({
             color="primary"
             variant="solid"
             class="cursor-pointer"
-            @click="isOpen = false"
+            @click="onSubmit"
             >Proceed</UButton
           >
         </div>

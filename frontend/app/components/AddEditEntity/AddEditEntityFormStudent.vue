@@ -2,8 +2,6 @@
 import type { FormError, FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
 import type { Gender, YearLevel } from '~/types';
 
-import { useEntityDetails, useEditEntityDetails } from '~/composables';
-
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
@@ -82,7 +80,9 @@ async function onSubmit(event: FormSubmitEvent<typeof state>) {
     programCode: event.data.programCode.label,
   };
 
-  const { data: messageData, error } = await useEditEntityDetails(props.dialogType, newEntity);
+  const fn = props.dialogType === 'add' ? useCreateEntity : useEditEntityDetails;
+
+  const { data: messageData, error } = await fn(props.dialogType, newEntity);
 
   if (error.value) {
     toast.add({
