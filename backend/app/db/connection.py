@@ -43,7 +43,7 @@ class Database:
     def fetch_one(self, query, params=None):
         """For SELECT queries returning a single row."""
         try:
-            with self.conn.cursor(cursor_factory=RealDictCursor) as cur:
+            with self.conn.cursor(row_factory=psycopg.rows.dict_row) as cur:
                 cur.execute(query, params)
                 return cur.fetchone()
         except Exception as e:
