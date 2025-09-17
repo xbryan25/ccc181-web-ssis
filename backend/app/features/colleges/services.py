@@ -1,10 +1,15 @@
 from .repository import CollegeRepository
 
+from app.features.common.dataclasses import College
+
 class CollegeServices:
 
     @staticmethod
     def get_college_details_service(college_code: str):
-        return CollegeRepository.get_college_by_college_code(college_code)
+
+        row = CollegeRepository.get_college_by_college_code(college_code)
+
+        return College(**row)
     
     @staticmethod
     def get_total_college_count_service():
