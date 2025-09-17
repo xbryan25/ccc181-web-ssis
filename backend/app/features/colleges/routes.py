@@ -3,7 +3,7 @@ from .controllers import CollegeController
 
 college_bp = Blueprint("college_bp", __name__)
 
-@college_bp.route("/<str:college_code>", methods=["GET"])
+@college_bp.route("/<string:college_code>", methods=["GET"])
 def get_college_details(college_code: str):
     return CollegeController.get_college_details_controller(college_code)
 
@@ -19,10 +19,10 @@ def get_many_colleges():
 def create_college():
     return CollegeController.create_college_controller()
 
-@college_bp.route("/<str:college_code>", methods=["DELETE"])
+@college_bp.route("/<string:college_code>", methods=["DELETE"])
 def delete_college(college_code: str):
     return CollegeController.delete_college_controller(college_code)
 
-@college_bp.route("/<str:college_code>", methods=["PUT"])
+@college_bp.route("/<string:college_code>", methods=["PUT"])
 def edit_college_details(college_code: str):
     return CollegeController.delete_college_controller(college_code)
