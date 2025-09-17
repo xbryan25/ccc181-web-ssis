@@ -25,4 +25,4 @@ def delete_student(id_number: str):
 
 @student_bp.route("/<str:id_number>", methods=["PUT"])
 def edit_student_details(id_number: str):
-    return StudentController.delete_student_controller()
+    return StudentController.delete_student_controller(id_number)
