@@ -25,4 +25,4 @@ def delete_program(program_code: str):
 
 @program_bp.route("/<string:program_code>", methods=["PUT"])
 def edit_program_details(program_code: str):
-    return ProgramController.delete_program_controller(program_code)
+    return ProgramController.edit_program_details_controller(program_code)

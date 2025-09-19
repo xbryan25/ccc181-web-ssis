@@ -18,18 +18,18 @@ class CollegeController:
             return jsonify({"result": asdict(college_details)}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
     
     @staticmethod
     def get_total_college_count_controller():
         try:
-            total_college_count: int = CollegeServices.get_total_college_count_service()
+            total_college_count_dict = CollegeServices.get_total_college_count_service()
 
-            return jsonify({"totalCount": total_college_count}), 200
+            return jsonify({"totalCount": total_college_count_dict["count"]}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
@@ -63,7 +63,7 @@ class CollegeController:
             return jsonify({"message": "College added successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
@@ -74,7 +74,7 @@ class CollegeController:
             return jsonify({"message": "College deleted successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
 
@@ -89,5 +89,5 @@ class CollegeController:
             return jsonify({"message": "College edited successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500

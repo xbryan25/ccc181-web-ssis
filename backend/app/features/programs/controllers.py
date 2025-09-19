@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from dataclasses import asdict
 
+import traceback
+
 from .services import ProgramServices
 
 from ..common.dataclasses import Program
@@ -16,29 +18,29 @@ class ProgramController:
             return jsonify({"result": asdict(program_details)}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
     
     @staticmethod
     def get_total_program_count_controller():
         try:
-            total_program_count: int = ProgramServices.get_total_program_count_service()
+            total_program_count_dict = ProgramServices.get_total_program_count_service()
 
-            return jsonify({"totalCount": total_program_count}), 200
+            return jsonify({"totalCount": total_program_count_dict["count"]}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
     def get_many_programs_controller():
         params = {
-            "rows_per_page": request.args.get("rowsPerPage"),
-            "page_number": request.args.get("pageNumber"),
+            "rows_per_page": int(request.args.get("rowsPerPage")),
+            "page_number": int(request.args.get("pageNumber")),
             "search_value": request.args.get("searchValue"),
             "search_by": request.args.get("searchBy"),
             "search_type": request.args.get("searchType"),
-            "search_value": request.args.get("sortField"),
+            "sort_field": request.args.get("sortField"),
             "sort_order":request.args.get("sortOrder")
         }
 
@@ -48,7 +50,7 @@ class ProgramController:
             return jsonify({"entities": [asdict(program_details) for program_details in programs]}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
@@ -61,7 +63,7 @@ class ProgramController:
             return jsonify({"message": "Program added successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
@@ -72,7 +74,7 @@ class ProgramController:
             return jsonify({"message": "Program deleted successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
 
@@ -84,8 +86,8 @@ class ProgramController:
         try:
             ProgramServices.edit_program_details_service(program_code, new_program_data)
 
-            return jsonify({"message": "program edited successfully."}), 200
+            return jsonify({"message": "Program edited successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
