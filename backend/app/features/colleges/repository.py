@@ -53,9 +53,11 @@ class CollegeRepository:
     def delete_college(college_code: str):
         db = current_app.extensions['db']
 
-        return db.execute_query(CommonQueries.DELETE_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
+        db.execute_query(CommonQueries.DELETE_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
 
     def edit_college_details(college_code: str, new_college_data):
         db = current_app.extensions['db']
 
-        db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="colleges", set_clause="college_code = %s, college_name = %s", pk="college_code"), (new_college_data["collegeCode"], new_college_data["collegeName"], college_code))   
+        db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="colleges", 
+                                                           set_clause="college_code = %s, college_name = %s", pk="college_code"), 
+                                                           (new_college_data["collegeCode"], new_college_data["collegeName"], college_code))   
