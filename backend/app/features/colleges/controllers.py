@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from dataclasses import asdict
 
+import traceback
+
 from .services import CollegeServices
 
 from ..common.dataclasses import College
@@ -32,23 +34,23 @@ class CollegeController:
 
     @staticmethod
     def get_many_colleges_controller():
-        params = {
-            "rows_per_page": request.args.get("rowsPerPage"),
-            "page_number": request.args.get("pageNumber"),
-            "search_value": request.args.get("searchValue"),
-            "search_by": request.args.get("searchBy"),
-            "search_type": request.args.get("searchType"),
-            "search_value": request.args.get("sortField"),
-            "sort_order":request.args.get("sortOrder")
-        }
-
         try:
+            params = {
+                "rows_per_page": int(request.args.get("rowsPerPage")),
+                "page_number": int(request.args.get("pageNumber")),
+                "search_value": request.args.get("searchValue"),
+                "search_by": request.args.get("searchBy"),
+                "search_type": request.args.get("searchType"),
+                "sort_field": request.args.get("sortField"),
+                "sort_order":request.args.get("sortOrder")
+            }
+
             colleges = CollegeServices.get_many_colleges_service(params)
 
             return jsonify({"entities": [asdict(college_details) for college_details in colleges]}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()  
             return jsonify({"error": str(e)}), 500
 
     @staticmethod

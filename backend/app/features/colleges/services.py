@@ -17,7 +17,14 @@ class CollegeServices:
 
     @staticmethod
     def get_many_colleges_service(params):
-        return CollegeRepository.get_many_colleges(params)
+        colleges = CollegeRepository.get_many_colleges(params)
+
+        college_dataclasses = []
+
+        for college in colleges:
+            college_dataclasses.append(College(**college))
+
+        return college_dataclasses
 
     @staticmethod
     def create_college_service(college_data):
@@ -25,7 +32,7 @@ class CollegeServices:
 
     @staticmethod
     def delete_college_service(college_code: str):
-        CollegeRepository.create_college(college_code)
+        CollegeRepository.delete_college(college_code)
 
     @staticmethod
     def edit_college_details_service(college_code: str, new_college_data):
