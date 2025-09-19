@@ -25,4 +25,4 @@ def delete_college(college_code: str):
 
 @college_bp.route("/<string:college_code>", methods=["PUT"])
 def edit_college_details(college_code: str):
-    return CollegeController.delete_college_controller(college_code)
+    return CollegeController.edit_college_details_controller(college_code)
