@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from dataclasses import asdict
 
+import traceback
+
 from .services import StudentServices
 
 from ..common.dataclasses.student import Student
@@ -17,29 +19,29 @@ class StudentController:
             return jsonify({"result": asdict(student_details)}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
     
     @staticmethod
     def get_total_student_count_controller():
         try:
-            total_student_count: int = StudentServices.get_total_student_count_service()
+            total_student_count_dict: int = StudentServices.get_total_student_count_service()
 
-            return jsonify({"totalCount": total_student_count}), 200
+            return jsonify({"totalCount": total_student_count_dict["count"]}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
     def get_many_students_controller():
         params = {
-            "rows_per_page": request.args.get("rowsPerPage"),
-            "page_number": request.args.get("pageNumber"),
+            "rows_per_page": int(request.args.get("rowsPerPage")),
+            "page_number": int(request.args.get("pageNumber")),
             "search_value": request.args.get("searchValue"),
             "search_by": request.args.get("searchBy"),
             "search_type": request.args.get("searchType"),
-            "search_value": request.args.get("sortField"),
+            "sort_field": request.args.get("sortField"),
             "sort_order":request.args.get("sortOrder")
         }
 
@@ -49,7 +51,7 @@ class StudentController:
             return jsonify({"entities": [asdict(student_details) for student_details in students]}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
@@ -62,7 +64,7 @@ class StudentController:
             return jsonify({"message": "Student added successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
@@ -73,7 +75,7 @@ class StudentController:
             return jsonify({"message": "Student deleted successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
 
@@ -88,5 +90,5 @@ class StudentController:
             return jsonify({"message": "Student edited successfully."}), 200
 
         except Exception as e:
-            print(e)
+            traceback.print_exc()
             return jsonify({"error": str(e)}), 500
