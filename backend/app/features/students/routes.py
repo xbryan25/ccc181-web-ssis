@@ -3,7 +3,7 @@ from .controllers import StudentController
 
 student_bp = Blueprint("student_bp", __name__)
 
-@student_bp.route("/<str:id_number>", methods=["GET"])
+@student_bp.route("/<string:id_number>", methods=["GET"])
 def get_student_details(id_number: str):
     return StudentController.get_student_details_controller(id_number)
 
@@ -19,10 +19,10 @@ def get_many_students():
 def create_student():
     return StudentController.create_student_controller()
 
-@student_bp.route("/<str:id_number>", methods=["DELETE"])
+@student_bp.route("/<string:id_number>", methods=["DELETE"])
 def delete_student(id_number: str):
     return StudentController.delete_student_controller(id_number)
 
-@student_bp.route("/<str:id_number>", methods=["PUT"])
+@student_bp.route("/<string:id_number>", methods=["PUT"])
 def edit_student_details(id_number: str):
-    return StudentController.delete_student_controller(id_number)
+    return StudentController.edit_student_details_controller(id_number)

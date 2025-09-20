@@ -3,7 +3,7 @@ from .controllers import ProgramController
 
 program_bp = Blueprint("program_bp", __name__)
 
-@program_bp.route("/<str:program_code>", methods=["GET"])
+@program_bp.route("/<string:program_code>", methods=["GET"])
 def get_program_details(program_code: str):
     return ProgramController.get_program_details_controller(program_code)
 
@@ -19,10 +19,10 @@ def get_many_programs():
 def create_program():
     return ProgramController.create_program_controller()
 
-@program_bp.route("/<str:program_code>", methods=["DELETE"])
+@program_bp.route("/<string:program_code>", methods=["DELETE"])
 def delete_program(program_code: str):
     return ProgramController.delete_program_controller(program_code)
 
-@program_bp.route("/<str:program_code>", methods=["PUT"])
+@program_bp.route("/<string:program_code>", methods=["PUT"])
 def edit_program_details(program_code: str):
-    return ProgramController.delete_program_controller(program_code)
+    return ProgramController.edit_program_details_controller(program_code)

@@ -1,7 +1,9 @@
-from flask import Flask
+from flask import Flask, current_app
 from flask_cors import CORS
 
 from .config import Config
+
+from .db.connection import Database
 
 
 def create_app():
@@ -17,5 +19,8 @@ def create_app():
     app.register_blueprint(student_bp, url_prefix='/api/students')
     app.register_blueprint(program_bp, url_prefix='/api/programs')
     app.register_blueprint(college_bp, url_prefix='/api/colleges')
+
+    with app.app_context():
+        current_app.extensions['db'] = Database()
 
     return app

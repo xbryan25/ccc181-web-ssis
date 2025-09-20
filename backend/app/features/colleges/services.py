@@ -1,10 +1,15 @@
 from .repository import CollegeRepository
 
+from app.features.common.dataclasses import College
+
 class CollegeServices:
 
     @staticmethod
     def get_college_details_service(college_code: str):
-        return CollegeRepository.get_college_by_college_code(college_code)
+
+        row = CollegeRepository.get_college_by_college_code(college_code)
+
+        return College(**row)
     
     @staticmethod
     def get_total_college_count_service():
@@ -12,7 +17,14 @@ class CollegeServices:
 
     @staticmethod
     def get_many_colleges_service(params):
-        return CollegeRepository.get_many_colleges(params)
+        colleges = CollegeRepository.get_many_colleges(params)
+
+        college_dataclasses = []
+
+        for college in colleges:
+            college_dataclasses.append(College(**college))
+
+        return college_dataclasses
 
     @staticmethod
     def create_college_service(college_data):
@@ -20,7 +32,7 @@ class CollegeServices:
 
     @staticmethod
     def delete_college_service(college_code: str):
-        CollegeRepository.create_college(college_code)
+        CollegeRepository.delete_college(college_code)
 
     @staticmethod
     def edit_college_details_service(college_code: str, new_college_data):
