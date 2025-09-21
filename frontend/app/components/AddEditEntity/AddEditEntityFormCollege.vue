@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from '@nuxt/ui';
-
 import type { CollegeFormState } from '~/types';
 
 import { validateForm } from '#imports';
@@ -8,6 +6,7 @@ import { validateForm } from '#imports';
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
+  toSubmit: boolean;
 }>();
 
 const state = reactive<CollegeFormState>({
@@ -15,51 +14,38 @@ const state = reactive<CollegeFormState>({
   collegeName: '',
 });
 
-const toast = useToast();
-
-async function onSubmit(event: FormSubmitEvent<typeof state>) {
-  const newEntity = {
-    collegeCode: event.data.collegeCode,
-    collegeName: event.data.collegeName,
+const transformCollegeState = (input: CollegeFormState) => {
+  return {
+    collegeCode: input.collegeCode,
+    collegeName: input.collegeName,
   };
+};
 
-  const fn = props.dialogType === 'add' ? useCreateEntity : useEditEntityDetails;
-
-  const { data: messageData, error } = await fn(props.dialogType, newEntity);
-
-  if (error.value) {
-    toast.add({
-      title: 'Error',
-      description: 'Something went wrong!',
-      color: 'error',
-    });
-    return;
-  } else if (!error.value && messageData.value) {
-    toast.add({
-      title: 'Success',
-      description: messageData.value.message,
-      color: 'success',
-    });
-  }
-}
+const emit = defineEmits<{
+  (e: 'onSubmit', newEntity: CollegeFormState): void;
+}>();
 
 let hasCalled = false;
-let isMounted = false;
 
-onMounted(() => {
+onMounted(async () => {
   if (props.dialogType === 'edit') {
-    const { data: collegeData } = useEntityDetails(
-      props.dialogType,
-      props.selectedEntity as string,
-    );
+    const data = await useEntityDetails('colleges', props.selectedEntity as string);
 
-    Object.assign(state, collegeData);
+    Object.assign(state, data.entityDetails);
     console.log('Data loaded', state);
   }
 
   hasCalled = true;
-  isMounted = true;
 });
+
+watch(
+  () => props.toSubmit,
+  (val) => {
+    if (val) {
+      emit('onSubmit', transformCollegeState(state));
+    }
+  },
+);
 </script>
 
 <template>
@@ -67,7 +53,6 @@ onMounted(() => {
     :validate="(state) => validateForm(state, 'college', hasCalled)"
     :state="state"
     class="flex flex-col space-y-4"
-    @submit="onSubmit"
   >
     <UFormField label="College Code" name="collegeCode" class="flex-1">
       <UInput v-model="state.collegeCode" class="w-full" />

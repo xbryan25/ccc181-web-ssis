@@ -17,7 +17,7 @@ class CollegeController:
         try:
             college_details: College = CollegeServices.get_college_details_service(college_code)
 
-            return jsonify({"result": asdict(college_details)}), 200
+            return jsonify({"entityDetails": dict_keys_to_camel(asdict(college_details))}), 200
 
         except Exception as e:
             traceback.print_exc()
@@ -83,7 +83,12 @@ class CollegeController:
     @staticmethod
     def edit_college_details_controller(college_code: str):
 
-        new_college_data = request.json
+        entity_details = request.json
+
+        new_college_data = {
+            'collegeCode': entity_details['entityDetails']['collegeCode'],
+            'collegeName': entity_details['entityDetails']['collegeName']
+        }
 
         try:
             CollegeServices.edit_college_details_service(college_code, new_college_data)

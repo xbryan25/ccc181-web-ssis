@@ -273,6 +273,7 @@ onBeforeUnmount(() => {
     :entity-type="props.entityType"
     :dialog-type="'edit'"
     :selected-entity="selectedEntity"
+    @on-submit="loadEntities()"
   />
 
   <ConfirmDeleteEntityDialog
