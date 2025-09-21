@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
-import type { StudentFormState } from '~/types';
+import type { Gender, Student, StudentFormState } from '~/types';
 
-import { validateForm } from '#imports';
+import { validateForm, capitalizeFirstWord } from '#imports';
+import type { SelectMenuItem } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
+  toSubmit: boolean;
 }>();
 
 const state = reactive<StudentFormState>({
@@ -20,41 +21,24 @@ const state = reactive<StudentFormState>({
     label: 'Male',
   },
   programCode: {
-    label: 'BSCS',
+    label: '',
   },
 });
 
-const toast = useToast();
-
-async function onSubmit(event: FormSubmitEvent<typeof state>) {
-  const newEntity = {
-    idNumber: event.data.idNumber,
-    firstName: event.data.firstName,
-    lastName: event.data.lastName,
-    yearLevel: event.data.yearLevel.label,
-    gender: event.data.gender.label,
-    programCode: event.data.programCode.label,
+const transformStudentState = () => {
+  return {
+    idNumber: state.idNumber,
+    firstName: state.firstName,
+    lastName: state.lastName,
+    yearLevel: state.yearLevel.label,
+    gender: state.gender.label,
+    programCode: state.programCode.label,
   };
+};
 
-  const fn = props.dialogType === 'add' ? useCreateEntity : useEditEntityDetails;
-
-  const { data: messageData, error } = await fn(props.dialogType, newEntity);
-
-  if (error.value) {
-    toast.add({
-      title: 'Error',
-      description: 'Something went wrong!',
-      color: 'error',
-    });
-    return;
-  } else if (!error.value && messageData.value) {
-    toast.add({
-      title: 'Success',
-      description: messageData.value.message,
-      color: 'success',
-    });
-  }
-}
+const emit = defineEmits<{
+  (e: 'onSubmit', newEntity: Student): void;
+}>();
 
 const yearLevelOptions = ref([
   {
@@ -89,49 +73,70 @@ const genderOptions = ref([
   },
 ]);
 
-const programCodeOptions = ref<SelectMenuItem[]>([
-  {
-    type: 'label',
-    label: 'CCS',
-  },
-  {
-    label: 'BSCS',
-  },
-  {
-    label: 'BSCA',
-  },
-  {
-    label: 'BSIS',
-  },
-  {
-    label: 'BSIT',
-  },
-  {
-    type: 'separator',
-  },
-  {
-    type: 'label',
-    label: 'COE',
-  },
-  {
-    label: 'BSCE',
-  },
-]);
+const programCodeOptions = ref<SelectMenuItem[]>([]);
+
+// TODO: Do dropdown with labels for program codes soon, call from backend, then process on frontend
+
+// const programCodeOptions = ref<SelectMenuItem[]>([
+//   {
+//     type: 'label',
+//     label: 'CCS',
+//   },
+//   {
+//     label: 'BSCS',
+//   },
+//   {
+//     label: 'BSCA',
+//   },
+//   {
+//     label: 'BSIS',
+//   },
+//   {
+//     label: 'BSIT',
+//   },
+//   {
+//     type: 'separator',
+//   },
+//   {
+//     type: 'label',
+//     label: 'COE',
+//   },
+//   {
+//     label: 'BSCE',
+//   },
+// ]);
 
 let hasCalled = false;
 
-onMounted(() => {
+onMounted(async () => {
   if (props.dialogType === 'edit') {
-    const { data: studentData } = useEntityDetails(
-      props.dialogType,
-      props.selectedEntity as string,
-    );
-    Object.assign(state, studentData);
-    console.log('Data loaded', state);
+    const entityData = await useEntityDetails('students', props.selectedEntity as string);
+
+    console.log(entityData);
+
+    state.idNumber = entityData.idNumber;
+    state.firstName = entityData.firstName;
+    state.lastName = entityData.lastName;
+    state.yearLevel.label = entityData.yearLevel;
+    state.gender.label = capitalizeFirstWord(entityData.gender) as Gender;
+    state.programCode.label = entityData.programCode;
   }
+
+  const programCodesDetailsData = await useEntityIds('programs');
+
+  programCodeOptions.value = programCodesDetailsData.entityIds;
 
   hasCalled = true;
 });
+
+watch(
+  () => props.toSubmit,
+  (val) => {
+    if (val) {
+      emit('onSubmit', transformStudentState());
+    }
+  },
+);
 </script>
 
 <template>
@@ -139,7 +144,6 @@ onMounted(() => {
     :validate="(state) => validateForm(state, 'student', hasCalled)"
     :state="state"
     class="flex flex-col space-y-4"
-    @submit="onSubmit"
   >
     <div class="flex gap-4 w-full">
       <UFormField label="ID Number" name="idNumber" class="flex-1">

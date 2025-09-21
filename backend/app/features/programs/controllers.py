@@ -100,3 +100,14 @@ class ProgramController:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
         
+    @staticmethod
+    def get_program_codes_controller():
+        try:
+            program_codes_details = ProgramServices.get_program_codes_service()
+
+            return jsonify({"entityIds": [{"label": program_codes_details["program_code"]} for program_codes_details in program_codes_details]}), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        

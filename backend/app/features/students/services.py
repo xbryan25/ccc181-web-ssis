@@ -22,6 +22,8 @@ class StudentServices:
         student_dataclasses = []
 
         for student in students:
+            student['gender'] = student['gender'].capitalize()
+
             student_dataclasses.append(Student(**student))
 
         return student_dataclasses

@@ -36,3 +36,8 @@ class ProgramServices:
     @staticmethod
     def edit_program_details_service(program_code: str, new_program_data):
         ProgramRepository.edit_program_details(program_code, new_program_data)
+
+    @staticmethod
+    def get_program_codes_service():
+        return ProgramRepository.get_program_codes()
+    

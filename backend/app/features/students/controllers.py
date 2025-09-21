@@ -18,7 +18,7 @@ class StudentController:
         try:
             student_details: Student = StudentServices.get_student_details_service(id_number)
 
-            return jsonify({"result": asdict(student_details)}), 200
+            return jsonify(dict_keys_to_camel(asdict(student_details))), 200
 
         except Exception as e:
             traceback.print_exc()
@@ -84,7 +84,16 @@ class StudentController:
     @staticmethod
     def edit_student_details_controller(id_number: str):
 
-        new_student_data = request.json
+        entity_details = request.json
+
+        new_student_data = {
+            'idNumber': entity_details['entityDetails']['idNumber'],
+            'firstName': entity_details['entityDetails']['firstName'],
+            'lastName': entity_details['entityDetails']['lastName'],
+            'yearLevel': entity_details['entityDetails']['yearLevel'],
+            'gender': entity_details['entityDetails']['gender'].lower(),
+            'programCode': entity_details['entityDetails']['programCode']
+        }
 
         try:
             StudentServices.edit_student_details_service(id_number, new_student_data)

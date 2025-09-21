@@ -127,8 +127,6 @@ const loadEntities = async () => {
   const data = await useEntities(props.entityType, options);
 
   entitiesData.value = data.entities;
-
-  console.log(entitiesData.value);
 };
 
 const totalPages = ref(1);
@@ -151,11 +149,11 @@ const calculateRows = () => {
 };
 
 const getMaxPages = () => {
-  const options = {
-    searchValue: props.searchValue,
-    searchBy: props.searchBy,
-    searchType: props.searchType,
-  };
+  // const options = {
+  //   searchValue: props.searchValue,
+  //   searchBy: props.searchBy,
+  //   searchType: props.searchType,
+  // };
 
   totalPages.value = 5;
 
