@@ -17,7 +17,7 @@ class CollegeController:
         try:
             college_details: College = CollegeServices.get_college_details_service(college_code)
 
-            return jsonify({"entityDetails": dict_keys_to_camel(asdict(college_details))}), 200
+            return jsonify(dict_keys_to_camel(asdict(college_details))), 200
 
         except Exception as e:
             traceback.print_exc()
@@ -98,3 +98,15 @@ class CollegeController:
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+        
+    @staticmethod
+    def get_college_codes_controller():
+        try:
+            college_codes_details = CollegeServices.get_college_codes_service()
+
+            return jsonify({"entityIds": [{"label": college_code_details["college_code"]} for college_code_details in college_codes_details]}), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        

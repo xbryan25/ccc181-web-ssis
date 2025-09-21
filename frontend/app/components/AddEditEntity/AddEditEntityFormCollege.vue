@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CollegeFormState } from '~/types';
+import type { College, CollegeFormState } from '~/types';
 
 import { validateForm } from '#imports';
 
@@ -14,25 +14,25 @@ const state = reactive<CollegeFormState>({
   collegeName: '',
 });
 
-const transformCollegeState = (input: CollegeFormState) => {
+const transformCollegeState = () => {
   return {
-    collegeCode: input.collegeCode,
-    collegeName: input.collegeName,
+    collegeCode: state.collegeCode,
+    collegeName: state.collegeName,
   };
 };
 
 const emit = defineEmits<{
-  (e: 'onSubmit', newEntity: CollegeFormState): void;
+  (e: 'onSubmit', newEntity: College): void;
 }>();
 
 let hasCalled = false;
 
 onMounted(async () => {
   if (props.dialogType === 'edit') {
-    const data = await useEntityDetails('colleges', props.selectedEntity as string);
+    const entityData = await useEntityDetails('colleges', props.selectedEntity as string);
 
-    Object.assign(state, data.entityDetails);
-    console.log('Data loaded', state);
+    state.collegeCode = entityData.collegeCode;
+    state.collegeName = entityData.collegeName;
   }
 
   hasCalled = true;
@@ -42,7 +42,7 @@ watch(
   () => props.toSubmit,
   (val) => {
     if (val) {
-      emit('onSubmit', transformCollegeState(state));
+      emit('onSubmit', transformCollegeState());
     }
   },
 );

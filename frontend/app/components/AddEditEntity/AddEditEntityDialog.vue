@@ -23,6 +23,8 @@ const isOpen = computed({
 const toast = useToast();
 
 async function onSubmit(newEntity: Student | Program | College) {
+  console.log('REACHHH HEREE');
+
   try {
     let data: { message: string };
 
@@ -96,6 +98,7 @@ const clickProceed = () => {
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
           :to-submit="toSubmit"
+          @on-submit="(newEntity) => onSubmit(newEntity)"
         />
         <AddEditEntityFormCollege
           v-if="entityType === 'colleges'"

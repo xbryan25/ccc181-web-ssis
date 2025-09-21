@@ -17,7 +17,7 @@ class ProgramController:
         try:
             program_details: Program = ProgramServices.get_program_details_service(program_code)
 
-            return jsonify({"result": asdict(program_details)}), 200
+            return jsonify(dict_keys_to_camel(asdict(program_details))), 200
 
         except Exception as e:
             traceback.print_exc()
@@ -83,7 +83,13 @@ class ProgramController:
     @staticmethod
     def edit_program_details_controller(program_code: str):
 
-        new_program_data = request.json
+        entity_details = request.json
+
+        new_program_data = {
+            'programCode': entity_details['entityDetails']['programCode'],
+            'programName': entity_details['entityDetails']['programName'],
+            'collegeCode': entity_details['entityDetails']['collegeCode']
+        }
 
         try:
             ProgramServices.edit_program_details_service(program_code, new_program_data)
@@ -93,3 +99,4 @@ class ProgramController:
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+        
