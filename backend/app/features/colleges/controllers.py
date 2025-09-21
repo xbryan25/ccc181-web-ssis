@@ -7,6 +7,8 @@ from .services import CollegeServices
 
 from ..common.dataclasses import College
 
+from app.utils import dict_keys_to_camel
+
 class CollegeController:
     
     @staticmethod
@@ -47,7 +49,7 @@ class CollegeController:
 
             colleges = CollegeServices.get_many_colleges_service(params)
 
-            return jsonify({"entities": [asdict(college_details) for college_details in colleges]}), 200
+            return jsonify({"entities": [dict_keys_to_camel(asdict(college_details)) for college_details in colleges]}), 200
 
         except Exception as e:
             traceback.print_exc()  

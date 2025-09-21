@@ -66,247 +66,6 @@ const openConfirmEditDialog = (row: Student | Program | College) => {
   }
 };
 
-const studentData = ref<Student[]>([
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-  {
-    idNumber: '2023-0022',
-    firstName: 'Bryan',
-    lastName: 'Agan',
-    yearLevel: '3rd',
-    gender: 'Male',
-    programCode: 'BSCS',
-  },
-]);
-
-const programData = ref<Program[]>([
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-  {
-    programCode: 'BSCS',
-    programName: 'Bachelor of Science in Computer Science',
-    collegeCode: 'CCS',
-  },
-]);
-
-const collegeData = ref<College[]>([
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'COE',
-    collegeName: 'College of Engineering',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-  {
-    collegeCode: 'CCS',
-    collegeName: 'College of Computer Studies',
-  },
-]);
-
 const entitiesData = ref<Student[] | Program[] | College[]>([]);
 
 const UButton = resolveComponent('UButton') as DefineComponent;
@@ -354,7 +113,7 @@ const updateUrl = () => {
   return newQuery;
 };
 
-const loadEntities = () => {
+const loadEntities = async () => {
   const options = {
     rowsPerPage: rowsPerPage.value,
     pageNumber: pageNumber.value,
@@ -365,13 +124,11 @@ const loadEntities = () => {
     sortOrder: props.sortOrder,
   };
 
-  // const { data, error } = useEntities(props.entityType, options);
+  const data = await useEntities(props.entityType, options);
 
-  // if (data.value) {
-  //   entitiesData.value = data.value.entities;
-  // }
+  entitiesData.value = data.entities;
 
-  console.log(options);
+  console.log(entitiesData.value);
 };
 
 const totalPages = ref(1);
@@ -530,7 +287,7 @@ onBeforeUnmount(() => {
     loading
     loading-color="primary"
     loading-animation="carousel"
-    :data="studentData.slice(0, rowsPerPage)"
+    :data="(entitiesData as Student[]).slice(0, rowsPerPage)"
     :columns="studentTableColumns"
     class="flex-1"
   />
@@ -540,7 +297,7 @@ onBeforeUnmount(() => {
     loading
     loading-color="primary"
     loading-animation="carousel"
-    :data="programData.slice(0, rowsPerPage)"
+    :data="(entitiesData as Program[]).slice(0, rowsPerPage)"
     :columns="programsTableColumns"
     class="flex-1"
   />
@@ -550,7 +307,7 @@ onBeforeUnmount(() => {
     loading
     loading-color="primary"
     loading-animation="carousel"
-    :data="collegeData.slice(0, rowsPerPage)"
+    :data="(entitiesData as College[]).slice(0, rowsPerPage)"
     :columns="collegesTableColumns"
     class="flex-1"
   />

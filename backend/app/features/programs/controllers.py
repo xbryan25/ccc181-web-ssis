@@ -7,6 +7,8 @@ from .services import ProgramServices
 
 from ..common.dataclasses import Program
 
+from app.utils import dict_keys_to_camel
+
 class ProgramController:
     
     @staticmethod
@@ -47,7 +49,7 @@ class ProgramController:
         try:
             programs = ProgramServices.get_many_programs_service(params)
 
-            return jsonify({"entities": [asdict(program_details) for program_details in programs]}), 200
+            return jsonify({"entities": [dict_keys_to_camel(asdict(program_details)) for program_details in programs]}), 200
 
         except Exception as e:
             traceback.print_exc()

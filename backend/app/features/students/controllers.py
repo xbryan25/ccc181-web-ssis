@@ -7,6 +7,8 @@ from .services import StudentServices
 
 from ..common.dataclasses.student import Student
 
+from app.utils import dict_keys_to_camel
+
 class StudentController:
  
 
@@ -48,7 +50,7 @@ class StudentController:
         try:
             students = StudentServices.get_many_students_service(params)
 
-            return jsonify({"entities": [asdict(student_details) for student_details in students]}), 200
+            return jsonify({"entities": [dict_keys_to_camel(asdict(student_details)) for student_details in students]}), 200
 
         except Exception as e:
             traceback.print_exc()
