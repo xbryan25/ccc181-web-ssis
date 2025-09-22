@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Student, Program, College } from '~/types';
+
 const props = defineProps<{
   entityType: string;
   dialogType: string;
@@ -8,6 +10,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void;
+  (e: 'onSubmit'): void;
 }>();
 
 const isOpen = computed({
@@ -16,6 +19,48 @@ const isOpen = computed({
     emit('update:isOpen', val);
   },
 });
+
+const toast = useToast();
+
+async function onSubmit(newEntity: Student | Program | College) {
+  try {
+    let data: { message: string };
+
+    console.log('reach here');
+
+    if (props.dialogType === 'add') {
+      data = await useCreateEntity(props.entityType, newEntity);
+    } else {
+      data = await useEditEntityDetails(
+        props.entityType,
+        newEntity,
+        props.selectedEntity as string,
+      );
+    }
+
+    toast.add({
+      title: 'Success',
+      description: data.message,
+      color: 'success',
+    });
+  } catch {
+    toast.add({
+      title: 'Error',
+      description: 'Something went wrong!',
+      color: 'error',
+    });
+  }
+
+  toSubmit.value = false;
+
+  emit('onSubmit');
+}
+
+const toSubmit = ref(false);
+
+const clickProceed = () => {
+  toSubmit.value = true;
+};
 </script>
 
 <template>
@@ -46,16 +91,22 @@ const isOpen = computed({
           v-if="entityType === 'students'"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
+          :to-submit="toSubmit"
+          @on-submit="(newEntity) => onSubmit(newEntity)"
         />
         <AddEditEntityFormProgram
           v-if="entityType === 'programs'"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
+          :to-submit="toSubmit"
+          @on-submit="(newEntity) => onSubmit(newEntity)"
         />
         <AddEditEntityFormCollege
           v-if="entityType === 'colleges'"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
+          :to-submit="toSubmit"
+          @on-submit="(newEntity) => onSubmit(newEntity)"
         />
       </template>
 
@@ -74,7 +125,10 @@ const isOpen = computed({
             color="primary"
             variant="solid"
             class="cursor-pointer"
-            @click="isOpen = false"
+            @click="
+              isOpen = false;
+              clickProceed();
+            "
             >Proceed</UButton
           >
         </div>

@@ -7,6 +7,8 @@ from .services import StudentServices
 
 from ..common.dataclasses.student import Student
 
+from app.utils import dict_keys_to_camel
+
 class StudentController:
  
 
@@ -16,7 +18,7 @@ class StudentController:
         try:
             student_details: Student = StudentServices.get_student_details_service(id_number)
 
-            return jsonify({"result": asdict(student_details)}), 200
+            return jsonify(dict_keys_to_camel(asdict(student_details))), 200
 
         except Exception as e:
             traceback.print_exc()
@@ -48,7 +50,7 @@ class StudentController:
         try:
             students = StudentServices.get_many_students_service(params)
 
-            return jsonify({"entities": [asdict(student_details) for student_details in students]}), 200
+            return jsonify({"entities": [dict_keys_to_camel(asdict(student_details)) for student_details in students]}), 200
 
         except Exception as e:
             traceback.print_exc()
@@ -56,10 +58,20 @@ class StudentController:
 
     @staticmethod
     def create_student_controller():
-        student_data = request.json
+
+        entity_details = request.json
+
+        new_student_data = {
+            'idNumber': entity_details['entityDetails']['idNumber'],
+            'firstName': entity_details['entityDetails']['firstName'],
+            'lastName': entity_details['entityDetails']['lastName'],
+            'yearLevel': entity_details['entityDetails']['yearLevel'],
+            'gender': entity_details['entityDetails']['gender'].lower(),
+            'programCode': entity_details['entityDetails']['programCode']
+        }
 
         try:
-            StudentServices.create_student_service(student_data)
+            StudentServices.create_student_service(new_student_data)
 
             return jsonify({"message": "Student added successfully."}), 200
 
@@ -82,7 +94,16 @@ class StudentController:
     @staticmethod
     def edit_student_details_controller(id_number: str):
 
-        new_student_data = request.json
+        entity_details = request.json
+
+        new_student_data = {
+            'idNumber': entity_details['entityDetails']['idNumber'],
+            'firstName': entity_details['entityDetails']['firstName'],
+            'lastName': entity_details['entityDetails']['lastName'],
+            'yearLevel': entity_details['entityDetails']['yearLevel'],
+            'gender': entity_details['entityDetails']['gender'].lower(),
+            'programCode': entity_details['entityDetails']['programCode']
+        }
 
         try:
             StudentServices.edit_student_details_service(id_number, new_student_data)

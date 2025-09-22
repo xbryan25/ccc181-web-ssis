@@ -26,3 +26,7 @@ def delete_program(program_code: str):
 @program_bp.route("/<string:program_code>", methods=["PUT"])
 def edit_program_details(program_code: str):
     return ProgramController.edit_program_details_controller(program_code)
+
+@program_bp.route("/identifiers", methods=["GET"])
+def get_program_codes():
+    return ProgramController.get_program_codes_controller()

@@ -1,89 +1,66 @@
 <script setup lang="ts">
-import type { FormSubmitEvent } from '@nuxt/ui';
+import type { Program, ProgramFormState } from '~/types';
 
 import { validateForm } from '#imports';
 
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
+  toSubmit: boolean;
 }>();
-
-interface ProgramFormState {
-  programCode: string;
-  programName: string;
-  collegeCode: { label: string };
-}
 
 const state = reactive<ProgramFormState>({
   programCode: '',
   programName: '',
   collegeCode: {
-    label: 'CCS',
+    label: '',
   },
 });
 
-const toast = useToast();
-
-async function onSubmit(event: FormSubmitEvent<typeof state>) {
-  const newEntity = {
-    programCode: event.data.programCode,
-    programName: event.data.programName,
-    collegeCode: event.data.collegeCode.label,
+const transformProgramState = () => {
+  return {
+    programCode: state.programCode,
+    programName: state.programName,
+    collegeCode: state.collegeCode.label,
   };
+};
 
-  const fn = props.dialogType === 'add' ? useCreateEntity : useEditEntityDetails;
+const emit = defineEmits<{
+  (e: 'onSubmit', newEntity: Program): void;
+}>();
 
-  const { data: messageData, error } = await fn(props.dialogType, newEntity);
-
-  if (error.value) {
-    toast.add({
-      title: 'Error',
-      description: 'Something went wrong!',
-      color: 'error',
-    });
-    return;
-  } else if (!error.value && messageData.value) {
-    toast.add({
-      title: 'Success',
-      description: messageData.value.message,
-      color: 'success',
-    });
-  }
-}
-
-const collegeCodeOptions = ref([
-  {
-    label: 'CCS',
-  },
-  {
-    label: 'COE',
-  },
-  {
-    label: 'CHS',
-  },
-  {
-    label: 'CEBA',
-  },
-  {
-    label: 'CSM',
-  },
-]);
+const collegeCodeOptions = ref<{ label: string }[]>([]);
 
 let hasCalled = false;
 
 onMounted(async () => {
   if (props.dialogType === 'edit') {
-    const { data: programData } = await useEntityDetails(
-      props.dialogType,
-      props.selectedEntity as string,
-    );
+    const entityData = await useEntityDetails('programs', props.selectedEntity as string);
 
-    Object.assign(state, programData);
-    console.log('Data loaded', state);
+    state.programCode = entityData.programCode;
+    state.programName = entityData.programName;
+    state.collegeCode.label = entityData.collegeCode ? entityData.collegeCode : '';
+  }
+
+  const collegeCodesDetailsData = await useEntityIds('colleges');
+
+  collegeCodeOptions.value = collegeCodesDetailsData.entityIds;
+
+  if (state.collegeCode.label === '') {
+    state.collegeCode.label = collegeCodesDetailsData.entityIds[0]?.label as string;
   }
 
   hasCalled = true;
 });
+
+watch(
+  () => props.toSubmit,
+  (val) => {
+    if (val) {
+      emit('onSubmit', transformProgramState());
+    }
+  },
+);
 </script>
 
 <template>
@@ -91,7 +68,6 @@ onMounted(async () => {
     :validate="(state) => validateForm(state, 'program', hasCalled)"
     :state="state"
     class="flex flex-col space-y-4"
-    @submit="onSubmit"
   >
     <UFormField label="Program Code" name="programCode" class="flex-1">
       <UInput v-model="state.programCode" class="w-full" />

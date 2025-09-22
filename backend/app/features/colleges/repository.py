@@ -61,3 +61,8 @@ class CollegeRepository:
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="colleges", 
                                                            set_clause="college_code = %s, college_name = %s", pk="college_code"), 
                                                            (new_college_data["collegeCode"], new_college_data["collegeName"], college_code))   
+        
+    def get_college_codes():
+        db = current_app.extensions['db']
+
+        return db.fetch_all(CommonQueries.GET_ALL_IDS.format(pk="college_code", table="colleges"))   

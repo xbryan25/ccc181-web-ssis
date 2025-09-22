@@ -20,6 +20,7 @@ const emit = defineEmits<{
       | 'update:sortOrder',
     value: string,
   ): void;
+  (e: 'onCreateEntitySubmit'): void;
 }>();
 
 const isOpenAddDialog = ref(false);
@@ -79,6 +80,7 @@ const searchValue = computed({
       class="ml-auto hidden"
       :entity-type="props.entityType"
       :dialog-type="'add'"
+      @on-submit="emit('onCreateEntitySubmit')"
     />
   </div>
 </template>

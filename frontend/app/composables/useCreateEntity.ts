@@ -7,9 +7,9 @@ type CreateEntityResponse = {
 export function useCreateEntity(entityType: string, entityDetails: Student | Program | College){
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  return useFetch<CreateEntityResponse>(`${apiUrl}/api/${entityType}`, {
+  return $fetch<CreateEntityResponse>(`${apiUrl}/api/${entityType}/`, {
     method: 'POST',
-    params: {
+    body: {
       entityDetails
     },
   });
