@@ -57,10 +57,17 @@ class CollegeController:
 
     @staticmethod
     def create_college_controller():
-        college_data = request.json
+        entity_details = request.json
+
+        new_college_data = {
+            'collegeCode': entity_details['entityDetails']['collegeCode'],
+            'collegeName': entity_details['entityDetails']['collegeName']
+        }
+
+        print(new_college_data)
 
         try:
-            CollegeServices.create_college_service(college_data)
+            CollegeServices.create_college_service(new_college_data)
 
             return jsonify({"message": "College added successfully."}), 200
 

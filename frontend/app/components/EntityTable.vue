@@ -15,6 +15,7 @@ const props = defineProps<{
   searchType: string;
   sortField: string;
   sortOrder: string;
+  createEntitySubmitRef: boolean;
 }>();
 
 const router = useRouter();
@@ -40,6 +41,7 @@ const emit = defineEmits<{
       | 'update:sortOrder',
     value: string,
   ): void;
+  (e: 'disableCreateEntitySubmit'): void;
 }>();
 
 const openConfirmDeleteDialog = (row: Student | Program | College) => {
@@ -222,6 +224,16 @@ watch(
   (newValue) => {
     internalSortOrder.value = newValue;
     emit('update:sortOrder', newValue);
+  },
+);
+
+watch(
+  () => props.createEntitySubmitRef,
+  (newVal) => {
+    if (newVal) {
+      loadEntities();
+      emit('disableCreateEntitySubmit');
+    }
   },
 );
 

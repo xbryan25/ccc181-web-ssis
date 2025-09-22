@@ -9,7 +9,7 @@ export function useCreateEntity(entityType: string, entityDetails: Student | Pro
 
   return $fetch<CreateEntityResponse>(`${apiUrl}/api/${entityType}`, {
     method: 'POST',
-    params: {
+    body: {
       entityDetails
     },
   });
