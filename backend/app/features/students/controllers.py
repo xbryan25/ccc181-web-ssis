@@ -58,10 +58,20 @@ class StudentController:
 
     @staticmethod
     def create_student_controller():
-        student_data = request.json
+
+        entity_details = request.json
+
+        new_student_data = {
+            'idNumber': entity_details['entityDetails']['idNumber'],
+            'firstName': entity_details['entityDetails']['firstName'],
+            'lastName': entity_details['entityDetails']['lastName'],
+            'yearLevel': entity_details['entityDetails']['yearLevel'],
+            'gender': entity_details['entityDetails']['gender'].lower(),
+            'programCode': entity_details['entityDetails']['programCode']
+        }
 
         try:
-            StudentServices.create_student_service(student_data)
+            StudentServices.create_student_service(new_student_data)
 
             return jsonify({"message": "Student added successfully."}), 200
 

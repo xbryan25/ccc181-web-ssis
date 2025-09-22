@@ -57,10 +57,16 @@ class ProgramController:
 
     @staticmethod
     def create_program_controller():
-        program_data = request.json
+        entity_details = request.json
+
+        new_program_data = {
+            'programCode': entity_details['entityDetails']['programCode'],
+            'programName': entity_details['entityDetails']['programName'],
+            'collegeCode': entity_details['entityDetails']['collegeCode']
+        }
 
         try:
-            ProgramServices.create_program_service(program_data)
+            ProgramServices.create_program_service(new_program_data)
 
             return jsonify({"message": "Program added successfully."}), 200
 

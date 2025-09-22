@@ -17,7 +17,7 @@ export function useEntities(entityType: string,
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  return $fetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}`, {
+  return $fetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}/`, {
     method: 'GET',
     query: {
       ...(options || {})

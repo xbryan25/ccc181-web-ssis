@@ -11,11 +11,11 @@ def get_college_details(college_code: str):
 def get_total_college_count():
     return CollegeController.get_total_college_count_controller()
 
-@college_bp.route("", methods=["GET"])
+@college_bp.route("/", methods=["GET"])
 def get_many_colleges():
     return CollegeController.get_many_colleges_controller()
 
-@college_bp.route("", methods=["POST"])
+@college_bp.route("/", methods=["POST"])
 def create_college():
     return CollegeController.create_college_controller()
 
