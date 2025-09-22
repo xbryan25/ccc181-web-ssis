@@ -112,19 +112,21 @@ onMounted(async () => {
   if (props.dialogType === 'edit') {
     const entityData = await useEntityDetails('students', props.selectedEntity as string);
 
-    console.log(entityData);
-
     state.idNumber = entityData.idNumber;
     state.firstName = entityData.firstName;
     state.lastName = entityData.lastName;
     state.yearLevel.label = entityData.yearLevel;
     state.gender.label = capitalizeFirstWord(entityData.gender) as Gender;
-    state.programCode.label = entityData.programCode;
+    state.programCode.label = entityData.programCode ? entityData.programCode : '';
   }
 
   const programCodesDetailsData = await useEntityIds('programs');
 
   programCodeOptions.value = programCodesDetailsData.entityIds;
+
+  if (state.programCode.label === '') {
+    state.programCode.label = programCodesDetailsData.entityIds[0]?.label as string;
+  }
 
   hasCalled = true;
 });

@@ -39,12 +39,16 @@ onMounted(async () => {
 
     state.programCode = entityData.programCode;
     state.programName = entityData.programName;
-    state.collegeCode.label = entityData.collegeCode;
+    state.collegeCode.label = entityData.collegeCode ? entityData.collegeCode : '';
   }
 
   const collegeCodesDetailsData = await useEntityIds('colleges');
 
   collegeCodeOptions.value = collegeCodesDetailsData.entityIds;
+
+  if (state.collegeCode.label === '') {
+    state.collegeCode.label = collegeCodesDetailsData.entityIds[0]?.label as string;
+  }
 
   hasCalled = true;
 });
