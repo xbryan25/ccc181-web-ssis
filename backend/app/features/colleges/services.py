@@ -37,3 +37,7 @@ class CollegeServices:
     @staticmethod
     def edit_college_details_service(college_code: str, new_college_data):
         CollegeRepository.edit_college_details(college_code, new_college_data)
+
+    @staticmethod
+    def get_college_codes_service():
+        return CollegeRepository.get_college_codes()

@@ -21,6 +21,9 @@ class ProgramServices:
         program_dataclasses = []
 
         for program in programs:
+            if not program['college_code']:
+                program['college_code'] = 'N/A'
+
             program_dataclasses.append(Program(**program))
 
         return program_dataclasses
@@ -36,3 +39,8 @@ class ProgramServices:
     @staticmethod
     def edit_program_details_service(program_code: str, new_program_data):
         ProgramRepository.edit_program_details(program_code, new_program_data)
+
+    @staticmethod
+    def get_program_codes_service():
+        return ProgramRepository.get_program_codes()
+    

@@ -62,3 +62,8 @@ class ProgramRepository:
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="programs", 
                                                            set_clause="program_code = %s, program_name = %s, college_code = %s", pk="program_code"), 
                                                            (new_program_data["programCode"], new_program_data["programName"], new_program_data["collegeCode"], program_code))   
+
+    def get_program_codes():
+        db = current_app.extensions['db']
+
+        return db.fetch_all(CommonQueries.GET_ALL_IDS.format(pk="program_code", table="programs"))   

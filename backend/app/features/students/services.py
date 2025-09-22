@@ -22,6 +22,11 @@ class StudentServices:
         student_dataclasses = []
 
         for student in students:
+            student['gender'] = student['gender'].capitalize()
+
+            if not student['program_code']:
+                student['program_code'] = 'N/A'
+
             student_dataclasses.append(Student(**student))
 
         return student_dataclasses

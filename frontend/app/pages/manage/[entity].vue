@@ -32,6 +32,8 @@ const searchAndSortState = reactive({
   sortField: defaultField,
   sortOrder: 'Ascending',
 });
+
+const createEntitySubmitRef = ref(false);
 </script>
 
 <template>
@@ -46,6 +48,7 @@ const searchAndSortState = reactive({
       @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
       @update:sort-field="(value: string) => (searchAndSortState.sortField = value)"
       @update:sort-order="(value: string) => (searchAndSortState.sortOrder = value)"
+      @on-create-entity-submit="() => (createEntitySubmitRef = true)"
     />
 
     <EntityTable
@@ -55,11 +58,13 @@ const searchAndSortState = reactive({
       :search-type="searchAndSortState.searchType"
       :sort-field="searchAndSortState.sortField"
       :sort-order="searchAndSortState.sortOrder"
+      :create-entity-submit-ref="createEntitySubmitRef"
       @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
       @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
       @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
       @update:sort-field="(value: string) => (searchAndSortState.sortField = value)"
       @update:sort-order="(value: string) => (searchAndSortState.sortOrder = value)"
+      @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
     />
   </div>
 </template>

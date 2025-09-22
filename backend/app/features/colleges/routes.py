@@ -26,3 +26,7 @@ def delete_college(college_code: str):
 @college_bp.route("/<string:college_code>", methods=["PUT"])
 def edit_college_details(college_code: str):
     return CollegeController.edit_college_details_controller(college_code)
+
+@college_bp.route("/identifiers", methods=["GET"])
+def get_college_codes():
+    return CollegeController.get_college_codes_controller()

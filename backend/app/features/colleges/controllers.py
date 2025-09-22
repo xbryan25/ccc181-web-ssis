@@ -7,6 +7,8 @@ from .services import CollegeServices
 
 from ..common.dataclasses import College
 
+from app.utils import dict_keys_to_camel
+
 class CollegeController:
     
     @staticmethod
@@ -15,7 +17,7 @@ class CollegeController:
         try:
             college_details: College = CollegeServices.get_college_details_service(college_code)
 
-            return jsonify({"result": asdict(college_details)}), 200
+            return jsonify(dict_keys_to_camel(asdict(college_details))), 200
 
         except Exception as e:
             traceback.print_exc()
@@ -47,7 +49,7 @@ class CollegeController:
 
             colleges = CollegeServices.get_many_colleges_service(params)
 
-            return jsonify({"entities": [asdict(college_details) for college_details in colleges]}), 200
+            return jsonify({"entities": [dict_keys_to_camel(asdict(college_details)) for college_details in colleges]}), 200
 
         except Exception as e:
             traceback.print_exc()  
@@ -55,10 +57,17 @@ class CollegeController:
 
     @staticmethod
     def create_college_controller():
-        college_data = request.json
+        entity_details = request.json
+
+        new_college_data = {
+            'collegeCode': entity_details['entityDetails']['collegeCode'],
+            'collegeName': entity_details['entityDetails']['collegeName']
+        }
+
+        print(new_college_data)
 
         try:
-            CollegeServices.create_college_service(college_data)
+            CollegeServices.create_college_service(new_college_data)
 
             return jsonify({"message": "College added successfully."}), 200
 
@@ -81,7 +90,12 @@ class CollegeController:
     @staticmethod
     def edit_college_details_controller(college_code: str):
 
-        new_college_data = request.json
+        entity_details = request.json
+
+        new_college_data = {
+            'collegeCode': entity_details['entityDetails']['collegeCode'],
+            'collegeName': entity_details['entityDetails']['collegeName']
+        }
 
         try:
             CollegeServices.edit_college_details_service(college_code, new_college_data)
@@ -91,3 +105,15 @@ class CollegeController:
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+        
+    @staticmethod
+    def get_college_codes_controller():
+        try:
+            college_codes_details = CollegeServices.get_college_codes_service()
+
+            return jsonify({"entityIds": [{"label": college_code_details["college_code"]} for college_code_details in college_codes_details]}), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        
