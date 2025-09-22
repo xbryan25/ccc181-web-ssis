@@ -291,6 +291,7 @@ onBeforeUnmount(() => {
     class="ml-auto hidden"
     :entity-type="props.entityType"
     :selected-entity="selectedEntity"
+    @on-delete="loadEntities()"
   />
 
   <UTable

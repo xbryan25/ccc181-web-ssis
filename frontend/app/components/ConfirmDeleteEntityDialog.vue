@@ -7,6 +7,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:isOpen', value: boolean): void;
+  (e: 'onDelete'): void;
 }>();
 
 const isOpen = computed({
@@ -19,26 +20,24 @@ const isOpen = computed({
 
 const toast = useToast();
 
-async function onSubmit() {
-  isOpen.value = false;
+async function onDelete() {
+  try {
+    isOpen.value = false;
 
-  const { data: messageData, error } = await useDeleteEntity(
-    props.entityType,
-    props.selectedEntity,
-  );
+    const data: { message: string } = await useDeleteEntity(props.entityType, props.selectedEntity);
 
-  if (error.value) {
+    toast.add({
+      title: 'Success',
+      description: data.message,
+      color: 'success',
+    });
+
+    emit('onDelete');
+  } catch {
     toast.add({
       title: 'Error',
       description: 'Something went wrong!',
       color: 'error',
-    });
-    return;
-  } else if (!error.value && messageData.value) {
-    toast.add({
-      title: 'Success',
-      description: messageData.value.message,
-      color: 'success',
     });
   }
 }
@@ -90,7 +89,7 @@ async function onSubmit() {
             color="primary"
             variant="solid"
             class="cursor-pointer"
-            @click="onSubmit"
+            @click="onDelete"
             >Proceed</UButton
           >
         </div>

@@ -53,7 +53,6 @@ async function onSubmit(newEntity: Student | Program | College) {
 
   toSubmit.value = false;
 
-  console.log('emit???');
   emit('onSubmit');
 }
 
