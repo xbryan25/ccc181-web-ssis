@@ -13,7 +13,6 @@ const emit = defineEmits<{
 const isOpen = computed({
   get: () => props.isOpen,
   set: (val: boolean) => {
-    console.log('close dialog');
     emit('update:isOpen', val);
   },
 });

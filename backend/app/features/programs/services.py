@@ -21,6 +21,9 @@ class ProgramServices:
         program_dataclasses = []
 
         for program in programs:
+            if not program['college_code']:
+                program['college_code'] = 'N/A'
+
             program_dataclasses.append(Program(**program))
 
         return program_dataclasses
