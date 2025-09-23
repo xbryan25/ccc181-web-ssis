@@ -10,8 +10,26 @@ const state = reactive({
   password: '',
 });
 
-const onSubmit = (event: FormSubmitEvent<typeof state>) => {
+const toast = useToast();
+
+const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
   console.log(event.data);
+
+  try {
+    const userLoginResponse = await useUserLogin(event.data.email, event.data.password);
+
+    toast.add({
+      title: 'Login successful.',
+      description: userLoginResponse.message,
+      color: 'success',
+    });
+  } catch (error) {
+    toast.add({
+      title: 'Login failed.',
+      description: error.data.error,
+      color: 'error',
+    });
+  }
 };
 </script>
 

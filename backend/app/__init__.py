@@ -14,11 +14,12 @@ def create_app():
 
     CORS(app, origins='*')
     
-    from .features import student_bp, program_bp, college_bp
+    from .features import student_bp, program_bp, college_bp, user_bp
 
     app.register_blueprint(student_bp, url_prefix='/api/students')
     app.register_blueprint(program_bp, url_prefix='/api/programs')
     app.register_blueprint(college_bp, url_prefix='/api/colleges')
+    app.register_blueprint(user_bp, url_prefix='/api/user')
 
     with app.app_context():
         current_app.extensions['db'] = Database()
