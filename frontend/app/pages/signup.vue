@@ -30,5 +30,5 @@ const auth = useAuthStore();
 </script>
 
 <template>
-  <AuthForm auth-type="login" />
+  <AuthForm auth-type="signup" />
 </template>
