@@ -1,9 +1,12 @@
 from flask import Flask, current_app
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 
 from .config import Config
 
 from .db.connection import Database
+
+jwt = JWTManager()
 
 
 def create_app():
@@ -12,6 +15,7 @@ def create_app():
 
     app.config.from_object(Config)
 
+    jwt.init_app(app)
     CORS(app, origins='*')
     
     from .features import student_bp, program_bp, college_bp, user_bp

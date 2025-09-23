@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from dataclasses import asdict
 
 from flask_jwt_extended import create_access_token
@@ -24,10 +24,21 @@ class UserController:
             
             access_token = create_access_token(identity=user.user_id)
 
-            return jsonify({
-                "accessToken": access_token,
+            resp = make_response({
                 "username": user.username,
-            }), 200
+                "message": "Login successful"
+            })
+            
+            # HttpOnly cookie, cannot be read by JS
+            resp.set_cookie(
+                "accessToken",
+                access_token,
+                httponly=True,
+                secure=True, 
+                samesite="Strict"
+            )
+
+            return resp, 200
         
         except Exception as e:
             traceback.print_exc()
