@@ -8,27 +8,28 @@ definePageMeta({
 const toast = useToast();
 const auth = useAuthStore();
 
-// const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
-//   console.log(event.data);
+const onSubmitSignup = async (username: string, email: string, password: string) => {
+  try {
+    const userSignupResponse = await useUserSignup(username, email, password);
 
-//   try {
-//     const userLoginMessage = await auth.login(event.data.email, event.data.password);
-
-//     toast.add({
-//       title: 'Login successful.',
-//       description: userLoginMessage,
-//       color: 'success',
-//     });
-//   } catch (error) {
-//     toast.add({
-//       title: 'Login failed.',
-//       description: error.data.error,
-//       color: 'error',
-//     });
-//   }
-// };
+    toast.add({
+      title: userSignupResponse.messageTitle,
+      description: userSignupResponse.message,
+      color: 'success',
+    });
+  } catch (error) {
+    toast.add({
+      title: 'Signup failed.',
+      description: error.data.error,
+      color: 'error',
+    });
+  }
+};
 </script>
 
 <template>
-  <AuthForm auth-type="signup" />
+  <AuthForm
+    auth-type="signup"
+    @on-submit-signup="(username, email, password) => onSubmitSignup(username, email, password)"
+  />
 </template>

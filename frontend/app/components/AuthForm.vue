@@ -7,6 +7,11 @@ const props = defineProps<{
   authType: string;
 }>();
 
+const emit = defineEmits<{
+  (e: 'onSubmitLogin', email: string, password: string): void;
+  (e: 'onSubmitSignup', username: string, email: string, password: string): void;
+}>();
+
 const state = reactive({
   username: '',
   email: '',
@@ -14,9 +19,11 @@ const state = reactive({
 });
 
 const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
-  console.log(event.data);
-
-  // if props.authType == login, emit login, else, emit sign up
+  if (props.authType === 'login') {
+    emit('onSubmitLogin', event.data.email, event.data.password);
+  } else {
+    emit('onSubmitSignup', event.data.username, event.data.email, event.data.password);
+  }
 };
 </script>
 

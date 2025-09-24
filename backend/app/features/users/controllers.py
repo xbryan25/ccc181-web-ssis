@@ -14,10 +14,10 @@ class UserController:
     @staticmethod
     def user_login_controller():
 
-        user_details = request.json
+        user_login_details = request.json
 
         try:
-            user = UserServices.user_login_service(user_details.get('email'), user_details.get('password'))
+            user = UserServices.user_login_service(user_login_details.get('email'), user_login_details.get('password'))
             
             if not user:
                 return jsonify({"error": "Invalid credentials."}), 401
@@ -26,7 +26,7 @@ class UserController:
 
             resp = make_response({
                 "username": user.username,
-                "message": "Login successful"
+                "message": "Login successful."
             })
             
             # HttpOnly cookie, cannot be read by JS
@@ -43,3 +43,18 @@ class UserController:
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+        
+    @staticmethod
+    def user_signup_controller():
+
+        user_signup_details = request.json
+
+        try:
+            UserServices.user_signup_service(user_signup_details)
+            
+            return jsonify({"messageTitle": "Signup successful.", "message": "Your account is ready. Enjoy using Sequence!"}), 201
+        
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        

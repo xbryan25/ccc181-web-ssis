@@ -9,3 +9,12 @@ class UserRepository:
         db = current_app.extensions['db']
 
         return db.fetch_one(CommonQueries.GET_BY_SPECIFIC_COLUMN.format(table="users", column="email"), (email, ))
+
+    @staticmethod
+    def user_signup(user_id, username, email, password_hash):
+        db = current_app.extensions['db']
+
+        db.execute_query(CommonQueries.INSERT.format(table="users", 
+                                                     columns="user_id, username, email, password_hash",
+                                                     placeholders="%s, %s, %s, %s"),
+                                                     (user_id, username, email, password_hash))
