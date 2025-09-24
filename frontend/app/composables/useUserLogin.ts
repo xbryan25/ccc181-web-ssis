@@ -11,6 +11,7 @@ export function useUserLogin(email: string, password: string){
 
   return $fetch<UserLoginResponse>(`${apiUrl}/api/user/login`, {
     method: 'POST',
+    credentials: 'include',
     body: {
       email,
       password

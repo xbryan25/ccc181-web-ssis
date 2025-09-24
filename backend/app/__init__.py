@@ -16,7 +16,7 @@ def create_app():
     app.config.from_object(Config)
 
     jwt.init_app(app)
-    CORS(app, origins='*')
+    CORS(app, origins=["http://127.0.0.1:3000"], supports_credentials=True)
     
     from .features import student_bp, program_bp, college_bp, user_bp
 

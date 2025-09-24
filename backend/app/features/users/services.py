@@ -34,3 +34,9 @@ class UserServices:
         user_id = uuid.uuid4()
 
         UserRepository.user_signup(user_id, user_signup_details['username'], user_signup_details['email'], password_hash)
+
+    def get_username_service(user_id):
+        
+        username_dict = UserRepository.get_username(user_id)
+
+        return username_dict['username']

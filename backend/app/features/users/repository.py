@@ -18,3 +18,10 @@ class UserRepository:
                                                      columns="user_id, username, email, password_hash",
                                                      placeholders="%s, %s, %s, %s"),
                                                      (user_id, username, email, password_hash))
+        
+    @staticmethod
+    def get_username(user_id):
+        db = current_app.extensions['db']
+
+        return db.fetch_one(CommonQueries.GET_COLUMN_BY_PK.format(column="username", table="users", pk="user_id"), (user_id, ))
+        
