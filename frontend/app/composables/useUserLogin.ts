@@ -1,5 +1,6 @@
 
 type UserLoginResponse = {
+    messageTitle: string
     message: string
     accessToken: string
     username: string

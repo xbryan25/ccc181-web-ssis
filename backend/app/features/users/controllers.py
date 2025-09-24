@@ -26,7 +26,8 @@ class UserController:
 
             resp = make_response({
                 "username": user.username,
-                "message": "Login successful."
+                "messageTitle": "Login successful.",
+                "message": "Enjoy your session!"
             })
             
             # HttpOnly cookie, cannot be read by JS
