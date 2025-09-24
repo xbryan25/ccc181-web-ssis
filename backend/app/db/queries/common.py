@@ -10,4 +10,5 @@ class CommonQueries:
     UPDATE_BY_ID = "UPDATE {table} SET {set_clause} WHERE {pk} = %s"
     DELETE_BY_ID = "DELETE FROM {table} WHERE {pk} = %s"
     GET_ALL_IDS = "SELECT {pk} FROM {table} ASCENDING"
+    GET_BY_SPECIFIC_COLUMN = "SELECT * FROM {table} WHERE {column} = %s"
  

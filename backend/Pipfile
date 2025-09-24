@@ -9,6 +9,8 @@ python-dotenv = "*"
 flask-cors = "*"
 dataclasses = "*"
 psycopg = "*"
+uuid = "*"
+flask-jwt-extended = "*"
 
 [dev-packages]
 
