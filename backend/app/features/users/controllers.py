@@ -31,7 +31,7 @@ class UserController:
             
             # HttpOnly cookie, cannot be read by JS
             resp.set_cookie(
-                "accessToken",
+                "access_token",
                 access_token,
                 httponly=True,
                 secure=False, 
@@ -63,22 +63,14 @@ class UserController:
     def get_current_user_controller():
 
         try:
-            
-            print(request.cookies)
             user_id = get_jwt_identity()
-
-            print(user_id)
 
             if not user_id:
                 return jsonify({"message": "Not authenticated"}), 401
             
             username = UserServices.get_username_service(user_id)
 
-            print(username)
-
-            return "", 200
-
-            # return jsonify({"username": username}), 200
+            return jsonify({"username": username}), 200
 
         except Exception as e:
             traceback.print_exc()
