@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { DefineComponent } from 'vue';
+import { useDebounceFn } from '@vueuse/core';
+
 import type { Student, Program, College } from '~/types';
 
 import {
@@ -130,6 +132,10 @@ const loadEntities = async () => {
 
   entitiesData.value = data.entities;
 };
+
+const debouncedLoadEntities = useDebounceFn(async () => {
+  await loadEntities();
+}, 700); // 700ms debounce
 
 const totalPages = ref(1);
 const pageNumber = ref(1);
@@ -263,7 +269,7 @@ onMounted(() => {
         query: updateUrl(),
       });
 
-      loadEntities();
+      debouncedLoadEntities();
     },
     { immediate: true },
   );
