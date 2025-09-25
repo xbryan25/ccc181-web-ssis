@@ -30,7 +30,7 @@ def create_app():
 
     # Override default JWT error messages
     @jwt.unauthorized_loader
-    def custom_missing_cookie_callback():
+    def custom_missing_cookie_callback(err):
         if "text/html" in request.headers.get("Accept", ""):
             # Accessed directly in browser
             return jsonify(error="This page requires login. Please log in via the website."), 401
@@ -39,11 +39,11 @@ def create_app():
             return jsonify(error="Authentication required. Please log in first."), 401
 
     @jwt.invalid_token_loader
-    def custom_invalid_token_callback():
+    def custom_invalid_token_callback(err):
         return jsonify({"error": "Invalid or expired token. Please log in again."}), 401
 
     @jwt.expired_token_loader
-    def custom_expired_token_callback():
+    def custom_expired_token_callback(jwt_header, jwt_payload):
         return jsonify({"error": "Session expired. Please log in again."}), 401
 
     return app
