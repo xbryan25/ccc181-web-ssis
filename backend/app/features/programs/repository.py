@@ -66,4 +66,4 @@ class ProgramRepository:
     def get_program_codes():
         db = current_app.extensions['db']
 
-        return db.fetch_all(CommonQueries.GET_ALL_IDS.format(pk="program_code", table="programs"))   
+        return db.fetch_all(CommonQueries.GET_ALL_IDS.format(columns="program_code, college_code", table="programs", order_column="college_code"))   

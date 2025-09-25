@@ -40,4 +40,9 @@ class CollegeServices:
 
     @staticmethod
     def get_college_codes_service():
-        return CollegeRepository.get_college_codes()
+        college_codes_details = CollegeRepository.get_college_codes()
+
+        for college_code_details in college_codes_details:
+            college_code_details["collegeCode"] = college_code_details.pop('college_code')
+
+        return college_codes_details
