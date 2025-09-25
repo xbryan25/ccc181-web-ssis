@@ -8,5 +8,6 @@ export function useDeleteEntity(entityType: string, entityId: string){
 
   return $fetch<DeleteEntityResponse>(`${apiUrl}/api/${entityType}/${entityId}`, {
     method: 'DELETE',
+    credentials: 'include',
   });
 };

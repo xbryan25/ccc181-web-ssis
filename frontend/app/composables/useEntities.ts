@@ -19,6 +19,7 @@ export function useEntities(entityType: string,
 
   return $fetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}/`, {
     method: 'GET',
+    credentials: 'include',
     query: {
       ...(options || {})
     },

@@ -1,3 +1,7 @@
 <script setup lang="ts">
-navigateTo("/manage/students");
+import redirectHome from '~/middleware/redirectHome';
+
+definePageMeta({
+  middleware: redirectHome,
+});
 </script>

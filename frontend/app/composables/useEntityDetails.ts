@@ -14,6 +14,7 @@ export function useEntityDetails<T extends keyof EntityTypeMap>(
 
   return $fetch<EntityTypeMap[T]>(`${apiUrl}/api/${entityType}/${entityId}`, {
     method: 'GET',
+    credentials: 'include',
   })
 }
 

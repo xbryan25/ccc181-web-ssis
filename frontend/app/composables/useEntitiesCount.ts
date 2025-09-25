@@ -14,6 +14,7 @@ export function useEntitiesCount(entityType: string,
 
   return useFetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}/count`, {
     method: 'GET',
+    credentials: 'include',
     query: {
       ...(options || {})
     },
