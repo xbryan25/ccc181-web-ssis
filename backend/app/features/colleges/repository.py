@@ -65,4 +65,4 @@ class CollegeRepository:
     def get_college_codes():
         db = current_app.extensions['db']
 
-        return db.fetch_all(CommonQueries.GET_ALL_IDS.format(pk="college_code", table="colleges"))   
+        return db.fetch_all(CommonQueries.GET_ALL_IDS.format(columns="college_code", table="colleges", order_column="college_code"))   

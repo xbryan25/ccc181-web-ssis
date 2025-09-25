@@ -111,7 +111,9 @@ class CollegeController:
         try:
             college_codes_details = CollegeServices.get_college_codes_service()
 
-            return jsonify({"entityIds": [{"label": college_code_details["college_code"]} for college_code_details in college_codes_details]}), 200
+            print(college_codes_details)
+
+            return jsonify(college_codes_details), 200
 
         except Exception as e:
             traceback.print_exc()

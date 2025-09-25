@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Gender, Student, StudentFormState } from '~/types';
+import type { Gender, Student, StudentFormState, UseProgramCodesResponse } from '~/types';
 
-import { validateForm, capitalizeFirstWord } from '#imports';
+import { validateForm, capitalizeFirstWord, formatProgramCodesForSelectMenu } from '#imports';
 import type { SelectMenuItem } from '@nuxt/ui';
 
 const props = defineProps<{
@@ -75,37 +75,6 @@ const genderOptions = ref([
 
 const programCodeOptions = ref<SelectMenuItem[]>([]);
 
-// TODO: Do dropdown with labels for program codes soon, call from backend, then process on frontend
-
-// const programCodeOptions = ref<SelectMenuItem[]>([
-//   {
-//     type: 'label',
-//     label: 'CCS',
-//   },
-//   {
-//     label: 'BSCS',
-//   },
-//   {
-//     label: 'BSCA',
-//   },
-//   {
-//     label: 'BSIS',
-//   },
-//   {
-//     label: 'BSIT',
-//   },
-//   {
-//     type: 'separator',
-//   },
-//   {
-//     type: 'label',
-//     label: 'COE',
-//   },
-//   {
-//     label: 'BSCE',
-//   },
-// ]);
-
 let hasCalled = false;
 
 onMounted(async () => {
@@ -120,12 +89,14 @@ onMounted(async () => {
     state.programCode.label = entityData.programCode ? entityData.programCode : '';
   }
 
-  const programCodesDetailsData = await useEntityIds('programs');
+  const programCodesDetailsData: UseProgramCodesResponse[] = (await useEntityIds(
+    'programs',
+  )) as UseProgramCodesResponse[];
 
-  programCodeOptions.value = programCodesDetailsData.entityIds;
+  programCodeOptions.value = formatProgramCodesForSelectMenu(programCodesDetailsData);
 
   if (state.programCode.label === '') {
-    state.programCode.label = programCodesDetailsData.entityIds[0]?.label as string;
+    state.programCode.label = programCodesDetailsData[0]?.programCodes[0] as string;
   }
 
   hasCalled = true;

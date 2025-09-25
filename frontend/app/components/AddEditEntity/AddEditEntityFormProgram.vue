@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import type { Program, ProgramFormState } from '~/types';
+import type { Program, ProgramFormState, UseCollegeCodesResponse } from '~/types';
 
-import { validateForm } from '#imports';
+import { validateForm, formatCollegeCodesForSelectMenu } from '#imports';
+import type { SelectMenuItem } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
@@ -29,7 +30,7 @@ const emit = defineEmits<{
   (e: 'onSubmit', newEntity: Program): void;
 }>();
 
-const collegeCodeOptions = ref<{ label: string }[]>([]);
+const collegeCodeOptions = ref<SelectMenuItem[]>([]);
 
 let hasCalled = false;
 
@@ -42,12 +43,14 @@ onMounted(async () => {
     state.collegeCode.label = entityData.collegeCode ? entityData.collegeCode : '';
   }
 
-  const collegeCodesDetailsData = await useEntityIds('colleges');
+  const collegeCodesDetailsData: UseCollegeCodesResponse[] = (await useEntityIds(
+    'colleges',
+  )) as UseCollegeCodesResponse[];
 
-  collegeCodeOptions.value = collegeCodesDetailsData.entityIds;
+  collegeCodeOptions.value = formatCollegeCodesForSelectMenu(collegeCodesDetailsData);
 
   if (state.collegeCode.label === '') {
-    state.collegeCode.label = collegeCodesDetailsData.entityIds[0]?.label as string;
+    state.collegeCode.label = collegeCodesDetailsData[0]?.collegeCode as string;
   }
 
   hasCalled = true;
