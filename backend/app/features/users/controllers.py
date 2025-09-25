@@ -1,7 +1,6 @@
-from flask import request, jsonify, make_response
-from dataclasses import asdict
+from flask import request, jsonify, make_response, session
 
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, get_jwt_identity
 
 import traceback
 
@@ -32,11 +31,12 @@ class UserController:
             
             # HttpOnly cookie, cannot be read by JS
             resp.set_cookie(
-                "accessToken",
+                "access_token",
                 access_token,
                 httponly=True,
-                secure=True, 
-                samesite="Strict"
+                secure=False, 
+                samesite="Lax",
+                max_age=60*2
             )
 
             return resp, 200
@@ -55,6 +55,23 @@ class UserController:
             
             return jsonify({"messageTitle": "Signup successful.", "message": "Your account is ready. Enjoy using Sequence!"}), 201
         
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        
+    @staticmethod
+    def get_current_user_controller():
+
+        try:
+            user_id = get_jwt_identity()
+
+            if not user_id:
+                return jsonify({"message": "Not authenticated"}), 401
+            
+            username = UserServices.get_username_service(user_id)
+
+            return jsonify({"username": username}), 200
+
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500

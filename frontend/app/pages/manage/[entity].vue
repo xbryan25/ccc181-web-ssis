@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import SearchAndSortHeader from '~/components/SearchAndSortHeader.vue';
+import auth from '~/middleware/auth';
 import { capitalizeWords } from '~/utils/stringUtils';
 
 // definePageMeta validate only decides whether the page is valid to be shown
@@ -12,6 +13,7 @@ definePageMeta({
     console.log(entity);
     return ['students', 'programs', 'colleges'].includes(entity);
   },
+  middleware: auth,
 });
 
 const route = useRoute();

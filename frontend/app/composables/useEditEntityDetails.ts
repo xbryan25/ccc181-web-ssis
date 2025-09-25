@@ -10,6 +10,7 @@ export function useEditEntityDetails(entityType: string, entityDetails: Student 
 
   return $fetch<EditEntityResponse>(`${apiUrl}/api/${entityType}/${selectedEntity}`, {
     method: 'PUT',
+    credentials: 'include',
     body: {
       entityDetails
     },

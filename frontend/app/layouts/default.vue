@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import NavBarButtons from "~/components/NavBarButtons.vue";
+import NavBarButtons from '~/components/NavBarButtons.vue';
 
 interface NavBarDetails {
   url: string;
@@ -9,29 +9,29 @@ interface NavBarDetails {
 
 const navBarButtonDetails: NavBarDetails[] = [
   {
-    url: "/manage/students",
-    buttonName: "Students",
-    iconName: "solar:square-academic-cap-2-bold",
+    url: '/manage/students',
+    buttonName: 'Students',
+    iconName: 'solar:square-academic-cap-2-bold',
   },
   {
-    url: "/manage/programs",
-    buttonName: "Programs",
-    iconName: "solar:book-2-bold-duotone",
+    url: '/manage/programs',
+    buttonName: 'Programs',
+    iconName: 'solar:book-2-bold-duotone',
   },
   {
-    url: "/manage/colleges",
-    buttonName: "Colleges",
-    iconName: "solar:buildings-2-bold",
+    url: '/manage/colleges',
+    buttonName: 'Colleges',
+    iconName: 'solar:buildings-2-bold',
   },
   {
-    url: "/statistics",
-    buttonName: "Statistics",
-    iconName: "solar:chart-2-bold",
+    url: '/statistics',
+    buttonName: 'Statistics',
+    iconName: 'solar:chart-2-bold',
   },
   {
-    url: "/about",
-    buttonName: "About",
-    iconName: "solar:info-square-bold",
+    url: '/about',
+    buttonName: 'About',
+    iconName: 'solar:info-square-bold',
   },
 ];
 </script>
