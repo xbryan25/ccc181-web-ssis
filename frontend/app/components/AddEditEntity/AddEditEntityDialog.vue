@@ -94,12 +94,16 @@ async function onSubmitError() {
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
           @on-submit="(newEntity) => onSubmit(newEntity)"
+          @on-close="isOpen = false"
+          @on-submit-error="onSubmitError"
         />
         <AddEditEntityFormProgram
           v-if="entityType === 'programs'"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
           @on-submit="(newEntity) => onSubmit(newEntity)"
+          @on-close="isOpen = false"
+          @on-submit-error="onSubmitError"
         />
         <AddEditEntityFormCollege
           v-if="entityType === 'colleges'"
