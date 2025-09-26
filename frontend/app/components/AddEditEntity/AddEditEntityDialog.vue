@@ -28,8 +28,6 @@ async function onSubmit(newEntity: Student | Program | College) {
   try {
     let data: { message: string };
 
-    console.log('reach here');
-
     if (props.dialogType === 'add') {
       data = await useCreateEntity(props.entityType, newEntity);
     } else {

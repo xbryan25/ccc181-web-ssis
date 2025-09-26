@@ -2,7 +2,7 @@
 import type { Program, ProgramFormState, UseCollegeCodesResponse } from '~/types';
 
 import { validateForm, formatCollegeCodesForSelectMenu } from '#imports';
-import type { SelectMenuItem } from '@nuxt/ui';
+import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
@@ -47,6 +47,14 @@ onMounted(async () => {
 
   hasCalled = true;
 });
+
+const transformProgramState = (event: FormSubmitEvent<ProgramFormState>) => {
+  emit('onSubmit', {
+    programCode: event.data.programCode,
+    programName: event.data.programName,
+    collegeCode: event.data.collegeCode.label,
+  });
+};
 </script>
 
 <template>
@@ -54,7 +62,7 @@ onMounted(async () => {
     :validate="(state) => validateForm(state, 'program', hasCalled)"
     :state="state"
     class="flex flex-col space-y-4"
-    @submit="(event) => emit('onSubmit', event.data)"
+    @submit="(event) => transformProgramState(event)"
     @error="emit('onSubmitError')"
   >
     <UFormField label="Program Code" name="programCode" class="flex-1">

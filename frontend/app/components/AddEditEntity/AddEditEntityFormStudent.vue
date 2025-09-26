@@ -2,7 +2,7 @@
 import type { Gender, Student, StudentFormState, UseProgramCodesResponse } from '~/types';
 
 import { validateForm, capitalizeFirstWord, formatProgramCodesForSelectMenu } from '#imports';
-import type { SelectMenuItem } from '@nuxt/ui';
+import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
@@ -90,6 +90,17 @@ onMounted(async () => {
 
   hasCalled = true;
 });
+
+const transformStudentState = (event: FormSubmitEvent<StudentFormState>) => {
+  emit('onSubmit', {
+    idNumber: event.data.idNumber,
+    firstName: event.data.firstName,
+    lastName: event.data.lastName,
+    yearLevel: event.data.yearLevel.label,
+    gender: event.data.gender.label,
+    programCode: event.data.programCode.label,
+  });
+};
 </script>
 
 <template>
@@ -97,7 +108,7 @@ onMounted(async () => {
     :validate="(state) => validateForm(state, 'student', hasCalled)"
     :state="state"
     class="flex flex-col space-y-4"
-    @submit="(event) => emit('onSubmit', event.data)"
+    @submit="(event) => transformStudentState(event)"
     @error="emit('onSubmitError')"
   >
     <div class="flex gap-4 w-full">
