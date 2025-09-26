@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 
+from app.utils.get_cookie_max_age import get_cookie_max_age
+
 load_dotenv()
 
 
@@ -17,3 +19,6 @@ class Config:
     JWT_TOKEN_LOCATION = os.getenv("JWT_TOKEN_LOCATION", "cookies").split(",")  # ["cookies"]
     JWT_ACCESS_COOKIE_NAME = os.getenv("JWT_ACCESS_COOKIE_NAME", "accessToken")
     JWT_COOKIE_CSRF_PROTECT = os.getenv("JWT_COOKIE_CSRF_PROTECT", "False").lower() == "true"
+
+    # in seconds
+    COOKIE_MAX_AGE = get_cookie_max_age()

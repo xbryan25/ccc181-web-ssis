@@ -2,12 +2,11 @@
 import type { Gender, Student, StudentFormState, UseProgramCodesResponse } from '~/types';
 
 import { validateForm, capitalizeFirstWord, formatProgramCodesForSelectMenu } from '#imports';
-import type { SelectMenuItem } from '@nuxt/ui';
+import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
 
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
-  toSubmit: boolean;
 }>();
 
 const state = reactive<StudentFormState>({
@@ -25,19 +24,9 @@ const state = reactive<StudentFormState>({
   },
 });
 
-const transformStudentState = () => {
-  return {
-    idNumber: state.idNumber,
-    firstName: state.firstName,
-    lastName: state.lastName,
-    yearLevel: state.yearLevel.label,
-    gender: state.gender.label,
-    programCode: state.programCode.label,
-  };
-};
-
 const emit = defineEmits<{
   (e: 'onSubmit', newEntity: Student): void;
+  (e: 'onClose' | 'onSubmitError'): void;
 }>();
 
 const yearLevelOptions = ref([
@@ -102,14 +91,16 @@ onMounted(async () => {
   hasCalled = true;
 });
 
-watch(
-  () => props.toSubmit,
-  (val) => {
-    if (val) {
-      emit('onSubmit', transformStudentState());
-    }
-  },
-);
+const transformStudentState = (event: FormSubmitEvent<StudentFormState>) => {
+  emit('onSubmit', {
+    idNumber: event.data.idNumber,
+    firstName: event.data.firstName,
+    lastName: event.data.lastName,
+    yearLevel: event.data.yearLevel.label,
+    gender: event.data.gender.label,
+    programCode: event.data.programCode.label,
+  });
+};
 </script>
 
 <template>
@@ -117,6 +108,8 @@ watch(
     :validate="(state) => validateForm(state, 'student', hasCalled)"
     :state="state"
     class="flex flex-col space-y-4"
+    @submit="(event) => transformStudentState(event)"
+    @error="emit('onSubmitError')"
   >
     <div class="flex gap-4 w-full">
       <UFormField label="ID Number" name="idNumber" class="flex-1">
@@ -154,6 +147,20 @@ watch(
           }"
         />
       </UFormField>
+    </div>
+
+    <div class="flex justify-end gap-2 w-full pt-5">
+      <UButton
+        size="md"
+        color="error"
+        variant="solid"
+        class="cursor-pointer"
+        @click="emit('onClose')"
+        >Close</UButton
+      >
+      <UButton size="md" color="primary" variant="solid" type="submit" class="cursor-pointer"
+        >Proceed</UButton
+      >
     </div>
   </UForm>
 </template>
