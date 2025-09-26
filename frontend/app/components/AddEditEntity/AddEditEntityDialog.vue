@@ -23,6 +23,8 @@ const isOpen = computed({
 const toast = useToast();
 
 async function onSubmit(newEntity: Student | Program | College) {
+  isOpen.value = false;
+
   try {
     let data: { message: string };
 
@@ -51,16 +53,16 @@ async function onSubmit(newEntity: Student | Program | College) {
     });
   }
 
-  toSubmit.value = false;
-
   emit('onSubmit');
 }
 
-const toSubmit = ref(false);
-
-const clickProceed = () => {
-  toSubmit.value = true;
-};
+async function onSubmitError() {
+  toast.add({
+    title: 'Error with inputs',
+    description: `Resolve issues to ${props.dialogType} ${props.entityType.slice(0, -1)}.`,
+    color: 'error',
+  });
+}
 </script>
 
 <template>
@@ -91,26 +93,25 @@ const clickProceed = () => {
           v-if="entityType === 'students'"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
-          :to-submit="toSubmit"
           @on-submit="(newEntity) => onSubmit(newEntity)"
         />
         <AddEditEntityFormProgram
           v-if="entityType === 'programs'"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
-          :to-submit="toSubmit"
           @on-submit="(newEntity) => onSubmit(newEntity)"
         />
         <AddEditEntityFormCollege
           v-if="entityType === 'colleges'"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
-          :to-submit="toSubmit"
           @on-submit="(newEntity) => onSubmit(newEntity)"
+          @on-close="isOpen = false"
+          @on-submit-error="onSubmitError"
         />
       </template>
 
-      <template #footer>
+      <!-- <template #footer>
         <div class="flex justify-end gap-2 w-full">
           <UButton
             size="md"
@@ -132,7 +133,7 @@ const clickProceed = () => {
             >Proceed</UButton
           >
         </div>
-      </template>
+      </template> -->
     </UModal>
   </div>
 </template>
