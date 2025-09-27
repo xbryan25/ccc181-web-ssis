@@ -17,8 +17,8 @@ export function getStudentsTableColumns(callbacks :{
       header: "ID Number",
       meta: {
         class: {
-          th: "w-28",
-          td: "w-28 text-md",
+          th: "w-32",
+          td: "w-32 text-md",
         },
       },
     },
