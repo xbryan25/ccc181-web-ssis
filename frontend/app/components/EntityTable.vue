@@ -117,7 +117,11 @@ const updateUrl = () => {
   return newQuery;
 };
 
+const isLoading = ref(true);
+
 const loadEntities = async () => {
+  // isLoading.value = true;
+
   const options = {
     rowsPerPage: rowsPerPage.value,
     pageNumber: pageNumber.value,
@@ -131,9 +135,13 @@ const loadEntities = async () => {
   const data = await useEntities(props.entityType, options);
 
   entitiesData.value = data.entities;
+
+  isLoading.value = false;
 };
 
 const debouncedLoadEntities = useDebounceFn(async () => {
+  isLoading.value = true;
+
   await loadEntities();
 }, 700); // 700ms debounce
 
@@ -269,6 +277,8 @@ onMounted(() => {
         query: updateUrl(),
       });
 
+      isLoading.value = true;
+
       debouncedLoadEntities();
     },
     { immediate: true },
@@ -289,7 +299,10 @@ onBeforeUnmount(() => {
     :entity-type="props.entityType"
     :dialog-type="'edit'"
     :selected-entity="selectedEntity"
-    @on-submit="loadEntities()"
+    @on-submit="
+      isLoading = true;
+      debouncedLoadEntities();
+    "
   />
 
   <ConfirmDeleteEntityDialog
@@ -297,12 +310,15 @@ onBeforeUnmount(() => {
     class="ml-auto hidden"
     :entity-type="props.entityType"
     :selected-entity="selectedEntity"
-    @on-delete="loadEntities()"
+    @on-delete="
+      isLoading = true;
+      debouncedLoadEntities();
+    "
   />
 
   <UTable
     v-if="entityType === 'students'"
-    loading
+    :loading="isLoading"
     loading-color="primary"
     loading-animation="carousel"
     :data="(entitiesData as Student[]).slice(0, rowsPerPage)"
@@ -312,7 +328,7 @@ onBeforeUnmount(() => {
 
   <UTable
     v-if="entityType === 'programs'"
-    loading
+    :loading="isLoading"
     loading-color="primary"
     loading-animation="carousel"
     :data="(entitiesData as Program[]).slice(0, rowsPerPage)"
@@ -322,7 +338,7 @@ onBeforeUnmount(() => {
 
   <UTable
     v-if="entityType === 'colleges'"
-    loading
+    :loading="isLoading"
     loading-color="primary"
     loading-animation="carousel"
     :data="(entitiesData as College[]).slice(0, rowsPerPage)"
