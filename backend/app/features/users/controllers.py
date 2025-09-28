@@ -1,4 +1,4 @@
-from flask import request, jsonify, make_response, session
+from flask import request, jsonify, make_response, current_app
 
 from flask_jwt_extended import create_access_token, get_jwt_identity
 
@@ -36,7 +36,7 @@ class UserController:
                 httponly=True,
                 secure=False, 
                 samesite="Lax",
-                max_age=60*2
+                max_age=60 * current_app.config["COOKIE_MAX_AGE"] 
             )
 
             return resp, 200

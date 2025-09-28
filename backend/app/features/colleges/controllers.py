@@ -26,7 +26,13 @@ class CollegeController:
     @staticmethod
     def get_total_college_count_controller():
         try:
-            total_college_count_dict = CollegeServices.get_total_college_count_service()
+            params = {
+                "search_value": request.args.get("searchValue"),
+                "search_by": request.args.get("searchBy"),
+                "search_type": request.args.get("searchType"),
+            }
+
+            total_college_count_dict = CollegeServices.get_total_college_count_service(params)
 
             return jsonify({"totalCount": total_college_count_dict["count"]}), 200
 
@@ -63,8 +69,6 @@ class CollegeController:
             'collegeCode': entity_details['entityDetails']['collegeCode'],
             'collegeName': entity_details['entityDetails']['collegeName']
         }
-
-        print(new_college_data)
 
         try:
             CollegeServices.create_college_service(new_college_data)
@@ -111,7 +115,9 @@ class CollegeController:
         try:
             college_codes_details = CollegeServices.get_college_codes_service()
 
-            return jsonify({"entityIds": [{"label": college_code_details["college_code"]} for college_code_details in college_codes_details]}), 200
+            print(college_codes_details)
+
+            return jsonify(college_codes_details), 200
 
         except Exception as e:
             traceback.print_exc()

@@ -42,5 +42,30 @@ class ProgramServices:
 
     @staticmethod
     def get_program_codes_service():
-        return ProgramRepository.get_program_codes()
+        program_codes_details = ProgramRepository.get_program_codes()
+
+        print(program_codes_details)
+
+        grouped_program_codes = {}
+
+        for program_code_details in program_codes_details:
+
+            if program_code_details['college_code'] not in grouped_program_codes:
+                grouped_program_codes[program_code_details['college_code']] = {
+                    'collegeCode': program_code_details['college_code'],
+                    'programCodes': [program_code_details['program_code']]
+                }
+
+            else:
+                grouped_program_codes[program_code_details['college_code']]['programCodes'].append(program_code_details['program_code'])
+                
+                grouped_program_codes[program_code_details['college_code']]['programCodes'].sort()
+
+
+        # Rename None to "N/A"
+        grouped_program_codes["N/A"] = grouped_program_codes.pop(None)
+        grouped_program_codes["N/A"]['collegeCode'] = "N/A"
+
+        # Return list of values of the dict
+        return list(grouped_program_codes.values())
     

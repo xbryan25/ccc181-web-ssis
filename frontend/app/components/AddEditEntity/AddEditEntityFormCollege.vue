@@ -6,7 +6,6 @@ import { validateForm } from '#imports';
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
-  toSubmit: boolean;
 }>();
 
 const state = reactive<CollegeFormState>({
@@ -14,15 +13,9 @@ const state = reactive<CollegeFormState>({
   collegeName: '',
 });
 
-const transformCollegeState = () => {
-  return {
-    collegeCode: state.collegeCode,
-    collegeName: state.collegeName,
-  };
-};
-
 const emit = defineEmits<{
   (e: 'onSubmit', newEntity: College): void;
+  (e: 'onClose' | 'onSubmitError'): void;
 }>();
 
 let hasCalled = false;
@@ -37,15 +30,6 @@ onMounted(async () => {
 
   hasCalled = true;
 });
-
-watch(
-  () => props.toSubmit,
-  (val) => {
-    if (val) {
-      emit('onSubmit', transformCollegeState());
-    }
-  },
-);
 </script>
 
 <template>
@@ -53,6 +37,8 @@ watch(
     :validate="(state) => validateForm(state, 'college', hasCalled)"
     :state="state"
     class="flex flex-col space-y-4"
+    @submit="(event) => emit('onSubmit', event.data)"
+    @error="emit('onSubmitError')"
   >
     <UFormField label="College Code" name="collegeCode" class="flex-1">
       <UInput v-model="state.collegeCode" class="w-full" />
@@ -61,5 +47,19 @@ watch(
     <UFormField label="College Name" name="collegeName" class="flex-1">
       <UInput v-model="state.collegeName" class="w-full" />
     </UFormField>
+
+    <div class="flex justify-end gap-2 w-full pt-5">
+      <UButton
+        size="md"
+        color="error"
+        variant="solid"
+        class="cursor-pointer"
+        @click="emit('onClose')"
+        >Close</UButton
+      >
+      <UButton size="md" color="primary" variant="solid" type="submit" class="cursor-pointer"
+        >Proceed</UButton
+      >
+    </div>
   </UForm>
 </template>

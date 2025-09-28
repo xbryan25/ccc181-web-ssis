@@ -12,8 +12,8 @@ class CollegeServices:
         return College(**row)
     
     @staticmethod
-    def get_total_college_count_service():
-        return CollegeRepository.get_total_college_count()
+    def get_total_college_count_service(params):
+        return CollegeRepository.get_total_college_count(params)
 
     @staticmethod
     def get_many_colleges_service(params):
@@ -40,4 +40,9 @@ class CollegeServices:
 
     @staticmethod
     def get_college_codes_service():
-        return CollegeRepository.get_college_codes()
+        college_codes_details = CollegeRepository.get_college_codes()
+
+        for college_code_details in college_codes_details:
+            college_code_details["collegeCode"] = college_code_details.pop('college_code')
+
+        return college_codes_details
