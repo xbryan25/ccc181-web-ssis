@@ -178,7 +178,17 @@ const getTotalEntityCount = async () => {
 
 const debouncedGetTotalEntityCount = useDebounceFn(async () => {
   await getTotalEntityCount();
+
+  checkIfBeyondPageLimit();
 }, 200); // 700ms debounce
+
+const checkIfBeyondPageLimit = () => {
+  const totalPages = Math.ceil(totalEntityCount.value / rowsPerPage.value);
+
+  if (pageNumber.value > totalPages) {
+    pageNumber.value = totalPages;
+  }
+};
 
 // This watch function emits changes to [entity.vue]
 
