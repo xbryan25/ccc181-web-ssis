@@ -152,18 +152,16 @@ const rowsPerPage = ref(0);
 
 const updatePagination = () => {
   calculateRows();
-  getTotalEntityCount();
+  debouncedGetTotalEntityCount();
 };
 
 const calculateRows = () => {
   const row = document.querySelector('table tbody tr');
-  const rowHeight = row?.clientHeight ? row?.clientHeight + 1 : 64;
+  const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
 
   const availableHeight = window.innerHeight - reservedHeight;
 
   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
-
-  console.log(`number of rows ${rowsPerPage.value}`);
 };
 
 const getTotalEntityCount = async () => {
@@ -177,6 +175,10 @@ const getTotalEntityCount = async () => {
 
   totalEntityCount.value = totalCount;
 };
+
+const debouncedGetTotalEntityCount = useDebounceFn(async () => {
+  await getTotalEntityCount();
+}, 200); // 700ms debounce
 
 // This watch function emits changes to [entity.vue]
 
@@ -237,7 +239,8 @@ watch(
   () => props.createEntitySubmitRef,
   (newVal) => {
     if (newVal) {
-      loadEntities();
+      debouncedGetTotalEntityCount();
+      debouncedLoadEntities();
       emit('disableCreateEntitySubmit');
     }
   },
@@ -257,6 +260,7 @@ onMounted(() => {
   // This watch function 'watches' any changes in table filters and pagination, doesn't include parent changes
   watch(
     [
+      () => rowsPerPage.value,
       () => pageNumber.value,
       () => internalSearchValue.value,
       () => internalSearchBy.value,
@@ -291,10 +295,10 @@ onBeforeUnmount(() => {
     :entity-type="props.entityType"
     :dialog-type="'edit'"
     :selected-entity="selectedEntity"
-    @on-submit="
+    @on-submit-details="
       isLoading = true;
       debouncedLoadEntities();
-      getMaxPages();
+      debouncedGetTotalEntityCount();
     "
   />
 
@@ -306,7 +310,7 @@ onBeforeUnmount(() => {
     @on-delete="
       isLoading = true;
       debouncedLoadEntities();
-      getMaxPages();
+      debouncedGetTotalEntityCount();
     "
   />
 
@@ -337,7 +341,7 @@ onBeforeUnmount(() => {
     loading-animation="carousel"
     :data="(entitiesData as College[]).slice(0, rowsPerPage)"
     :columns="collegesTableColumns"
-    class="flex-1"
+    class="flex-1 overflow-y-hidden"
   />
 
   <div class="flex justify-center">
@@ -346,7 +350,7 @@ onBeforeUnmount(() => {
       :items-per-page="rowsPerPage"
       show-edges
       size="xl"
-      :sibling-count="1"
+      :sibling-count="0"
       :total="totalEntityCount"
     />
   </div>

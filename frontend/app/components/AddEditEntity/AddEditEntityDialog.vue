@@ -43,6 +43,8 @@ async function onSubmit(newEntity: Student | Program | College) {
       description: data.message,
       color: 'success',
     });
+
+    emit('onSubmit');
   } catch {
     toast.add({
       title: 'Error',
@@ -50,8 +52,6 @@ async function onSubmit(newEntity: Student | Program | College) {
       color: 'error',
     });
   }
-
-  emit('onSubmit');
 }
 
 async function onSubmitError() {
