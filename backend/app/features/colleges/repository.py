@@ -13,10 +13,26 @@ class CollegeRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
 
     @staticmethod
-    def get_total_college_count() -> int:
+    def get_total_college_count(params) -> int:
         db = current_app.extensions['db']
 
-        return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="colleges"))
+        if params["search_value"]:
+
+            if params["search_type"] == "Starts With":
+                search_pattern = f"{params["search_value"]}%"
+            elif params["search_type"] == "Ends With":
+                search_pattern = f"%{params["search_value"]}"
+            elif params["search_type"] == "Contains":
+                search_pattern = f"%{params["search_value"]}%"
+            else:
+                search_pattern = params["search_value"]
+
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT_WITH_SEARCH.format(table="colleges", search_by=f"{params["search_by"].lower().replace(' ', '_')}"),
+                                (search_pattern,))
+        
+        else:
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="colleges"))
+
 
     def get_many_colleges(params):
         db = current_app.extensions['db']

@@ -1,10 +1,10 @@
 
 type UseEntitiesResponse = {
-    entitiesCount: number
+    totalCount: number
 }
 
 export function useEntitiesCount(entityType: string, 
-                                options?: {
+                                  options?: {
                                     searchValue?: string, 
                                     searchBy?: string, 
                                     searchType?: string,
@@ -12,7 +12,7 @@ export function useEntitiesCount(entityType: string,
 
   const apiUrl = import.meta.env.VITE_API_URL;
 
-  return useFetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}/count`, {
+  return $fetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}/total-count`, {
     method: 'GET',
     credentials: 'include',
     query: {

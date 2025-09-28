@@ -145,14 +145,14 @@ const debouncedLoadEntities = useDebounceFn(async () => {
   await loadEntities();
 }, 700); // 700ms debounce
 
-const totalPages = ref(1);
+const totalEntityCount = ref(0);
 const pageNumber = ref(1);
 const reservedHeight = 300;
 const rowsPerPage = ref(0);
 
 const updatePagination = () => {
   calculateRows();
-  getMaxPages();
+  getTotalEntityCount();
 };
 
 const calculateRows = () => {
@@ -162,28 +162,20 @@ const calculateRows = () => {
   const availableHeight = window.innerHeight - reservedHeight;
 
   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
+
+  console.log(`number of rows ${rowsPerPage.value}`);
 };
 
-const getMaxPages = () => {
-  // const options = {
-  //   searchValue: props.searchValue,
-  //   searchBy: props.searchBy,
-  //   searchType: props.searchType,
-  // };
+const getTotalEntityCount = async () => {
+  const options = {
+    searchValue: props.searchValue,
+    searchBy: props.searchBy,
+    searchType: props.searchType,
+  };
 
-  totalPages.value = 5;
+  const { totalCount }: { totalCount: number } = await useEntitiesCount(props.entityType, options);
 
-  // const { data, error } = useEntitiesCount(props.entityType, options);
-
-  // if (!error.value && data.value) {
-  //   totalPages.value = Math.ceil(data.value.entitiesCount / rowsPerPage.value)
-  // }
-
-  if (pageNumber.value > totalPages.value) {
-    pageNumber.value = totalPages.value;
-  } else if (pageNumber.value < 1) {
-    pageNumber.value = 1;
-  }
+  totalEntityCount.value = totalCount;
 };
 
 // This watch function emits changes to [entity.vue]
@@ -302,6 +294,7 @@ onBeforeUnmount(() => {
     @on-submit="
       isLoading = true;
       debouncedLoadEntities();
+      getMaxPages();
     "
   />
 
@@ -313,6 +306,7 @@ onBeforeUnmount(() => {
     @on-delete="
       isLoading = true;
       debouncedLoadEntities();
+      getMaxPages();
     "
   />
 
@@ -353,7 +347,7 @@ onBeforeUnmount(() => {
       show-edges
       size="xl"
       :sibling-count="1"
-      :total="30"
+      :total="totalEntityCount"
     />
   </div>
 </template>
