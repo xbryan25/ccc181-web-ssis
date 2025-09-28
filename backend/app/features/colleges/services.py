@@ -12,8 +12,8 @@ class CollegeServices:
         return College(**row)
     
     @staticmethod
-    def get_total_college_count_service():
-        return CollegeRepository.get_total_college_count()
+    def get_total_college_count_service(params):
+        return CollegeRepository.get_total_college_count(params)
 
     @staticmethod
     def get_many_colleges_service(params):
