@@ -14,58 +14,60 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (
-    e:
-      | "update:searchBy"
-      | "update:searchType"
-      | "update:sortField"
-      | "update:sortOrder",
-    value: string
+    e: 'update:searchBy' | 'update:searchType' | 'update:sortField' | 'update:sortOrder',
+    value: string,
   ): void;
 }>();
 
 const isOpen = ref(false);
 
 const entityPropertiesOptions: EntityPropertiesOptions = {
-  students: [
-    "ID Number",
-    "First Name",
-    "Last Name",
-    "Year Level",
-    "Gender",
-    "Program Code",
-  ],
-  programs: ["Program Code", "Program Name", "College Code"],
-  colleges: ["College Code", "College Name"],
+  students: ['ID Number', 'First Name', 'Last Name', 'Year Level', 'Gender', 'Program Code'],
+  programs: ['Program Code', 'Program Name', 'College Code'],
+  colleges: ['College Code', 'College Name'],
 };
 
-const filterTypes = ["Starts With", "Ends With", "Contains"];
+const filterTypes = ['Starts With', 'Ends With', 'Contains'];
 
-const sortTypes = ["Ascending", "Descending"];
+const sortTypes = ['Ascending', 'Descending'];
+
+const getTextForTooltip = (): string => {
+  if (props.dialogType === 'filter') {
+    return `Search By: ${props.searchAndSortState.searchBy} | Search Type: ${props.searchAndSortState.searchType}`;
+  } else {
+    return `Sort Field: ${props.searchAndSortState.sortField} | Sort Order: ${props.searchAndSortState.sortOrder}`;
+  }
+};
 </script>
 
 <template>
   <div>
     <UModal v-model:open="isOpen">
-      <UButton
-        :icon="
-          props.dialogType === 'filter'
-            ? 'solar:filter-linear'
-            : 'solar:sort-linear'
-        "
-        size="md"
-        color="primary"
-        variant="solid"
-        class="cursor-pointer"
-        @click="isOpen = true"
-        >{{
-          props.dialogType === "filter" ? "Filters" : "Sort Options"
-        }}</UButton
+      <UTooltip
+        :content="{
+          align: 'center',
+          side: 'top',
+          sideOffset: 8,
+        }"
+        arrow
+        :ui="{ content: 'data-[state=delayed-open]:animate-none data-[state=closed]:animate-none' }"
       >
+        <template #content>
+          {{ getTextForTooltip() }}
+        </template>
+        <UButton
+          :icon="props.dialogType === 'filter' ? 'solar:filter-linear' : 'solar:sort-linear'"
+          size="md"
+          color="primary"
+          variant="solid"
+          class="cursor-pointer"
+          @click="isOpen = true"
+          >{{ props.dialogType === 'filter' ? 'Filters' : 'Sort Options' }}
+        </UButton>
+      </UTooltip>
 
       <template #header>
-        <h2 v-if="props.dialogType === 'filter'" class="text-3xl font-semibold">
-          Search Filters
-        </h2>
+        <h2 v-if="props.dialogType === 'filter'" class="text-3xl font-semibold">Search Filters</h2>
 
         <h2 v-else class="text-3xl font-semibold">Sort Options</h2>
       </template>
@@ -73,10 +75,7 @@ const sortTypes = ["Ascending", "Descending"];
       <template #body>
         <div>
           <div class="flex-col mb-12">
-            <div
-              v-if="props.dialogType === 'filter'"
-              class="w-full flex gap-4 mb-2"
-            >
+            <div v-if="props.dialogType === 'filter'" class="w-full flex gap-4 mb-2">
               <h3 class="flex-1 text-lg font-medium">Search By</h3>
               <h3 class="flex-1 text-lg font-medium">Search Type</h3>
             </div>
@@ -94,38 +93,20 @@ const sortTypes = ["Ascending", "Descending"];
                 :dialog-type="props.dialogType"
                 :column-position="'first'"
                 :search-and-sort-state="props.searchAndSortState"
-                @update:search-by="
-                  (value: string) => emit('update:searchBy', value)
-                "
-                @update:search-type="
-                  (value: string) => emit('update:searchType', value)
-                "
-                @update:sort-field="
-                  (value: string) => emit('update:sortField', value)
-                "
-                @update:sort-order="
-                  (value: string) => emit('update:sortOrder', value)
-                "
+                @update:search-by="(value: string) => emit('update:searchBy', value)"
+                @update:search-type="(value: string) => emit('update:searchType', value)"
+                @update:sort-field="(value: string) => emit('update:sortField', value)"
+                @update:sort-order="(value: string) => emit('update:sortOrder', value)"
               />
               <RadioSelectButtons
-                :options="
-                  props.dialogType === 'filter' ? filterTypes : sortTypes
-                "
+                :options="props.dialogType === 'filter' ? filterTypes : sortTypes"
                 :dialog-type="props.dialogType"
                 :column-position="'second'"
                 :search-and-sort-state="props.searchAndSortState"
-                @update:search-by="
-                  (value: string) => emit('update:searchBy', value)
-                "
-                @update:search-type="
-                  (value: string) => emit('update:searchType', value)
-                "
-                @update:sort-field="
-                  (value: string) => emit('update:sortField', value)
-                "
-                @update:sort-order="
-                  (value: string) => emit('update:sortOrder', value)
-                "
+                @update:search-by="(value: string) => emit('update:searchBy', value)"
+                @update:search-type="(value: string) => emit('update:searchType', value)"
+                @update:sort-field="(value: string) => emit('update:sortField', value)"
+                @update:sort-order="(value: string) => emit('update:sortOrder', value)"
               />
             </div>
           </div>

@@ -249,6 +249,7 @@ watch(
   () => props.createEntitySubmitRef,
   (newVal) => {
     if (newVal) {
+      isLoading.value = true;
       debouncedGetTotalEntityCount();
       debouncedLoadEntities();
       emit('disableCreateEntitySubmit');
@@ -305,10 +306,10 @@ onBeforeUnmount(() => {
     :entity-type="props.entityType"
     :dialog-type="'edit'"
     :selected-entity="selectedEntity"
-    @on-submit-details="
+    @on-submit="
       isLoading = true;
-      debouncedLoadEntities();
       debouncedGetTotalEntityCount();
+      debouncedLoadEntities();
     "
   />
 

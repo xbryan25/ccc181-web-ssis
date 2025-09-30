@@ -9,6 +9,8 @@ from ..common.dataclasses.student import Student
 
 from app.utils import dict_keys_to_camel
 
+from psycopg.errors import UniqueViolation
+
 class StudentController:
  
 
@@ -22,7 +24,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
     
     @staticmethod
     def get_total_student_count_controller():
@@ -33,7 +35,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
     def get_many_students_controller():
@@ -54,7 +56,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
     def create_student_controller():
@@ -75,9 +77,23 @@ class StudentController:
 
             return jsonify({"message": "Student added successfully."}), 200
 
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'students_pkey':
+                return jsonify({"errorMessage": "ID number already exists."}), 500
+            
+            elif constraint_name == 'unique_full_name':
+                return jsonify({"errorMessage": "Name combination already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
+
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
     def delete_student_controller(id_number: str):
@@ -88,7 +104,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
 
     @staticmethod
@@ -109,7 +125,21 @@ class StudentController:
             StudentServices.edit_student_details_service(id_number, new_student_data)
 
             return jsonify({"message": "Student edited successfully."}), 200
+        
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'students_pkey':
+                return jsonify({"errorMessage": "ID number already exists."}), 500
+            
+            elif constraint_name == 'unique_full_name':
+                return jsonify({"errorMessage": "Name combination already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500

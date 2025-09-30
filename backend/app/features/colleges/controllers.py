@@ -9,6 +9,8 @@ from ..common.dataclasses import College
 
 from app.utils import dict_keys_to_camel
 
+from psycopg.errors import UniqueViolation
+
 class CollegeController:
     
     @staticmethod
@@ -74,6 +76,20 @@ class CollegeController:
             CollegeServices.create_college_service(new_college_data)
 
             return jsonify({"message": "College added successfully."}), 200
+                
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'colleges_pkey':
+                return jsonify({"errorMessage": "College code already exists."}), 500
+            
+            elif constraint_name == 'colleges_college_name_key':
+                return jsonify({"errorMessage": "College name already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
@@ -105,6 +121,20 @@ class CollegeController:
             CollegeServices.edit_college_details_service(college_code, new_college_data)
 
             return jsonify({"message": "College edited successfully."}), 200
+        
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'colleges_pkey':
+                return jsonify({"errorMessage": "College code already exists."}), 500
+            
+            elif constraint_name == 'colleges_college_name_key':
+                return jsonify({"errorMessage": "College name already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
