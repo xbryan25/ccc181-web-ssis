@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { RouteLocationNormalizedGeneric } from "vue-router";
+import type { RouteLocationNormalizedGeneric } from 'vue-router';
 
 const props = defineProps<{
   url: string;
@@ -29,7 +29,6 @@ const isActive = () => {
       isActive()
         ? 'bg-zinc-700 text-green-400'
         : 'text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300',
-      url.endsWith('/about') ? 'mt-auto' : '',
     ]"
   >
     <Icon :name="iconName" class="flex-1 w-8 h-8" />
