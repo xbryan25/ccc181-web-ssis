@@ -9,6 +9,8 @@ from ..common.dataclasses import Program
 
 from app.utils import dict_keys_to_camel
 
+from psycopg.errors import UniqueViolation
+
 class ProgramController:
     
     @staticmethod
@@ -69,6 +71,20 @@ class ProgramController:
             ProgramServices.create_program_service(new_program_data)
 
             return jsonify({"message": "Program added successfully."}), 200
+        
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'programs_pkey':
+                return jsonify({"errorMessage": "Program code already exists."}), 500
+            
+            elif constraint_name == 'programs_program_name_key':
+                return jsonify({"errorMessage": "Program name already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
@@ -101,6 +117,24 @@ class ProgramController:
             ProgramServices.edit_program_details_service(program_code, new_program_data)
 
             return jsonify({"message": "Program edited successfully."}), 200
+              
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'programs_pkey':
+                return jsonify({"errorMessage": "Program code already exists."}), 500
+            
+            elif constraint_name == 'programs_program_name_key':
+                return jsonify({"errorMessage": "Program name already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
 
         except Exception as e:
             traceback.print_exc()
