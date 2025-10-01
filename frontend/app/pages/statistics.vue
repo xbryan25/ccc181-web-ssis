@@ -8,8 +8,30 @@ definePageMeta({
 
 <template>
   <div>
-    <h1>Welcome to the statistics page</h1>
-    <AppAlert class=""> This is an auto-imported component </AppAlert>
-    <NuxtLink to="/about" class="font-bold">Link</NuxtLink>
+    <div class="flex flex-col gap-10 h-full">
+      <h1 class="font-bold text-5xl">Statistics</h1>
+
+      <GeneralStatistics />
+
+      <StudentsStatistics />
+
+      <ProgramsStatistics />
+
+      <CollegesStatistics />
+    </div>
+
+    <div class="flex justify-center h-20 pt-10">
+      <p class="text-primary">
+        Made with love by
+        <a
+          href="https://github.com/xbryan25"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-block underline transition-transform duration-300 hover:scale-105"
+        >
+          @xbryan25
+        </a>
+      </p>
+    </div>
   </div>
 </template>
