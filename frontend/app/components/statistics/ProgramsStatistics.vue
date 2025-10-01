@@ -9,7 +9,8 @@ const data = [
 ];
 
 const triggers = {
-  [Donut.selectors.segment]: (d) => `${d.data.label}: ${d.data.value}`,
+  [Donut.selectors.segment]: (d: { data: { label: string; value: number } }) =>
+    `${d.data.label}: ${d.data.value}`,
 };
 const value = (d: { label: string; value: number }) => d.value;
 
@@ -72,3 +73,11 @@ const genderLegendItems = [
     </div>
   </div>
 </template>
+
+<style scoped>
+.unovis-single-container {
+  --vis-tooltip-background-color: var(--ui-bg);
+  --vis-tooltip-border-color: var(--ui-border);
+  --vis-tooltip-text-color: var(--ui-text-highlighted);
+}
+</style>
