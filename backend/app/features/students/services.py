@@ -2,6 +2,8 @@ from .repository import StudentRepository
 
 from app.features.common.dataclasses import Student
 
+from app.utils import to_camel_case
+
 class StudentServices:
 
     @staticmethod
@@ -42,3 +44,26 @@ class StudentServices:
     @staticmethod
     def edit_student_details_service(id_number: str, new_student_data):
         StudentRepository.edit_student_details(id_number=id_number, new_student_data=new_student_data)
+
+    @staticmethod
+    def get_year_level_demographics_service():
+        
+        # TODO: do get for programs and services params
+
+        year_level_demographics = StudentRepository.get_year_level_demographics()
+
+        formatted_year_level_demographics = [{to_camel_case(k): v for k, v in year_level_demographic.items()} for year_level_demographic in year_level_demographics]
+
+        return formatted_year_level_demographics
+    
+    @staticmethod
+    def get_gender_demographics_service():
+        
+        # TODO: do get for programs and services params
+
+        gender_demographics = StudentRepository.get_gender_demographics()
+
+        formatted_gender_demographics = [{to_camel_case(k): v for k, v in gender_demographic.items()} for gender_demographic in gender_demographics]
+
+        return formatted_gender_demographics
+    

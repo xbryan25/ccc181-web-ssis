@@ -2,16 +2,20 @@
 import { VisSingleContainer, VisTooltip, VisDonut, VisBulletLegend } from '@unovis/vue';
 import { Donut } from '@unovis/ts';
 
-const data = [
-  { label: 'Male', value: 5 },
-  { label: 'Female', value: 7 },
-  { label: 'Other', value: 3 },
-];
+const { totalCount: studentTotalCount }: { totalCount: number } =
+  await useEntitiesCount('students');
+
+const yearLevelData = formatForYearLevelDonutChart(await useYearLevelDemographics());
+
+const genderData = formatForGenderDonutChart(await useGenderDemographics());
 
 const triggers = {
-  [Donut.selectors.segment]: (d: { data: { label: string; value: number } }) =>
-    `${d.data.label}: ${d.data.value}`,
+  [Donut.selectors.segment]: (d: { data: { label: string; value: number } }) => {
+    console.log(d);
+    return `${d.data.label}: ${d.data.value}`;
+  },
 };
+
 const value = (d: { label: string; value: number }) => d.value;
 
 const yearLevelLegendItems = [
@@ -36,8 +40,8 @@ const genderLegendItems = [
     </USeparator>
 
     <UPageCard
-      icon="i-lucide-users"
-      title="Test"
+      icon="solar:square-academic-cap-2-bold"
+      title="Students"
       variant="subtle"
       :ui="{
         container: 'gap-y-1.5',
@@ -48,14 +52,14 @@ const genderLegendItems = [
       class="w-75 transition-transform duration-300 hover:scale-105"
     >
       <div class="flex items-center gap-2">
-        <span class="text-2xl font-semibold text-highlighted"> 12 </span>
+        <span class="text-2xl font-semibold text-highlighted"> {{ studentTotalCount }} </span>
       </div>
     </UPageCard>
 
     <div class="flex flex-col xl:flex-row gap-10 w-full pt-5">
       <div class="flex-1 flex flex-col items-center gap-3 max-w-full">
         <VisBulletLegend :items="yearLevelLegendItems" />
-        <VisSingleContainer :data="data" class="h-50 max-w-100">
+        <VisSingleContainer :data="yearLevelData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>
@@ -63,7 +67,7 @@ const genderLegendItems = [
 
       <div class="flex-1 flex flex-col items-center gap-3">
         <VisBulletLegend :items="genderLegendItems" />
-        <VisSingleContainer :data="data" class="h-50 max-w-100">
+        <VisSingleContainer :data="genderData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>

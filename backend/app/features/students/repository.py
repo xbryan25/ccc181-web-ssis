@@ -67,3 +67,16 @@ class StudentRepository:
                                                            (new_student_data["idNumber"], new_student_data["firstName"], new_student_data["lastName"],
                                                             new_student_data["yearLevel"], new_student_data["gender"], new_student_data["programCode"], 
                                                             id_number))  
+
+    @staticmethod
+    def get_year_level_demographics():
+        db = current_app.extensions['db']
+
+        return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS)
+    
+    @staticmethod
+    def get_gender_demographics():
+        db = current_app.extensions['db']
+
+        return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS)
+    

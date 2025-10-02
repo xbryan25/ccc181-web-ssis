@@ -143,3 +143,36 @@ class StudentController:
         except Exception as e:
             traceback.print_exc()
             return jsonify({"errorMessage": str(e)}), 500
+        
+    @staticmethod
+    def get_year_level_demographics_controller():
+        # params = {
+        #     "program_code": request.args.get("programCode"),
+        #     "college_code": request.args.get("collegeCode"),
+        # }
+
+        try:
+            year_level_demographics = StudentServices.get_year_level_demographics_service()
+
+            return jsonify(year_level_demographics), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"errorMessage": str(e)}), 500
+        
+    @staticmethod
+    def get_gender_demographics_controller():
+        # params = {
+        #     "program_code": request.args.get("programCode"),
+        #     "college_code": request.args.get("collegeCode"),
+        # }
+
+        try:
+            gender_demographics = StudentServices.get_gender_demographics_service()
+
+            return jsonify(gender_demographics), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"errorMessage": str(e)}), 500
+        

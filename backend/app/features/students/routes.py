@@ -34,3 +34,13 @@ def delete_student(id_number: str):
 @jwt_required()
 def edit_student_details(id_number: str):
     return StudentController.edit_student_details_controller(id_number)
+
+@student_bp.route("/year-level-demographics", methods=["GET"])
+@jwt_required()
+def get_year_level_demographics():
+    return StudentController.get_year_level_demographics_controller()
+
+@student_bp.route("/gender-demographics", methods=["GET"])
+@jwt_required()
+def get_gender_demographics():
+    return StudentController.get_gender_demographics_controller()
