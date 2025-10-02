@@ -30,7 +30,7 @@ const genderLegendItems = [
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 px-[10%]">
+  <div class="flex flex-col items-center gap-4 px-[10%] w-300">
     <USeparator color="primary" type="solid">
       <h2 class="font-bold text-4xl">Programs</h2>
     </USeparator>
@@ -54,10 +54,10 @@ const genderLegendItems = [
       </div>
     </UPageCard>
 
-    <div class="flex gap-10 w-full pt-5">
-      <div class="flex-1 flex flex-col items-center gap-3">
+    <div class="flex flex-col xl:flex-row gap-10 w-full pt-5">
+      <div class="flex-1 flex flex-col items-center gap-3 max-w-full">
         <VisBulletLegend :items="yearLevelLegendItems" />
-        <VisSingleContainer :data="data" class="h-50">
+        <VisSingleContainer :data="data" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>
@@ -65,7 +65,7 @@ const genderLegendItems = [
 
       <div class="flex-1 flex flex-col items-center gap-3">
         <VisBulletLegend :items="genderLegendItems" />
-        <VisSingleContainer :data="data" class="h-50">
+        <VisSingleContainer :data="data" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>

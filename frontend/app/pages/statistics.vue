@@ -8,8 +8,10 @@ definePageMeta({
 
 <template>
   <div>
-    <div class="flex flex-col gap-10 h-full">
-      <h1 class="font-bold text-5xl">Statistics</h1>
+    <div class="flex flex-col justify-center items-center gap-10 h-full">
+      <div class="w-full">
+        <h1 class="font-bold text-5xl">Statistics</h1>
+      </div>
 
       <GeneralStatistics />
 

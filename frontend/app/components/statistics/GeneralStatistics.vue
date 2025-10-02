@@ -1,12 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 px-[10%]">
+  <div class="flex flex-col items-center gap-4 px-[10%] w-300">
     <USeparator color="primary" type="solid">
       <h2 class="font-bold text-4xl">General</h2>
     </USeparator>
 
-    <UPageGrid class="flex gap-10 w-full">
+    <UPageGrid class="flex flex-col xl:flex-row gap-10 w-full items-center">
       <UPageCard
         v-for="n in 3"
         :key="n"
