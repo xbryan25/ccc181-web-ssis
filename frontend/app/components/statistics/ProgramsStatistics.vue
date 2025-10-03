@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { VisSingleContainer, VisTooltip, VisDonut, VisBulletLegend } from '@unovis/vue';
 import { Donut } from '@unovis/ts';
-import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
+import type { SelectMenuItem } from '@nuxt/ui';
 import type { UseProgramCodesResponse } from '~/types';
 
 const triggers = {

@@ -1,12 +1,8 @@
 <script setup lang="ts">
 import { VisSingleContainer, VisTooltip, VisDonut, VisBulletLegend } from '@unovis/vue';
 import { Donut } from '@unovis/ts';
-
-const data = [
-  { label: 'Male', value: 5 },
-  { label: 'Female', value: 7 },
-  { label: 'Other', value: 3 },
-];
+import type { SelectMenuItem } from '@nuxt/ui';
+import type { UseCollegeCodesResponse } from '~/types';
 
 const triggers = {
   [Donut.selectors.segment]: (d: { data: { label: string; value: number } }) =>
@@ -28,6 +24,65 @@ const genderLegendItems = [
   { name: 'Others' },
   { name: 'Prefer not to say' },
 ];
+
+const collegeCodeOptions = ref<SelectMenuItem[]>([]);
+const selectedCollegeCode = ref({
+  label: '',
+});
+
+const studentsTotalCount: Ref<number> = ref(0);
+const programsTotalCount: Ref<number> = ref(0);
+
+const yearLevelData = ref<{ label: string | undefined; value: number | undefined }[]>([]);
+
+const genderData = ref<{ label: string | undefined; value: number | undefined }[]>([]);
+
+onMounted(async () => {
+  const collegeCodesDetailsData: UseCollegeCodesResponse[] = (await useEntityIds(
+    'colleges',
+  )) as UseCollegeCodesResponse[];
+
+  collegeCodeOptions.value = formatCollegeCodesForSelectMenu(collegeCodesDetailsData);
+
+  selectedCollegeCode.value.label = collegeCodesDetailsData[0]?.collegeCode as string;
+
+  ({ totalCount: studentsTotalCount.value } = await useEntitiesCount('students', {
+    filterBy: { collegeCode: selectedCollegeCode.value.label },
+  }));
+
+  ({ totalCount: programsTotalCount.value } = await useEntitiesCount('programs', {
+    filterBy: { collegeCode: selectedCollegeCode.value.label },
+  }));
+
+  yearLevelData.value = formatForYearLevelDonutChart(
+    await useYearLevelDemographics({ collegeCode: selectedCollegeCode.value.label }),
+  );
+
+  genderData.value = formatForGenderDonutChart(
+    await useGenderDemographics({ programCode: selectedCollegeCode.value.label }),
+  );
+});
+
+watch(
+  () => selectedCollegeCode.value.label,
+  async (newSelectedCollegeCode) => {
+    ({ totalCount: studentsTotalCount.value } = await useEntitiesCount('students', {
+      filterBy: { collegeCode: newSelectedCollegeCode },
+    }));
+
+    ({ totalCount: programsTotalCount.value } = await useEntitiesCount('programs', {
+      filterBy: { collegeCode: selectedCollegeCode.value.label },
+    }));
+
+    yearLevelData.value = formatForYearLevelDonutChart(
+      await useYearLevelDemographics({ collegeCode: newSelectedCollegeCode }),
+    );
+
+    genderData.value = formatForGenderDonutChart(
+      await useGenderDemographics({ collegeCode: newSelectedCollegeCode }),
+    );
+  },
+);
 </script>
 
 <template>
@@ -36,14 +91,20 @@ const genderLegendItems = [
       <h2 class="font-bold text-4xl">Colleges</h2>
     </USeparator>
 
-    <USelectMenu class="w-75" />
+    <USelectMenu
+      v-model="selectedCollegeCode"
+      :items="collegeCodeOptions"
+      class="w-75"
+      :ui="{
+        trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
+        label: 'text-green-400 ',
+      }"
+    />
 
-    <UPageGrid class="flex gap-10 flex-col lg:flex-row">
+    <div class="flex gap-10 flex-col lg:flex-row">
       <UPageCard
-        v-for="n in 2"
-        :key="n"
-        icon="i-lucide-users"
-        title="Test"
+        icon="solar:square-academic-cap-2-bold"
+        title="Students"
         variant="subtle"
         :ui="{
           container: 'gap-y-1.5',
@@ -54,15 +115,32 @@ const genderLegendItems = [
         class="flex-1 w-75 transition-transform duration-300 hover:scale-105"
       >
         <div class="flex items-center gap-2">
-          <span class="text-2xl font-semibold text-highlighted"> 12 </span>
+          <span class="text-2xl font-semibold text-highlighted"> {{ studentsTotalCount }}</span>
         </div>
       </UPageCard>
-    </UPageGrid>
+
+      <UPageCard
+        icon="solar:book-2-bold-duotone"
+        title="Programs"
+        variant="subtle"
+        :ui="{
+          container: 'gap-y-1.5',
+          wrapper: 'items-start',
+          leading: 'p-2.5 rounded-full bg-primary/10 ring ring-inset ring-primary/25 flex-col',
+          title: 'font-bold text-md',
+        }"
+        class="flex-1 w-75 transition-transform duration-300 hover:scale-105"
+      >
+        <div class="flex items-center gap-2">
+          <span class="text-2xl font-semibold text-highlighted"> {{ programsTotalCount }} </span>
+        </div>
+      </UPageCard>
+    </div>
 
     <div class="flex flex-col xl:flex-row gap-10 w-full pt-5">
       <div class="flex-1 flex flex-col items-center gap-3">
         <VisBulletLegend :items="yearLevelLegendItems" />
-        <VisSingleContainer :data="data" class="h-50 max-w-100">
+        <VisSingleContainer :data="yearLevelData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>
@@ -70,7 +148,7 @@ const genderLegendItems = [
 
       <div class="flex-1 flex flex-col items-center gap-3">
         <VisBulletLegend :items="genderLegendItems" />
-        <VisSingleContainer :data="data" class="h-50 max-w-100">
+        <VisSingleContainer :data="genderData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>

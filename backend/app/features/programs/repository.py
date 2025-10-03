@@ -16,6 +16,9 @@ class ProgramRepository:
     def get_total_program_count(params) -> int:
         db = current_app.extensions['db']
 
+        if sum(x is not None for x in [params["search_value"], params["college_code"]]) > 1:
+            raise ValueError("Only one should exist at a time between search_value, and college_code")
+
         if params["search_value"]:
 
             if params["search_type"] == "Starts With":
@@ -29,6 +32,9 @@ class ProgramRepository:
 
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT_WITH_SEARCH.format(table="programs", search_by=f"{params["search_by"].lower().replace(' ', '_')}"),
                                 (search_pattern,))
+        
+        elif params["college_code"]:
+            return db.fetch_one(ProgramQueries.GET_TOTAL_COUNT_FROM_COLLEGE_CODE, (params["college_code"],))
         
         else:
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="programs"))

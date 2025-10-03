@@ -35,6 +35,9 @@ class StudentRepository:
         
         elif params["program_code"]:
             return db.fetch_one(StudentQueries.GET_TOTAL_COUNT_FROM_PROGRAM_CODE, (params["program_code"],))
+        
+        elif params["college_code"]:
+            return db.fetch_one(StudentQueries.GET_TOTAL_COUNT_FROM_COLLEGE_CODE, (params["college_code"],))
 
         else:
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="students"))
@@ -99,6 +102,9 @@ class StudentRepository:
         if params["program_code"]:
             return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS_FROM_PROGRAM_CODE, (params["program_code"], ))
         
+        elif params["college_code"]:
+            return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS_FROM_COLLEGE_CODE, (params["college_code"], ))
+        
         return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS)
     
     @staticmethod
@@ -110,6 +116,9 @@ class StudentRepository:
         
         if params["program_code"]:
             return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS_FROM_PROGRAM_CODE, (params["program_code"], ))
+        
+        elif params["college_code"]:
+            return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS_FROM_COLLEGE_CODE, (params["college_code"], ))
 
         return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS)
     

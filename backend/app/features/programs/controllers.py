@@ -3,6 +3,8 @@ from dataclasses import asdict
 
 import traceback
 
+import json
+
 from .services import ProgramServices
 
 from ..common.dataclasses import Program
@@ -33,6 +35,16 @@ class ProgramController:
                 "search_by": request.args.get("searchBy"),
                 "search_type": request.args.get("searchType"),
             }
+
+            filter_by = request.args.get("filterBy")
+
+            if filter_by:
+                dict_filter_by = json.loads(filter_by)
+                
+                if 'collegeCode' in dict_filter_by.keys():
+                    params.update({"college_code": dict_filter_by['collegeCode']})
+            else:
+                params.update({"college_code": None})
 
             total_program_count_dict = ProgramServices.get_total_program_count_service(params)
 
