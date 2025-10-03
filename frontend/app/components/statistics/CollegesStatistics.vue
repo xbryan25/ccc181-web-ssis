@@ -139,6 +139,7 @@ watch(
 
     <div class="flex flex-col xl:flex-row gap-10 w-full pt-5">
       <div class="flex-1 flex flex-col items-center gap-3">
+        <h3 class="font-bold text-xl">Year Level</h3>
         <VisBulletLegend :items="yearLevelLegendItems" />
         <VisSingleContainer :data="yearLevelData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
@@ -147,6 +148,7 @@ watch(
       </div>
 
       <div class="flex-1 flex flex-col items-center gap-3">
+        <h3 class="font-bold text-xl">Gender</h3>
         <VisBulletLegend :items="genderLegendItems" />
         <VisSingleContainer :data="genderData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
