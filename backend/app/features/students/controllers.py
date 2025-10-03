@@ -3,6 +3,8 @@ from dataclasses import asdict
 
 import traceback
 
+import json
+
 from .services import StudentServices
 
 from ..common.dataclasses.student import Student
@@ -29,7 +31,31 @@ class StudentController:
     @staticmethod
     def get_total_student_count_controller():
         try:
-            total_student_count_dict: int = StudentServices.get_total_student_count_service()
+            params = {
+                "search_value": request.args.get("searchValue"),
+                "search_by": request.args.get("searchBy"),
+                "search_type": request.args.get("searchType"),
+            }
+
+            filter_by = request.args.get("filterBy")
+
+            if filter_by:
+
+                dict_filter_by = json.loads(filter_by)
+
+                if 'programCode' in dict_filter_by.keys():
+                    params.update({"program_code": dict_filter_by['programCode']})
+                    params.update({"college_code": None})
+
+                elif 'collegeCode' in dict_filter_by.keys():
+                    params.update({"program_code": None})
+                    params.update({"college_code": dict_filter_by['collegeCode']})
+
+            else:
+                params.update({"program_code": None})
+                params.update({"college_code": None})
+
+            total_student_count_dict: int = StudentServices.get_total_student_count_service(params)
 
             return jsonify({"totalCount": total_student_count_dict["count"]}), 200
 
@@ -143,3 +169,36 @@ class StudentController:
         except Exception as e:
             traceback.print_exc()
             return jsonify({"errorMessage": str(e)}), 500
+        
+    @staticmethod
+    def get_year_level_demographics_controller():
+        params = {
+            "program_code": request.args.get("programCode"),
+            "college_code": request.args.get("collegeCode"),
+        }
+
+        try:
+            year_level_demographics = StudentServices.get_year_level_demographics_service(params)
+
+            return jsonify(year_level_demographics), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"errorMessage": str(e)}), 500
+        
+    @staticmethod
+    def get_gender_demographics_controller():
+        params = {
+            "program_code": request.args.get("programCode"),
+            "college_code": request.args.get("collegeCode"),
+        }
+
+        try:
+            gender_demographics = StudentServices.get_gender_demographics_service(params)
+
+            return jsonify(gender_demographics), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"errorMessage": str(e)}), 500
+        

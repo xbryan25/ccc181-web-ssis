@@ -8,6 +8,7 @@ export function useEntitiesCount(entityType: string,
                                     searchValue?: string, 
                                     searchBy?: string, 
                                     searchType?: string,
+                                    filterBy?: Record<string, string | number>
                                 }){
 
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -16,7 +17,7 @@ export function useEntitiesCount(entityType: string,
     method: 'GET',
     credentials: 'include',
     query: {
-      ...(options || {})
+      ...(options || {}),
     },
   });
 };

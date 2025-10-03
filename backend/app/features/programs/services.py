@@ -11,8 +11,8 @@ class ProgramServices:
         return Program(**row)
 
     @staticmethod
-    def get_total_program_count_service():
-        return ProgramRepository.get_total_program_count()
+    def get_total_program_count_service(params):
+        return ProgramRepository.get_total_program_count(params)
 
     @staticmethod
     def get_many_programs_service(params):
@@ -43,8 +43,6 @@ class ProgramServices:
     @staticmethod
     def get_program_codes_service():
         program_codes_details = ProgramRepository.get_program_codes()
-
-        print(program_codes_details)
 
         grouped_program_codes = {}
 
