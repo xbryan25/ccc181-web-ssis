@@ -11,6 +11,15 @@ class StudentQueries:
                                     GROUP BY yrlvl.year_level
                                     ORDER BY yrlvl.year_level;"""
     
+    GET_YEAR_LEVEL_DEMOGRAPHICS_FROM_PROGRAM_CODE = """SELECT yrlvl.year_level, 
+                                                            COUNT(s.year_level) AS count 
+                                                        FROM unnest(enum_range(NULL::year_level_enum)) AS yrlvl(year_level)
+                                                        LEFT JOIN students s 
+                                                            ON s.year_level = yrlvl.year_level
+                                                            AND s.program_code = %s
+                                                        GROUP BY yrlvl.year_level
+                                                        ORDER BY yrlvl.year_level;"""
+    
     GET_GENDER_DEMOGRAPHICS = """SELECT g.gender, 
                                     COUNT(s.gender) AS count 
                                 FROM unnest(enum_range(NULL::gender_enum)) AS g(gender)
@@ -18,3 +27,14 @@ class StudentQueries:
                                     ON s.gender = g.gender
                                 GROUP BY g.gender
                                 ORDER BY g.gender;"""
+    
+    GET_GENDER_DEMOGRAPHICS_FROM_PROGRAM_CODE = """SELECT g.gender, 
+                                                        COUNT(s.gender) AS count 
+                                                    FROM unnest(enum_range(NULL::gender_enum)) AS g(gender)
+                                                    LEFT JOIN students s 
+                                                        ON s.gender = g.gender
+                                                        AND s.program_code = %s
+                                                    GROUP BY g.gender
+                                                    ORDER BY g.gender;"""
+    
+    GET_TOTAL_COUNT_FROM_PROGRAM_CODE = "SELECT COUNT(*) FROM students WHERE program_code LIKE %s"

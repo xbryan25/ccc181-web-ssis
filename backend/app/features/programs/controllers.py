@@ -28,7 +28,13 @@ class ProgramController:
     @staticmethod
     def get_total_program_count_controller():
         try:
-            total_program_count_dict = ProgramServices.get_total_program_count_service()
+            params = {
+                "search_value": request.args.get("searchValue"),
+                "search_by": request.args.get("searchBy"),
+                "search_type": request.args.get("searchType"),
+            }
+
+            total_program_count_dict = ProgramServices.get_total_program_count_service(params)
 
             return jsonify({"totalCount": total_program_count_dict["count"]}), 200
 

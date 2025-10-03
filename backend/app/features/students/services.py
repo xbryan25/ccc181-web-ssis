@@ -14,8 +14,8 @@ class StudentServices:
         return Student(**row)
     
     @staticmethod
-    def get_total_student_count_service():
-        return StudentRepository.get_total_student_count()
+    def get_total_student_count_service(params):
+        return StudentRepository.get_total_student_count(params)
 
     @staticmethod
     def get_many_students_service(params):
@@ -46,22 +46,18 @@ class StudentServices:
         StudentRepository.edit_student_details(id_number=id_number, new_student_data=new_student_data)
 
     @staticmethod
-    def get_year_level_demographics_service():
-        
-        # TODO: do get for programs and services params
+    def get_year_level_demographics_service(params):
 
-        year_level_demographics = StudentRepository.get_year_level_demographics()
+        year_level_demographics = StudentRepository.get_year_level_demographics(params)
 
         formatted_year_level_demographics = [{to_camel_case(k): v for k, v in year_level_demographic.items()} for year_level_demographic in year_level_demographics]
 
         return formatted_year_level_demographics
     
     @staticmethod
-    def get_gender_demographics_service():
-        
-        # TODO: do get for programs and services params
+    def get_gender_demographics_service(params):
 
-        gender_demographics = StudentRepository.get_gender_demographics()
+        gender_demographics = StudentRepository.get_gender_demographics(params)
 
         formatted_gender_demographics = [{to_camel_case(k): v for k, v in gender_demographic.items()} for gender_demographic in gender_demographics]
 

@@ -13,10 +13,25 @@ class ProgramRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="programs", pk="program_code"), (program_code, ))
 
     @staticmethod
-    def get_total_program_count() -> int:
+    def get_total_program_count(params) -> int:
         db = current_app.extensions['db']
 
-        return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="programs"))
+        if params["search_value"]:
+
+            if params["search_type"] == "Starts With":
+                search_pattern = f"{params["search_value"]}%"
+            elif params["search_type"] == "Ends With":
+                search_pattern = f"%{params["search_value"]}"
+            elif params["search_type"] == "Contains":
+                search_pattern = f"%{params["search_value"]}%"
+            else:
+                search_pattern = params["search_value"]
+
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT_WITH_SEARCH.format(table="programs", search_by=f"{params["search_by"].lower().replace(' ', '_')}"),
+                                (search_pattern,))
+        
+        else:
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="programs"))
 
     def get_many_programs(params):
         db = current_app.extensions['db']
