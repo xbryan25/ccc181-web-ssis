@@ -143,7 +143,7 @@ const transformStudentState = (event: FormSubmitEvent<StudentFormState>) => {
           class="w-full"
           :ui="{
             trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
-            label: 'text-green-400 ',
+            label: 'text-primary',
           }"
         />
       </UFormField>

@@ -13,10 +13,34 @@ class StudentRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="students", pk="id_number"), (id_number, ))
 
     @staticmethod
-    def get_total_student_count() -> int:
+    def get_total_student_count(params) -> int:
         db = current_app.extensions['db']
 
-        return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="students"))
+        if sum(x is not None for x in [params["search_value"] , params["program_code"], params["college_code"]]) > 1:
+            raise ValueError("Only one should exist at a time between search_value, program_code, and college_code")
+
+        if params["search_value"]:
+
+            if params["search_type"] == "Starts With":
+                search_pattern = f"{params["search_value"]}%"
+            elif params["search_type"] == "Ends With":
+                search_pattern = f"%{params["search_value"]}"
+            elif params["search_type"] == "Contains":
+                search_pattern = f"%{params["search_value"]}%"
+            else:
+                search_pattern = params["search_value"]
+
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT_WITH_SEARCH.format(table="students", search_by=f"{params["search_by"].lower().replace(' ', '_')}"),
+                                (search_pattern,))
+        
+        elif params["program_code"]:
+            return db.fetch_one(StudentQueries.GET_TOTAL_COUNT_FROM_PROGRAM_CODE, (params["program_code"],))
+        
+        elif params["college_code"]:
+            return db.fetch_one(StudentQueries.GET_TOTAL_COUNT_FROM_COLLEGE_CODE, (params["college_code"],))
+
+        else:
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="students"))
 
     def get_many_students(params):
         db = current_app.extensions['db']
@@ -67,3 +91,34 @@ class StudentRepository:
                                                            (new_student_data["idNumber"], new_student_data["firstName"], new_student_data["lastName"],
                                                             new_student_data["yearLevel"], new_student_data["gender"], new_student_data["programCode"], 
                                                             id_number))  
+
+    @staticmethod
+    def get_year_level_demographics(params):
+        db = current_app.extensions['db']
+
+        if sum(x is not None for x in [params["program_code"], params["college_code"]]) > 1:
+            raise ValueError("Only one should exist at a time between program_code, and college_code")
+        
+        if params["program_code"]:
+            return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS_FROM_PROGRAM_CODE, (params["program_code"], ))
+        
+        elif params["college_code"]:
+            return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS_FROM_COLLEGE_CODE, (params["college_code"], ))
+        
+        return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS)
+    
+    @staticmethod
+    def get_gender_demographics(params):
+        db = current_app.extensions['db']
+
+        if sum(x is not None for x in [params["program_code"], params["college_code"]]) > 1:
+            raise ValueError("Only one should exist at a time between program_code, and college_code")
+        
+        if params["program_code"]:
+            return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS_FROM_PROGRAM_CODE, (params["program_code"], ))
+        
+        elif params["college_code"]:
+            return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS_FROM_COLLEGE_CODE, (params["college_code"], ))
+
+        return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS)
+    

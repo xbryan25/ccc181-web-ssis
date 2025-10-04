@@ -3,11 +3,15 @@ from dataclasses import asdict
 
 import traceback
 
+import json
+
 from .services import StudentServices
 
 from ..common.dataclasses.student import Student
 
 from app.utils import dict_keys_to_camel
+
+from psycopg.errors import UniqueViolation
 
 class StudentController:
  
@@ -22,18 +26,42 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
     
     @staticmethod
     def get_total_student_count_controller():
         try:
-            total_student_count_dict: int = StudentServices.get_total_student_count_service()
+            params = {
+                "search_value": request.args.get("searchValue"),
+                "search_by": request.args.get("searchBy"),
+                "search_type": request.args.get("searchType"),
+            }
+
+            filter_by = request.args.get("filterBy")
+
+            if filter_by:
+
+                dict_filter_by = json.loads(filter_by)
+
+                if 'programCode' in dict_filter_by.keys():
+                    params.update({"program_code": dict_filter_by['programCode']})
+                    params.update({"college_code": None})
+
+                elif 'collegeCode' in dict_filter_by.keys():
+                    params.update({"program_code": None})
+                    params.update({"college_code": dict_filter_by['collegeCode']})
+
+            else:
+                params.update({"program_code": None})
+                params.update({"college_code": None})
+
+            total_student_count_dict: int = StudentServices.get_total_student_count_service(params)
 
             return jsonify({"totalCount": total_student_count_dict["count"]}), 200
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
     def get_many_students_controller():
@@ -54,7 +82,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
     def create_student_controller():
@@ -75,9 +103,23 @@ class StudentController:
 
             return jsonify({"message": "Student added successfully."}), 200
 
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'students_pkey':
+                return jsonify({"errorMessage": "ID number already exists."}), 500
+            
+            elif constraint_name == 'unique_full_name':
+                return jsonify({"errorMessage": "Name combination already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
+
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
     def delete_student_controller(id_number: str):
@@ -88,7 +130,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
 
 
     @staticmethod
@@ -109,7 +151,54 @@ class StudentController:
             StudentServices.edit_student_details_service(id_number, new_student_data)
 
             return jsonify({"message": "Student edited successfully."}), 200
+        
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'students_pkey':
+                return jsonify({"errorMessage": "ID number already exists."}), 500
+            
+            elif constraint_name == 'unique_full_name':
+                return jsonify({"errorMessage": "Name combination already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"errorMessage": str(e)}), 500
+        
+    @staticmethod
+    def get_year_level_demographics_controller():
+        params = {
+            "program_code": request.args.get("programCode"),
+            "college_code": request.args.get("collegeCode"),
+        }
+
+        try:
+            year_level_demographics = StudentServices.get_year_level_demographics_service(params)
+
+            return jsonify(year_level_demographics), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"errorMessage": str(e)}), 500
+        
+    @staticmethod
+    def get_gender_demographics_controller():
+        params = {
+            "program_code": request.args.get("programCode"),
+            "college_code": request.args.get("collegeCode"),
+        }
+
+        try:
+            gender_demographics = StudentServices.get_gender_demographics_service(params)
+
+            return jsonify(gender_demographics), 200
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"errorMessage": str(e)}), 500
+        

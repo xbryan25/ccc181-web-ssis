@@ -3,11 +3,15 @@ from dataclasses import asdict
 
 import traceback
 
+import json
+
 from .services import ProgramServices
 
 from ..common.dataclasses import Program
 
 from app.utils import dict_keys_to_camel
+
+from psycopg.errors import UniqueViolation
 
 class ProgramController:
     
@@ -26,7 +30,23 @@ class ProgramController:
     @staticmethod
     def get_total_program_count_controller():
         try:
-            total_program_count_dict = ProgramServices.get_total_program_count_service()
+            params = {
+                "search_value": request.args.get("searchValue"),
+                "search_by": request.args.get("searchBy"),
+                "search_type": request.args.get("searchType"),
+            }
+
+            filter_by = request.args.get("filterBy")
+
+            if filter_by:
+                dict_filter_by = json.loads(filter_by)
+                
+                if 'collegeCode' in dict_filter_by.keys():
+                    params.update({"college_code": dict_filter_by['collegeCode']})
+            else:
+                params.update({"college_code": None})
+
+            total_program_count_dict = ProgramServices.get_total_program_count_service(params)
 
             return jsonify({"totalCount": total_program_count_dict["count"]}), 200
 
@@ -69,6 +89,20 @@ class ProgramController:
             ProgramServices.create_program_service(new_program_data)
 
             return jsonify({"message": "Program added successfully."}), 200
+        
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'programs_pkey':
+                return jsonify({"errorMessage": "Program code already exists."}), 500
+            
+            elif constraint_name == 'programs_program_name_key':
+                return jsonify({"errorMessage": "Program name already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
@@ -101,6 +135,24 @@ class ProgramController:
             ProgramServices.edit_program_details_service(program_code, new_program_data)
 
             return jsonify({"message": "Program edited successfully."}), 200
+              
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'programs_pkey':
+                return jsonify({"errorMessage": "Program code already exists."}), 500
+            
+            elif constraint_name == 'programs_program_name_key':
+                return jsonify({"errorMessage": "Program name already exists."}), 500
+            
+            else:
+                return jsonify({"errorMessage": "Something went wrong."}), 500
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
 
         except Exception as e:
             traceback.print_exc()

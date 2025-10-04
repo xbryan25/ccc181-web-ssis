@@ -30,7 +30,7 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
 <template>
   <div
     :class="[
-      'flex flex-col bg-zinc-800 rounded-xl py-5 gap-4 w-96 ',
+      'flex flex-col dark:bg-elevated bg-accented rounded-xl py-5 gap-4 w-96 ',
       props.authType === 'login' ? 'h-96 ' : 'h-115',
     ]"
   >

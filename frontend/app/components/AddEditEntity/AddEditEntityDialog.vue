@@ -23,8 +23,6 @@ const isOpen = computed({
 const toast = useToast();
 
 async function onSubmit(newEntity: Student | Program | College) {
-  isOpen.value = false;
-
   try {
     let data: { message: string };
 
@@ -44,11 +42,22 @@ async function onSubmit(newEntity: Student | Program | College) {
       color: 'success',
     });
 
+    isOpen.value = false;
     emit('onSubmit');
-  } catch {
+  } catch (error) {
+    let errorMessage;
+
+    if (error instanceof Error) {
+      errorMessage = error.message; // fetch error reason
+    }
+
+    if (typeof error === 'object' && error !== null && 'data' in error) {
+      errorMessage = (error as any).data.errorMessage;
+    }
+
     toast.add({
       title: 'Error',
-      description: 'Something went wrong!',
+      description: errorMessage,
       color: 'error',
     });
   }
@@ -112,30 +121,6 @@ async function onSubmitError() {
           @on-submit-error="onSubmitError"
         />
       </template>
-
-      <!-- <template #footer>
-        <div class="flex justify-end gap-2 w-full">
-          <UButton
-            size="md"
-            color="error"
-            variant="solid"
-            class="cursor-pointer"
-            @click="isOpen = false"
-            >Close</UButton
-          >
-          <UButton
-            size="md"
-            color="primary"
-            variant="solid"
-            class="cursor-pointer"
-            @click="
-              isOpen = false;
-              clickProceed();
-            "
-            >Proceed</UButton
-          >
-        </div>
-      </template> -->
     </UModal>
   </div>
 </template>
