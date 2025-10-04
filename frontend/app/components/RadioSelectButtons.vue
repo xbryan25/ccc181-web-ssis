@@ -66,8 +66,10 @@ const handleClick = (option: string) => {
       v-for="(option, index) in options"
       :key="index"
       :class="[
-        'w-full h-10 rounded-lg transition-colors duration-100',
-        selectedOption === option ? 'bg-zinc-700 text-white' : 'text-white hover:bg-zinc-700',
+        'w-full h-10 rounded-lg transition-colors duration-100 cursor-pointer',
+        selectedOption === option
+          ? 'bg-accented text-primary'
+          : 'text-muted hover:bg-accented hover:text-primary',
       ]"
       @click="handleClick(option)"
     >
