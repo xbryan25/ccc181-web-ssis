@@ -26,9 +26,7 @@ const isActive = () => {
     :to="url"
     :class="[
       'flex items-center h-12 rounded-lg cursor-pointer transition-transform duration-300 hover:scale-105',
-      isActive()
-        ? 'bg-zinc-700 text-green-400'
-        : 'text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300',
+      isActive() ? 'bg-accented text-primary' : 'text-muted hover:bg-accented hover:text-primary',
     ]"
   >
     <Icon :name="iconName" class="flex-1 w-8 h-8" />

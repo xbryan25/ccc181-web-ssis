@@ -2,6 +2,8 @@
 import NavBarButtons from '~/components/NavBarButtons.vue';
 import { useAuthStore } from '~/stores/useAuthStore';
 
+import type { DropdownMenuItem } from '@nuxt/ui';
+
 interface NavBarDetails {
   url: string;
   buttonName: string;
@@ -40,7 +42,7 @@ const navBarButtonDetails: NavBarDetails[] = [
   },
 ];
 
-const items = ref([
+const items = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: 'Appearance',
@@ -53,7 +55,6 @@ const items = ref([
           checked: colorMode.value === 'light',
           onSelect(e: Event) {
             e.preventDefault();
-
             colorMode.preference = 'light';
           },
         },
@@ -62,19 +63,14 @@ const items = ref([
           icon: 'i-lucide-moon',
           type: 'checkbox',
           checked: colorMode.value === 'dark',
-          onUpdateChecked(checked: boolean) {
-            if (checked) {
-              colorMode.preference = 'dark';
-            }
-          },
           onSelect(e: Event) {
             e.preventDefault();
+            colorMode.preference = 'dark';
           },
         },
       ],
     },
   ],
-
   [
     {
       label: 'Logout',
@@ -86,7 +82,7 @@ const items = ref([
 
 <template>
   <div class="flex h-screen">
-    <div class="flex flex-col w-64 bg-stone-800">
+    <div class="flex flex-col w-64 bg-elevated">
       <div class="flex justify-center items-center py-5 px-1">
         <Icon name="simple-icons:progress text-primary" class="flex-1 w-10 h-10" />
         <p class="flex-[3] font-bold text-4xl font-rethink text-primary">Sequence</p>
@@ -108,7 +104,7 @@ const items = ref([
           class="w-full cursor-pointer"
           :content="{ align: 'center', collisionPadding: 12 }"
           :ui="{
-            content: 'w-(--reka-dropdown-menu-trigger-width) bg-stone-900',
+            content: 'w-(--reka-dropdown-menu-trigger-width) bg-default',
             item: 'cursor-pointer',
           }"
         >
@@ -116,7 +112,7 @@ const items = ref([
             trailing-icon="i-lucide-menu"
             color="neutral"
             variant="ghost"
-            class="flex w-full bg-stone-800 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300 active:bg-stone-900 active:text-zinc-500"
+            class="flex w-full text-muted hover:bg-accented hover:text-primary active:bg-default active:text-primary"
           >
             <div class="flex-1 justify-items-start px-2">
               <p class="text-lg font-bold">{{ auth.username }}</p>

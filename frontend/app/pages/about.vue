@@ -11,7 +11,10 @@ definePageMeta({
     <div class="flex flex-col gap-10 h-full">
       <h1 class="font-bold text-5xl">About</h1>
       <div class="flex flex-col items-center gap-4 px-[20%]">
-        <h2 class="font-bold text-4xl">What is Sequence?</h2>
+        <USeparator color="primary" type="solid">
+          <h2 class="font-bold text-4xl">What is Sequence?</h2>
+        </USeparator>
+
         <div class="flex flex-col items-center gap-4">
           <p class="text-md text-justify w-full">
             Sequence is a web-based simple student information system (SSIS) made in accordance with
@@ -42,7 +45,9 @@ definePageMeta({
         </div>
       </div>
       <div class="flex flex-col items-center gap-8 px-[20%]">
-        <h2 class="font-bold text-4xl">Tech Stack</h2>
+        <USeparator color="primary" type="solid">
+          <h2 class="font-bold text-4xl">Tech Stack</h2>
+        </USeparator>
         <div class="flex flex-col gap-4 w-full">
           <div class="flex flex-col items-center gap-5 w-full">
             <h2 class="font-bold text-2xl">Frontend</h2>
@@ -54,7 +59,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="Vue"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5 bg-neutral', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="devicon:vuejs" class="size-25 shrink-0" />
@@ -67,7 +72,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="Nuxt"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="devicon:nuxt" class="size-25 shrink-0" />
@@ -80,7 +85,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="TailwindCSS"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="devicon:tailwindcss" class="size-25 shrink-0" />
@@ -97,7 +102,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="Flask"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="skill-icons:flask-light" class="size-25 shrink-0" />
@@ -110,7 +115,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="Python"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="devicon:python" class="size-25 shrink-0" />
@@ -127,7 +132,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="PostgreSQL"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="devicon:postgresql" class="size-25 shrink-0" />
@@ -144,7 +149,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="Docker"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="devicon:docker" class="size-25 shrink-0" />
@@ -157,7 +162,7 @@ definePageMeta({
                   sideOffset: 4,
                 }"
                 text="Postman"
-                :ui="{ content: 'py-5', text: 'text-xl text-primary' }"
+                :ui="{ content: 'py-5', text: 'text-xl text-neutral' }"
                 class="flex-1"
               >
                 <UIcon name="devicon:postman" class="size-25 shrink-0" />

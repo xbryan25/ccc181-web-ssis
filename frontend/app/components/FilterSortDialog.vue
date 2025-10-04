@@ -84,8 +84,8 @@ const getTextForTooltip = (): string => {
               <h3 class="flex-1 text-lg font-medium">Sort Order</h3>
             </div>
             <div class="w-full flex gap-4 mb-2">
-              <div class="flex-1 h-[2px] bg-white" />
-              <div class="flex-1 h-[2px] bg-white" />
+              <div class="flex-1 h-[2px] bg-primary" />
+              <div class="flex-1 h-[2px] bg-primary" />
             </div>
             <div class="w-full flex gap-4 mb-4">
               <RadioSelectButtons
@@ -114,7 +114,7 @@ const getTextForTooltip = (): string => {
       </template>
 
       <template #footer>
-        <div class="flex justify-end gap-2">
+        <div class="flex justify-end gap-2 w-full">
           <UButton
             size="md"
             color="error"
