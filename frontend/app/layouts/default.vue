@@ -11,6 +11,28 @@ interface NavBarDetails {
 }
 
 const colorMode = useColorMode();
+const appConfig = useAppConfig();
+
+const colors = [
+  'red',
+  'orange',
+  'amber',
+  'yellow',
+  'lime',
+  'green',
+  'emerald',
+  'teal',
+  'cyan',
+  'sky',
+  'blue',
+  'indigo',
+  'violet',
+  'purple',
+  'fuchsia',
+  'pink',
+  'rose',
+];
+const neutrals = ['slate', 'gray', 'zinc', 'neutral', 'stone'];
 
 const auth = useAuthStore();
 
@@ -73,6 +95,57 @@ const items = computed<DropdownMenuItem[][]>(() => [
   ],
   [
     {
+      label: 'Theme',
+      icon: 'i-lucide-palette',
+      children: [
+        {
+          label: 'Primary',
+          slot: 'chip',
+          chip: appConfig.ui.colors.primary,
+          content: {
+            align: 'center',
+            collisionPadding: 16,
+          },
+          children: colors.map((color: string) => ({
+            label: color.charAt(0).toUpperCase() + color.slice(1),
+            chip: color,
+            slot: 'chip',
+            checked: appConfig.ui.colors.primary === color,
+            type: 'checkbox',
+            onSelect: (e: Event) => {
+              e.preventDefault();
+
+              appConfig.ui.colors.primary = color;
+            },
+          })),
+        },
+        {
+          label: 'Neutral',
+          slot: 'chip',
+          chip:
+            appConfig.ui.colors.neutral === 'neutral' ? 'old-neutral' : appConfig.ui.colors.neutral,
+          content: {
+            align: 'end',
+            collisionPadding: 16,
+          },
+          children: neutrals.map((color) => ({
+            label: color,
+            chip: color === 'neutral' ? 'old-neutral' : color,
+            slot: 'chip',
+            type: 'checkbox',
+            checked: appConfig.ui.colors.neutral === color,
+            onSelect: (e) => {
+              e.preventDefault();
+
+              appConfig.ui.colors.neutral = color;
+            },
+          })),
+        },
+      ],
+    },
+  ],
+  [
+    {
       label: 'Logout',
       icon: 'i-lucide-log-out',
     },
@@ -118,6 +191,16 @@ const items = computed<DropdownMenuItem[][]>(() => [
               <p class="text-lg font-bold">{{ auth.username }}</p>
             </div>
           </UButton>
+
+          <template #chip-leading="{ item }">
+            <span
+              :style="{
+                '--chip-light': `var(--color-${(item as any).chip}-500)`,
+                '--chip-dark': `var(--color-${(item as any).chip}-400)`,
+              }"
+              class="ms-0.5 size-2 rounded-full bg-(--chip-light) dark:bg-(--chip-dark)"
+            />
+          </template>
         </UDropdownMenu>
       </div>
     </div>
