@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 
-from app.utils.get_cookie_max_age import get_cookie_max_age
+from app.utils.get_cookie_max_age import get_cookie_max_age, get_refresh_cookie_max_age
 
 load_dotenv()
 
@@ -24,5 +24,9 @@ class Config:
     JWT_COOKIE_HTTPONLY = True
     JWT_COOKIE_CSRF_PROTECT = os.getenv("JWT_COOKIE_CSRF_PROTECT", "False").lower() == "true"
     
-    COOKIE_MAX_AGE = get_cookie_max_age() * 60
+    # in minutes
+    COOKIE_MAX_AGE = get_cookie_max_age()
+
+    # in days
+    REFRESH_COOKIE_MAX_AGE = get_refresh_cookie_max_age()
 

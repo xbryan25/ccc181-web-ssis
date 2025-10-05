@@ -1,7 +1,11 @@
 from flask import Blueprint
 from .controllers import UserController
 
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies
+
+from flask import make_response, current_app
+
+from datetime import datetime, timezone, timedelta
 
 user_bp = Blueprint("user_bp", __name__)
 
@@ -21,3 +25,8 @@ def user_signup():
 @jwt_required()
 def get_current_user():
     return UserController.get_current_user_controller()
+
+@user_bp.route("/refresh", methods=["POST"])
+@jwt_required(refresh=True)
+def refresh_access_token():
+    return UserController.refresh_access_token_controller()
