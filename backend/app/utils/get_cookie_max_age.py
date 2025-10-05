@@ -1,6 +1,6 @@
 import os
 
-# Cookie max age is in minutes
+# Result will be in minutes
 def get_cookie_max_age(default: str = 5) -> int:
     value = os.getenv("COOKIE_MAX_AGE", default)
 

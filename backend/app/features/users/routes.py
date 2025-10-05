@@ -9,6 +9,10 @@ user_bp = Blueprint("user_bp", __name__)
 def user_login():
     return UserController.user_login_controller()
 
+@user_bp.route("/logout", methods=["POST"])
+def user_logout():
+    return UserController.user_logout_controller()
+
 @user_bp.route("/signup", methods=["POST"])
 def user_signup():
     return UserController.user_signup_controller()

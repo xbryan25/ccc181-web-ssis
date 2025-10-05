@@ -1,6 +1,6 @@
 from flask import request, jsonify, make_response, current_app
 
-from flask_jwt_extended import create_access_token, get_jwt_identity
+from flask_jwt_extended import create_access_token, get_jwt_identity, set_access_cookies, unset_jwt_cookies, get_jwt
 
 import traceback
 
@@ -9,7 +9,6 @@ from .services import UserServices
 
 class UserController:
  
-
     @staticmethod
     def user_login_controller():
 
@@ -29,15 +28,25 @@ class UserController:
                 "message": "Enjoy your session!"
             })
             
-            # HttpOnly cookie, cannot be read by JS
-            resp.set_cookie(
-                "access_token",
-                access_token,
-                httponly=True,
-                secure=False, 
-                samesite="Lax",
-                max_age=60 * current_app.config["COOKIE_MAX_AGE"] 
-            )
+            set_access_cookies(resp, access_token, max_age=current_app.config["COOKIE_MAX_AGE"])
+
+            return resp, 200
+        
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        
+    @staticmethod
+    def user_logout_controller():
+
+        try:
+            resp = make_response({
+                "messageTitle": "Logout successful.",
+                "message": "Your session has been cleared."
+            })
+
+            # Clears both access and refresh cookies
+            unset_jwt_cookies(resp)
 
             return resp, 200
         
