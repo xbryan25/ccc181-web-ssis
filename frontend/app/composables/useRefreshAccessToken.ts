@@ -3,11 +3,21 @@ type RefreshAccessTokenResponse = {
     accessTokenExpiresAt: number
 }
 
-export function useRefreshAccessToken(){
+export function useRefreshAccessToken(runType: string, cookie? ){
   const apiUrl = import.meta.env.VITE_API_URL;
 
-	return $fetch<RefreshAccessTokenResponse>(`${apiUrl}/api/user/refresh`, {
-    method: 'POST',
-    credentials: 'include',
-  });
+	// If loadType === 'server', it is run during SSR
+  // else, run during client
+
+	if (runType == 'client'){
+		return $fetch<RefreshAccessTokenResponse>(`${apiUrl}/api/user/refresh`, {
+			method: 'POST',
+			credentials: 'include',
+		});
+	} else{
+		return $fetch<RefreshAccessTokenResponse>(`${apiUrl}/api/user/refresh`, {
+			method: 'POST',
+			headers: { cookie },
+		})
+	}
 };

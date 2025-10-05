@@ -1,12 +1,7 @@
 from flask import Blueprint
 from .controllers import UserController
 
-from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token, set_access_cookies
-
-from flask import make_response, current_app
-
-from datetime import datetime, timezone, timedelta
-
+from flask_jwt_extended import jwt_required
 user_bp = Blueprint("user_bp", __name__)
 
 @user_bp.route("/login", methods=["POST"])

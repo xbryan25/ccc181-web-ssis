@@ -185,7 +185,7 @@ const userLogout = async () => {
   <div class="flex h-screen">
     <div class="flex flex-col w-64 bg-elevated">
       <div class="flex justify-center items-center py-5 px-1">
-        <Icon name="simple-icons:progress text-primary" class="flex-1 w-10 h-10" />
+        <UIcon name="simple-icons:progress" class="flex-1 w-10 h-10 text-primary" />
         <p class="flex-[3] font-bold text-4xl font-rethink text-primary">Sequence</p>
       </div>
 
