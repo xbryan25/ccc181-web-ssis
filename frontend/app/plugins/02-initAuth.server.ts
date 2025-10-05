@@ -1,15 +1,14 @@
 import { useAuthStore } from '~/stores/useAuthStore'
 import { useCurrentUser } from '#imports'
 
-import type { H3Event } from 'h3'
-
-export default defineNuxtPlugin(async (nuxtApp) => {
+export default defineNuxtPlugin(async () => {
   const auth = useAuthStore()
 
-  const event: H3Event | undefined = nuxtApp.ssrContext?.event
+  const event = useRequestEvent()
+  const cookie = event ? event.node.req.headers.cookie : '' 
 
   try {
-    const response = await useCurrentUser('server', event)
+    const response = await useCurrentUser('server', cookie)
     auth.username = response.username
     auth.isAuthenticated = true
   } catch {

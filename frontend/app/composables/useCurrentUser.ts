@@ -1,25 +1,23 @@
-import type { H3Event } from 'h3'
 
 type CurrentUserResponse = {
     username: string
 }
 
-export async function useCurrentUser(loadType: string, event?: H3Event | null) {
+export function useCurrentUser(loadType: string, cookie?) {
   const apiUrl = import.meta.env.VITE_API_URL;
 
   // If loadType === 'server', it is run during SSR
   // else, run during client
 
-  if (loadType === 'server'){
-    return $fetch<CurrentUserResponse>(`${apiUrl}/api/user/me`, {
-      headers: {
-        cookie: event?.node.req.headers.cookie || ''
-      },
-    })
-  } else {
-    return $fetch<CurrentUserResponse>(`${apiUrl}/api/user/me`, {
-        method: 'GET',
-        credentials: 'include',
-    });
-  }
+  if (loadType == 'client'){
+		return $fetch<CurrentUserResponse>(`${apiUrl}/api/user/me`, {
+			method: 'GET',
+			credentials: 'include',
+		});
+	} else{
+		return $fetch<CurrentUserResponse>(`${apiUrl}/api/user/me`, {
+			method: 'GET',
+			headers: { cookie },
+		})
+	}
 }

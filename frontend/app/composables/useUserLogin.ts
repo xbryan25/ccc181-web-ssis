@@ -2,8 +2,8 @@
 type UserLoginResponse = {
     messageTitle: string
     message: string
-    accessToken: string
     username: string
+    accessTokenExpiresAt: number
 }
 
 export function useUserLogin(email: string, password: string){

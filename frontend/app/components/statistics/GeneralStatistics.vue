@@ -1,12 +1,9 @@
 <script setup lang="ts">
-const { totalCount: studentTotalCount }: { totalCount: number } =
-  await useEntitiesCount('students');
+const studentTotalCount = ref(0);
 
-const { totalCount: programTotalCount }: { totalCount: number } =
-  await useEntitiesCount('programs');
+const programTotalCount = ref(0);
 
-const { totalCount: collegeTotalCount }: { totalCount: number } =
-  await useEntitiesCount('colleges');
+const collegeTotalCount = ref(0);
 
 const entitiesTotalCounts = [
   {
@@ -21,6 +18,18 @@ const entitiesTotalCounts = [
   },
   { entityTitle: 'Colleges', entityIcon: 'solar:buildings-2-bold', totalCount: collegeTotalCount },
 ];
+
+onMounted(async () => {
+  const [students, programs, colleges] = await Promise.all([
+    useEntitiesCount('students'),
+    useEntitiesCount('programs'),
+    useEntitiesCount('colleges'),
+  ]);
+
+  studentTotalCount.value = students.totalCount;
+  programTotalCount.value = programs.totalCount;
+  collegeTotalCount.value = colleges.totalCount;
+});
 </script>
 
 <template>

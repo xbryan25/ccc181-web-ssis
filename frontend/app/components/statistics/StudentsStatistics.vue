@@ -2,13 +2,6 @@
 import { VisSingleContainer, VisTooltip, VisDonut, VisBulletLegend } from '@unovis/vue';
 import { Donut } from '@unovis/ts';
 
-const { totalCount: studentTotalCount }: { totalCount: number } =
-  await useEntitiesCount('students');
-
-const yearLevelData = formatForYearLevelDonutChart(await useYearLevelDemographics());
-
-const genderData = formatForGenderDonutChart(await useGenderDemographics());
-
 const triggers = {
   [Donut.selectors.segment]: (d: { data: { label: string; value: number } }) => {
     console.log(d);
@@ -31,6 +24,24 @@ const genderLegendItems = [
   { name: 'Others' },
   { name: 'Prefer not to say' },
 ];
+
+const studentTotalCount = ref(0);
+
+const yearLevelData: Ref<{ label: string | undefined; value: number | undefined }[]> = ref([]);
+
+const genderData: Ref<{ label: string; value: number | undefined }[]> = ref([]);
+
+onMounted(async () => {
+  const [students, yearLevelDemographics, genderDemographics] = await Promise.all([
+    useEntitiesCount('students'),
+    useYearLevelDemographics(),
+    useGenderDemographics(),
+  ]);
+
+  studentTotalCount.value = students.totalCount;
+  yearLevelData.value = formatForYearLevelDonutChart(yearLevelDemographics);
+  genderData.value = formatForGenderDonutChart(genderDemographics);
+});
 </script>
 
 <template>
