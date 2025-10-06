@@ -145,8 +145,6 @@ class CollegeController:
         try:
             college_codes_details = CollegeServices.get_college_codes_service()
 
-            print(college_codes_details)
-
             return jsonify(college_codes_details), 200
 
         except Exception as e:

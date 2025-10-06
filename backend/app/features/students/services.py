@@ -50,7 +50,8 @@ class StudentServices:
 
         year_level_demographics = StudentRepository.get_year_level_demographics(params)
 
-        formatted_year_level_demographics = [{to_camel_case(k): v for k, v in year_level_demographic.items()} for year_level_demographic in year_level_demographics]
+        # Changed to_camel_case(k) to just k because year_level starts with a number; it's not necessary anymore
+        formatted_year_level_demographics = [{k: v for k, v in year_level_demographic.items()} for year_level_demographic in year_level_demographics]
 
         return formatted_year_level_demographics
     
