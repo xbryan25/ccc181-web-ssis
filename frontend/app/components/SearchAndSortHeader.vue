@@ -12,14 +12,15 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (
-    e:
-      | 'update:searchValue'
-      | 'update:searchBy'
-      | 'update:searchType'
-      | 'update:sortField'
-      | 'update:sortOrder',
-    value: string,
+    e: 'onProceed',
+    localState: {
+      searchBy: string;
+      searchType: string;
+      sortField: string;
+      sortOrder: string;
+    },
   ): void;
+  (e: 'update:searchValue', value: string): void;
   (e: 'onCreateEntitySubmit'): void;
 }>();
 
@@ -49,20 +50,28 @@ const searchValue = computed({
       :entity-type="props.entityType"
       :dialog-type="'filter'"
       :search-and-sort-state="props.searchAndSortState"
-      @update:search-by="(value: string) => emit('update:searchBy', value)"
-      @update:search-type="(value: string) => emit('update:searchType', value)"
-      @update:sort-field="(value: string) => emit('update:sortField', value)"
-      @update:sort-order="(value: string) => emit('update:sortOrder', value)"
+      @on-proceed="
+        (localState: {
+          searchBy: string;
+          searchType: string;
+          sortField: string;
+          sortOrder: string;
+        }) => emit('onProceed', localState)
+      "
     />
 
     <FilterSortDialog
       :entity-type="props.entityType"
       :dialog-type="'sort'"
       :search-and-sort-state="props.searchAndSortState"
-      @update:search-by="(value: string) => emit('update:searchBy', value)"
-      @update:search-type="(value: string) => emit('update:searchType', value)"
-      @update:sort-field="(value: string) => emit('update:sortField', value)"
-      @update:sort-order="(value: string) => emit('update:sortOrder', value)"
+      @on-proceed="
+        (localState: {
+          searchBy: string;
+          searchType: string;
+          sortField: string;
+          sortOrder: string;
+        }) => emit('onProceed', localState)
+      "
     />
 
     <UButton
