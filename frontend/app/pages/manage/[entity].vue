@@ -36,6 +36,18 @@ const searchAndSortState = reactive({
 });
 
 const createEntitySubmitRef = ref(false);
+
+const onProceed = (localState: {
+  searchBy: string;
+  searchType: string;
+  sortField: string;
+  sortOrder: string;
+}) => {
+  searchAndSortState.searchBy = localState.searchBy;
+  searchAndSortState.searchType = localState.searchType;
+  searchAndSortState.sortField = localState.sortField;
+  searchAndSortState.sortOrder = localState.sortOrder;
+};
 </script>
 
 <template>
@@ -45,12 +57,15 @@ const createEntitySubmitRef = ref(false);
     <SearchAndSortHeader
       :entity-type="entity"
       :search-and-sort-state="searchAndSortState"
-      @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
-      @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
-      @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
-      @update:sort-field="(value: string) => (searchAndSortState.sortField = value)"
-      @update:sort-order="(value: string) => (searchAndSortState.sortOrder = value)"
       @on-create-entity-submit="() => (createEntitySubmitRef = true)"
+      @on-proceed="
+        (localState: {
+          searchBy: string;
+          searchType: string;
+          sortField: string;
+          sortOrder: string;
+        }) => onProceed(localState)
+      "
     />
 
     <EntityTable
