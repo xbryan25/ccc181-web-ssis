@@ -13,6 +13,7 @@ class UserController:
  
     @staticmethod
     def user_login_controller():
+        """Generate JWT access and refresh tokens, and set them as HTTP-only cookies after validating user credentials."""
 
         user_login_details = request.json
 
@@ -45,6 +46,7 @@ class UserController:
         
     @staticmethod
     def user_logout_controller():
+        """Unsets both access and refresh tokens."""
 
         try:
             resp = make_response({
@@ -63,6 +65,7 @@ class UserController:
         
     @staticmethod
     def user_signup_controller():
+        """Register a new user using signup details."""
 
         user_signup_details = request.json
 
@@ -77,6 +80,7 @@ class UserController:
         
     @staticmethod
     def get_current_user_controller():
+        "Retrieve the currently authenticated user's username."
 
         try:
             user_id = get_jwt_identity()
@@ -94,6 +98,7 @@ class UserController:
     
     @staticmethod
     def refresh_access_token_controller():
+        "Generate a new access token using a valid refresh token."
 
         try: 
             # Get user ID from the refresh token

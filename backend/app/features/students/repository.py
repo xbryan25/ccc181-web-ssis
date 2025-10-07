@@ -8,12 +8,45 @@ class StudentRepository:
 
     @staticmethod
     def get_student_by_id(id_number: str) -> dict | None:
+        """
+        Retrieve a student record from the database by ID number.
+
+        Args:
+            id_number (str): The unique ID number of the student.
+
+        Returns:
+            dict: A dictionary containing the student's details if found, otherwise None.
+        """
+
         db = current_app.extensions['db']
 
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="students", pk="id_number"), (id_number, ))
 
     @staticmethod
     def get_total_student_count(params) -> int:
+        """
+        Retrieve the total number of students based on a specific filter.
+
+        Args:
+            params (dict): A dictionary of filtering parameters. Expected keys include:
+                            - "search_value" (str | None): Text to search for in a specific column.
+                            - "search_type" (str | None): The search matching type. One of "Starts With", "Ends With" or "Contains".
+                            - "search_by" (str | None): The column name to apply the search on.
+                            - "program_code" (str | None): The program code to filter students by.
+                            - "college_code" (str | None): The college code to filter students by.
+
+        Returns:
+            int: The total number of students that match the given filter.
+
+        Raises:
+            ValueError: If more than one of "search_value", "program_code",
+            or "college_code" is provided.
+
+        Note:
+            Only one of "search_value", "program_code", or "college_code"
+            should be provided at a time. Otherwise, a ValueError is raised.
+        """
+
         db = current_app.extensions['db']
 
         if sum(x is not None for x in [params["search_value"] , params["program_code"], params["college_code"]]) > 1:
@@ -42,7 +75,26 @@ class StudentRepository:
         else:
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="students"))
 
+    @staticmethod
     def get_many_students(params):
+        """
+        Retrieve a paginated list of students based on search and sorting parameters.
+
+        Args:
+            params (dict): A dictionary of query parameters. Expected keys include:
+                - "search_value" (str): Text to search for in a specific column.
+                - "search_type" (str): Search matching type. One of "Starts With", "Ends With" or "Contains".
+                - "search_by" (str): Column name to apply the search on.
+                - "sort_field" (str): Column name to sort the results by.
+                - "sort_order" (str): Sort direction, either "Ascending" or "Descending".
+                - "page_number" (int): Current page number for pagination.
+                - "rows_per_page" (int): Number of records to retrieve per page.
+
+        Returns:
+            list[dict]: A list of student records matching the given filters, 
+            where each record is represented as a dictionary.
+        """
+            
         db = current_app.extensions['db']
 
         if params["search_type"] == "Starts With":
@@ -69,6 +121,21 @@ class StudentRepository:
                             (search_pattern, params["rows_per_page"], offset))
 
     def create_student(student_data):
+        """
+        Insert a new student record into the database.
+
+        Args:
+            student_data (dict): A dictionary containing the student's details.
+                Expected keys include:
+                    - "idNumber" (str): The unique ID number of the student.
+                    - "firstName" (str): The student's first name.
+                    - "lastName" (str): The student's last name.
+                    - "yearLevel" (str): The student's year level (e.g., "1st Year").
+                    - "gender" (str): The student's gender.
+                    - "programCode" (str): The code of the academic program the student belongs to.
+
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.INSERT.format(table="students", 
@@ -78,11 +145,35 @@ class StudentRepository:
                                                       student_data["yearLevel"], student_data["gender"], student_data["programCode"]))
 
     def delete_student(id_number: str):
+        """
+        Delete a student record from the database using their ID number.
+
+        Args:
+            id_number (str): The unique ID number of the student to delete.
+
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.DELETE_BY_ID.format(table="students", pk="id_number"), (id_number, ))
 
     def edit_student_details(id_number: str, new_student_data):
+        """
+        Update an existing student's details in the database.
+
+        Args:
+            id_number (str): The unique ID number of the student to update.
+            new_student_data (dict): A dictionary containing the updated student information.
+                Expected keys include:
+                    - "idNumber" (str): The updated ID number of the student.
+                    - "firstName" (str): The updated first name.
+                    - "lastName" (str): The updated last name.
+                    - "yearLevel" (str): The updated year level.
+                    - "gender" (str): The updated gender.
+                    - "programCode" (str): The updated program code.
+
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="students", 
@@ -94,6 +185,27 @@ class StudentRepository:
 
     @staticmethod
     def get_year_level_demographics(params):
+        """
+        Retrieve the student count grouped by year level, optionally filtered by program or college.
+
+        Args:
+            params (dict): A dictionary of filter parameters. Expected keys include:
+                - "program_code" (str | None): The program code to filter by. 
+                Cannot be provided at the same time as "college_code".
+
+                - "college_code" (str | None): The college code to filter by. 
+                Cannot be provided at the same time as "program_code".
+
+        Returns:
+            list[dict]: A list of dictionaries containing the year level and corresponding student count.
+                Each dictionary includes:
+                    - "year_level" (str): The academic year level (e.g., "1st Year").
+                    - "count" (int): The number of students in that year level.
+
+        Raises:
+            ValueError: If both "program_code" and "college_code" are provided simultaneously.
+        """
+
         db = current_app.extensions['db']
 
         if sum(x is not None for x in [params["program_code"], params["college_code"]]) > 1:
@@ -109,6 +221,26 @@ class StudentRepository:
     
     @staticmethod
     def get_gender_demographics(params):
+        """
+        Retrieve the student count grouped by gender, optionally filtered by program or college.
+
+        Args:
+            params (dict): A dictionary of filter parameters. Expected keys include:
+                - "program_code" (str | None): The program code to filter by. 
+                Cannot be provided at the same time as "college_code".
+                - "college_code" (str | None): The college code to filter by. 
+                Cannot be provided at the same time as "program_code".
+
+        Returns:
+            list[dict]: A list of dictionaries containing gender demographics.
+                Each dictionary includes:
+                    - "gender" (str): The gender category (e.g., "Male", "Female").
+                    - "count" (int): The number of students in that gender group.
+
+        Raises:
+            ValueError: If both "program_code" and "college_code" are provided simultaneously.
+        """
+
         db = current_app.extensions['db']
 
         if sum(x is not None for x in [params["program_code"], params["college_code"]]) > 1:

@@ -18,6 +18,7 @@ class StudentController:
 
     @staticmethod
     def get_student_details_controller(id_number: str):
+        """Retrieve detailed information about a specific student."""
 
         try:
             student_details: Student = StudentServices.get_student_details_service(id_number)
@@ -30,6 +31,8 @@ class StudentController:
     
     @staticmethod
     def get_total_student_count_controller():
+        """Retrieve the total number of students based on optional search filters."""
+
         try:
             params = {
                 "search_value": request.args.get("searchValue"),
@@ -65,6 +68,8 @@ class StudentController:
 
     @staticmethod
     def get_many_students_controller():
+        """Retrieve details of different students based on pagination, optional search and sort filters."""
+
         params = {
             "rows_per_page": int(request.args.get("rowsPerPage")),
             "page_number": int(request.args.get("pageNumber")),
@@ -86,6 +91,7 @@ class StudentController:
 
     @staticmethod
     def create_student_controller():
+        """Create a new student record."""
 
         entity_details = request.json
 
@@ -123,6 +129,8 @@ class StudentController:
 
     @staticmethod
     def delete_student_controller(id_number: str):
+        """Delete a student record by its code."""
+
         try:
             StudentServices.delete_student_service(id_number)
 
@@ -135,6 +143,7 @@ class StudentController:
 
     @staticmethod
     def edit_student_details_controller(id_number: str):
+        """Edit the details of an existing student."""
 
         entity_details = request.json
 
@@ -172,6 +181,8 @@ class StudentController:
         
     @staticmethod
     def get_year_level_demographics_controller():
+        """Retrieve student year-level demographics."""
+
         params = {
             "program_code": request.args.get("programCode"),
             "college_code": request.args.get("collegeCode"),
@@ -188,6 +199,8 @@ class StudentController:
         
     @staticmethod
     def get_gender_demographics_controller():
+        """Retrieve student gender demographics."""
+
         params = {
             "program_code": request.args.get("programCode"),
             "college_code": request.args.get("collegeCode"),

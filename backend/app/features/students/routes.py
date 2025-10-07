@@ -140,13 +140,13 @@ def create_student():
 
             idNumber: The unique code identifying the student.
 
-            firstName: The first name of the selected student.
+            firstName: The first name of the student.
 
-            lastName: The last name of the selected student.
+            lastName: The last name of the student.
 
-            yearLevel: The year level of the selected student.
+            yearLevel: The year level of the student.
 
-            gender: The gender of the selected student.
+            gender: The gender of the student.
 
             programCode: The identifier of the program in which this student belongs to.
 
@@ -240,7 +240,8 @@ def edit_student_details(id_number: str):
 @student_bp.route("/year-level-demographics", methods=["GET"])
 @jwt_required()
 def get_year_level_demographics():
-    """Retrieve student year-level demographics.
+    """
+    Retrieve student year-level demographics.
 
     This endpoint requires authentication via a valid access token (HTTP-only cookie).
     It returns the number of students in each year level, optionally filtered by either program or college.

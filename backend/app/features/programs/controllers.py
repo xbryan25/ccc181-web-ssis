@@ -17,6 +17,7 @@ class ProgramController:
     
     @staticmethod
     def get_program_details_controller(program_code: str):
+        """Retrieve detailed information about a specific program."""
 
         try:
             program_details: Program = ProgramServices.get_program_details_service(program_code)
@@ -29,6 +30,8 @@ class ProgramController:
     
     @staticmethod
     def get_total_program_count_controller():
+        """Retrieve the total number of programs based on optional search filters."""
+
         try:
             params = {
                 "search_value": request.args.get("searchValue"),
@@ -56,6 +59,8 @@ class ProgramController:
 
     @staticmethod
     def get_many_programs_controller():
+        """Retrieve details of different programs based on pagination, optional search and sort filters."""
+
         params = {
             "rows_per_page": int(request.args.get("rowsPerPage")),
             "page_number": int(request.args.get("pageNumber")),
@@ -77,6 +82,8 @@ class ProgramController:
 
     @staticmethod
     def create_program_controller():
+        """Create a new program record."""
+        
         entity_details = request.json
 
         new_program_data = {
@@ -110,6 +117,8 @@ class ProgramController:
 
     @staticmethod
     def delete_program_controller(program_code: str):
+        """Delete a program record by its code."""
+
         try:
             ProgramServices.delete_program_service(program_code)
 
@@ -122,6 +131,7 @@ class ProgramController:
 
     @staticmethod
     def edit_program_details_controller(program_code: str):
+        """Edit the details of an existing program."""
 
         entity_details = request.json
 
@@ -160,6 +170,8 @@ class ProgramController:
         
     @staticmethod
     def get_program_codes_controller():
+        """Retrieve a list of all program identifiers."""
+
         try:
             program_codes_details = ProgramServices.get_program_codes_service()
 

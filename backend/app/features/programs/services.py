@@ -6,16 +6,58 @@ class ProgramServices:
 
     @staticmethod
     def get_program_details_service(program_code: str):
+        """
+        Get the details of a program using the program_code.
+
+        Args:
+            program_code (str): program_code of the user.
+
+        Returns:
+            Program: A Program dataclass instance if a program has the given program_code, otherwise None.
+        """
+
         row = ProgramRepository.get_program_by_program_code(program_code)
 
         return Program(**row)
 
     @staticmethod
     def get_total_program_count_service(params):
+        """
+        Retrieve the total program count, with optional search filters.
+
+        Args:
+            params (dict): A dictionary containing the optional search filters.
+                Expected keys include:
+                    - "search_value" (str): The value to search for.
+                    - "search_by" (str): The field to search by, such as "programName" or "programCode".
+                    - "search_type" (str): The type of search to perform, such as "Starts With", "Contains", and "Ends With".
+
+        Returns:
+            int: The total program count, with search filters being optionally applied.
+        """
+
         return ProgramRepository.get_total_program_count(params)
 
     @staticmethod
     def get_many_programs_service(params):
+        """
+        Retrieve details of different programs based on pagination, optional search and sort filters.
+        
+        Args:
+            params (dict): A dictionary containing the pagination details, optional search and sort filters.
+                Expected keys include:
+                    - "rowsPerPage" (str): The number of program details to retrieve.
+                    - "pageNumber" (str): This number will be multiplied by rowsPerPage then serve as the offset for pagination.
+                    - "searchValue" (str): The value to search for.
+                    - "searchBy" (str): The field to search by, such as "programName" or "programCode".
+                    - "searchType" (str): The type of search to perform, such as "Starts With", "Contains", and "Ends With".
+                    - "sortField" (str): The field to search by, such as "programName" or "programCode".
+                    - "sortOrder" (str): The order of sort to perform, such as "Ascending", and "Descending".
+
+        Returns:
+            list[Program]: A list of program dataclass instances representing rowsPerPage programs.
+        """
+
         programs = ProgramRepository.get_many_programs(params)
 
         program_dataclasses = []
@@ -30,18 +72,57 @@ class ProgramServices:
 
     @staticmethod
     def create_program_service(program_data):
+        """
+        Create a new program record.
+        
+        Args:
+            program_data (dict): A dictionary containing the details of the new program.
+                Expected keys include:
+                    - "programCode" (str): The unique code identifying the program.
+                    - "programName" (str): The name of the program.
+                    - "collegeCode" (str): The identifier of the college in which this program belongs to.
+        """
+
         ProgramRepository.create_program(program_data)
 
     @staticmethod
     def delete_program_service(program_code: str):
+        """
+        Delete a program record by its program_code.
+
+        Args:
+            program_code (str): program_code of the program to be deleted.
+        """
+
         ProgramRepository.delete_program(program_code)
 
     @staticmethod
     def edit_program_details_service(program_code: str, new_program_data):
+        """
+        Edit the details of an existing program.
+        
+        Args:
+            program_code (str): The current unique code identifying the program to be updated.
+            program_data (dict): A dictionary containing the details of the updated program.
+                Expected keys include:
+                    - "programCode" (str): The updated program code of the program.
+                    - "programName" (str): The updated name of the program.
+                    - "collegeCode" (str): The identifier of the college in which this program belongs to.
+        """
+
         ProgramRepository.edit_program_details(program_code, new_program_data)
 
     @staticmethod
     def get_program_codes_service():
+        """
+        Retrieve all program codes.
+
+        Returns:
+            list[dict]: A list of dictionaries, each containing:
+                - "collegeCode" (str): The code of the college (or "N/A" if none).
+                - "programCodes" (list[str]): A sorted list of program codes under the college.
+        """
+        
         program_codes_details = ProgramRepository.get_program_codes()
 
         grouped_program_codes = {}

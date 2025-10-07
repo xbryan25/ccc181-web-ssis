@@ -15,6 +15,7 @@ class CollegeController:
     
     @staticmethod
     def get_college_details_controller(college_code: str):
+        """Retrieve detailed information about a specific college."""
 
         try:
             college_details: College = CollegeServices.get_college_details_service(college_code)
@@ -27,6 +28,8 @@ class CollegeController:
     
     @staticmethod
     def get_total_college_count_controller():
+        """Retrieve the total number of colleges based on optional search filters."""
+
         try:
             params = {
                 "search_value": request.args.get("searchValue"),
@@ -44,6 +47,8 @@ class CollegeController:
 
     @staticmethod
     def get_many_colleges_controller():
+        "Retrieve details of different colleges based on pagination, optional search and sort filters."
+
         try:
             params = {
                 "rows_per_page": int(request.args.get("rowsPerPage")),
@@ -65,6 +70,8 @@ class CollegeController:
 
     @staticmethod
     def create_college_controller():
+        """Create a new college record."""
+
         entity_details = request.json
 
         new_college_data = {
@@ -97,6 +104,8 @@ class CollegeController:
 
     @staticmethod
     def delete_college_controller(college_code: str):
+        """Delete a college record by its code."""
+
         try:
             CollegeServices.delete_college_service(college_code)
 
@@ -109,6 +118,7 @@ class CollegeController:
 
     @staticmethod
     def edit_college_details_controller(college_code: str):
+        """Edit the details of an existing college."""
 
         entity_details = request.json
 
@@ -142,6 +152,8 @@ class CollegeController:
         
     @staticmethod
     def get_college_codes_controller():
+        """Retrieve a list of all college identifiers."""
+
         try:
             college_codes_details = CollegeServices.get_college_codes_service()
 

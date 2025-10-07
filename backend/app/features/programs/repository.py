@@ -8,12 +8,42 @@ class ProgramRepository:
 
     @staticmethod
     def get_program_by_program_code(program_code: str) -> dict | None:
+        """
+        Retrieve a program record from the database by program code.
+
+        Args:
+            program_code (str): The unique program code of the program.
+
+        Returns:
+            dict: A dictionary containing the program's details if found, otherwise None.
+        """
+
         db = current_app.extensions['db']
 
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="programs", pk="program_code"), (program_code, ))
 
     @staticmethod
     def get_total_program_count(params) -> int:
+        """
+        Retrieve the total number of programs based on a specific filter.
+
+        Args:
+            params (dict): A dictionary of filtering parameters. Expected keys include:
+                            - "search_value" (str | None): Text to search for in a specific column.
+                            - "search_type" (str | None): The search matching type. One of "Starts With", "Ends With" or "Contains".
+                            - "search_by" (str | None): The column name to apply the search on.
+                            - "college_code" (str | None): The college code to filter programs by.
+
+        Returns:
+            int: The total number of programs that match the given filter.
+
+        Raises:
+            ValueError: If more than one of "search_value", or "college_code" is provided.
+
+        Note:
+            Only one of "search_value", or "college_code" should be provided at a time. Otherwise, a ValueError is raised.
+        """
+
         db = current_app.extensions['db']
 
         if sum(x is not None for x in [params["search_value"], params["college_code"]]) > 1:
@@ -40,6 +70,24 @@ class ProgramRepository:
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="programs"))
 
     def get_many_programs(params):
+        """
+        Retrieve a paginated list of programs based on search and sorting parameters.
+
+        Args:
+            params (dict): A dictionary of query parameters. Expected keys include:
+                - "search_value" (str): Text to search for in a specific column.
+                - "search_type" (str): Search matching type. One of "Starts With", "Ends With" or "Contains".
+                - "search_by" (str): Column name to apply the search on.
+                - "sort_field" (str): Column name to sort the results by.
+                - "sort_order" (str): Sort direction, either "Ascending" or "Descending".
+                - "page_number" (int): Current page number for pagination.
+                - "rows_per_page" (int): Number of records to retrieve per page.
+
+        Returns:
+            list[dict]: A list of program records matching the given filters, 
+            where each record is represented as a dictionary.
+        """
+
         db = current_app.extensions['db']
 
         if params["search_type"] == "Starts With":
@@ -65,19 +113,48 @@ class ProgramRepository:
                                     sort_order=sort_order),
                             (search_pattern, params["rows_per_page"], offset))
 
-
     def create_program(program_data):
+        """
+        Insert a new program record into the database.
+
+        Args:
+            program_data (dict): A dictionary containing the program's details.
+                Expected keys include:
+                    - "programCode" (str): The unique code of the program.
+                    - "programName" (str): The name of the program.
+                    - "collegeCode" (str): The code of the academic program the student belongs to.
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.INSERT.format(table="programs", columns="program_code, program_name, college_code", placeholders="%s, %s, %s"),
                          (program_data["programCode"], program_data["programName"], program_data["collegeCode"]))
 
     def delete_program(program_code: str):
+        """
+        Delete a program record from the database using their program code.
+
+        Args:
+            program_code (str): The unique program code of the program to delete.
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.DELETE_BY_ID.format(table="programs", pk="program_code"), (program_code, ))
 
     def edit_program_details(program_code: str, new_program_data):
+        """
+        Update an existing program's details in the database.
+
+        Args:
+            program_code (str): The unique program code of the program to update.
+            new_program_data (dict): A dictionary containing the updated program information.
+                Expected keys include:
+                    - "programCode" (str): The unique code of the program.
+                    - "programName" (str): The name of the program.
+                    - "collegeCode" (str): The code of the academic program the student belongs to.
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="programs", 
@@ -85,6 +162,15 @@ class ProgramRepository:
                                                            (new_program_data["programCode"], new_program_data["programName"], new_program_data["collegeCode"], program_code))   
 
     def get_program_codes():
+        """
+        Retrieve all program codes and their associated college codes from the database.
+
+        Returns:
+            list[dict[str, list[str] | str]]: A list of dictionaries, each containing:
+                - "collegeCode" (str): The code of the college.
+                - "programCodes" (list[str]): A list of program codes under that college.
+        """
+
         db = current_app.extensions['db']
 
         return db.fetch_all(CommonQueries.GET_ALL_IDS.format(columns="program_code, college_code", table="programs", order_column="college_code"))   

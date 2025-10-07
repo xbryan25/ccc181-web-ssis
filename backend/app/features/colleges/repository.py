@@ -8,12 +8,36 @@ class CollegeRepository:
 
     @staticmethod
     def get_college_by_college_code(college_code: str) -> dict | None:
+        """
+        Retrieve a college record from the database by college code.
+
+        Args:
+            college_code (str): The unique college code of the college.
+
+        Returns:
+            dict: A dictionary containing the college's details if found, otherwise None.
+        """
+
         db = current_app.extensions['db']
 
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
 
     @staticmethod
     def get_total_college_count(params) -> int:
+        """
+        Retrieve the total number of colleges based on a specific filter.
+
+        Args:
+            params (dict): A dictionary of filtering parameters. Expected keys include:
+                            - "search_value" (str | None): Text to search for in a specific column.
+                            - "search_type" (str | None): The search matching type. One of "Starts With", "Ends With" or "Contains".
+                            - "search_by" (str | None): The column name to apply the search on.
+                            - "college_code" (str | None): The college code to filter colleges by.
+
+        Returns:
+            int: The total number of colleges that match the given filter.
+        """
+
         db = current_app.extensions['db']
 
         if params["search_value"]:
@@ -35,6 +59,24 @@ class CollegeRepository:
 
 
     def get_many_colleges(params):
+        """
+        Retrieve a paginated list of colleges based on search and sorting parameters.
+
+        Args:
+            params (dict): A dictionary of query parameters. Expected keys include:
+                - "search_value" (str): Text to search for in a specific column.
+                - "search_type" (str): Search matching type. One of "Starts With", "Ends With" or "Contains".
+                - "search_by" (str): Column name to apply the search on.
+                - "sort_field" (str): Column name to sort the results by.
+                - "sort_order" (str): Sort direction, either "Ascending" or "Descending".
+                - "page_number" (int): Current page number for pagination.
+                - "rows_per_page" (int): Number of records to retrieve per page.
+
+        Returns:
+            list[dict]: A list of college records matching the given filters, 
+            where each record is represented as a dictionary.
+        """
+
         db = current_app.extensions['db']
 
         if params["search_type"] == "Starts With":
@@ -61,17 +103,45 @@ class CollegeRepository:
                             (search_pattern, params["rows_per_page"], offset))
 
     def create_college(college_data):
+        """
+        Insert a new college record into the database.
+
+        Args:
+            college_data (dict): A dictionary containing the college's details.
+                Expected keys include:
+                    - "collegeCode" (str): The unique code of the college.
+                    - "collegeName" (str): The name of the college.
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.INSERT.format(table="colleges", columns="college_code, college_name", placeholders="%s, %s"),
                          (college_data["collegeCode"], college_data["collegeName"]))
 
     def delete_college(college_code: str):
+        """
+        Delete a college record from the database using their college code.
+
+        Args:
+            college_code (str): The unique college code of the college to delete.
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.DELETE_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
 
     def edit_college_details(college_code: str, new_college_data):
+        """
+        Update an existing college's details in the database.
+
+        Args:
+            college_code (str): The unique college code of the college to update.
+            new_college_data (dict): A dictionary containing the updated college information.
+                Expected keys include:
+                    - "collegeCode" (str): The unique code of the college.
+                    - "collegeName" (str): The name of the college.
+        """
+
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="colleges", 
@@ -79,6 +149,14 @@ class CollegeRepository:
                                                            (new_college_data["collegeCode"], new_college_data["collegeName"], college_code))   
         
     def get_college_codes():
+        """
+        Retrieve all college codes from the database.
+
+        Returns:
+            list[dict[str]]: A list of dictionaries, each containing:
+                - "collegeCode" (str): The code of the college.
+        """
+
         db = current_app.extensions['db']
 
         return db.fetch_all(CommonQueries.GET_ALL_IDS.format(columns="college_code", table="colleges", order_column="college_code"))   
