@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, Response
 from .controllers import ProgramController
 
 from flask_jwt_extended import jwt_required
@@ -7,7 +7,7 @@ program_bp = Blueprint("program_bp", __name__)
 
 @program_bp.route("/<string:program_code>", methods=["GET"])
 @jwt_required()
-def get_program_details(program_code: str):
+def get_program_details(program_code: str) -> tuple[Response, int]:
     """
     Retrieve detailed information about a specific program.
 
@@ -39,7 +39,7 @@ def get_program_details(program_code: str):
 
 @program_bp.route("/total-count", methods=["GET"])
 @jwt_required()
-def get_total_program_count():
+def get_total_program_count() -> tuple[Response, int]:
     """
     Retrieve the total number of programs based on optional search filters.
 
@@ -70,7 +70,7 @@ def get_total_program_count():
 
 @program_bp.route("/", methods=["GET"])
 @jwt_required()
-def get_many_programs():
+def get_many_programs() -> tuple[Response, int]:
     """
     Retrieve details of different programs based on pagination, optional search and sort filters.
 
@@ -115,7 +115,7 @@ def get_many_programs():
 
 @program_bp.route("/", methods=["POST"])
 @jwt_required()
-def create_program():
+def create_program() -> tuple[Response, int]:
     """
     Create a new program record.
 
@@ -148,7 +148,7 @@ def create_program():
 
 @program_bp.route("/<string:program_code>", methods=["DELETE"])
 @jwt_required()
-def delete_program(program_code: str):
+def delete_program(program_code: str) -> tuple[Response, int]:
     """
     Delete a program record by its code.
 
@@ -177,7 +177,7 @@ def delete_program(program_code: str):
 
 @program_bp.route("/<string:program_code>", methods=["PUT"])
 @jwt_required()
-def edit_program_details(program_code: str):
+def edit_program_details(program_code: str) -> tuple[Response, int]:
     """
     Edit the details of an existing program.
 
@@ -214,7 +214,7 @@ def edit_program_details(program_code: str):
 
 @program_bp.route("/identifiers", methods=["GET"])
 @jwt_required()
-def get_program_codes():
+def get_program_codes() -> tuple[Response, int]:
     """
     Retrieve a list of all program identifiers.
 

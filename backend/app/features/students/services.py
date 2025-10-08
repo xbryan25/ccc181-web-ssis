@@ -7,7 +7,7 @@ from app.utils import to_camel_case
 class StudentServices:
 
     @staticmethod
-    def get_student_details_service(id_number: str):
+    def get_student_details_service(id_number: str) -> Student:
         """
         Get the details of a student using the id_number.
 
@@ -23,7 +23,7 @@ class StudentServices:
         return Student(**row)
     
     @staticmethod
-    def get_total_student_count_service(params):
+    def get_total_student_count_service(params) -> int:
         """
         Retrieve the total student count, with optional search filters.
 
@@ -38,10 +38,10 @@ class StudentServices:
             int: The total student count, with search filters being optionally applied.
         """
 
-        return StudentRepository.get_total_student_count(params)
+        return StudentRepository.get_total_student_count(params)["count"]
 
     @staticmethod
-    def get_many_students_service(params):
+    def get_many_students_service(params) -> list[Student]:
         """
         Retrieve details of different students based on pagination, optional search and sort filters.
         
@@ -75,7 +75,7 @@ class StudentServices:
         return student_dataclasses
 
     @staticmethod
-    def create_student_service(student_data):
+    def create_student_service(student_data) -> None:
         """
         Create a new student record.
         
@@ -93,7 +93,7 @@ class StudentServices:
         StudentRepository.create_student(student_data=student_data)
 
     @staticmethod
-    def delete_student_service(id_number: str):
+    def delete_student_service(id_number: str) -> None:
         """
         Delete a student record by its id_number.
 
@@ -104,7 +104,7 @@ class StudentServices:
         StudentRepository.delete_student(id_number=id_number)
 
     @staticmethod
-    def edit_student_details_service(id_number: str, new_student_data):
+    def edit_student_details_service(id_number: str, new_student_data) -> None:
         """
         Edit the details of an existing student.
         
@@ -123,7 +123,7 @@ class StudentServices:
         StudentRepository.edit_student_details(id_number=id_number, new_student_data=new_student_data)
 
     @staticmethod
-    def get_year_level_demographics_service(params):
+    def get_year_level_demographics_service(params) -> list[dict[str, int | str]]:
         """
         Retrieve student year-level demographics.
         
@@ -147,7 +147,7 @@ class StudentServices:
         return formatted_year_level_demographics
     
     @staticmethod
-    def get_gender_demographics_service(params):
+    def get_gender_demographics_service(params) -> list[dict[str, int | str]]:
         """
         Retrieve student gender demographics.
         

@@ -7,7 +7,7 @@ from flask import current_app
 class StudentRepository:
 
     @staticmethod
-    def get_student_by_id(id_number: str) -> dict | None:
+    def get_student_by_id(id_number: str) -> dict[str, str] | None:
         """
         Retrieve a student record from the database by ID number.
 
@@ -23,7 +23,7 @@ class StudentRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="students", pk="id_number"), (id_number, ))
 
     @staticmethod
-    def get_total_student_count(params) -> int:
+    def get_total_student_count(params) -> dict[str, str]:
         """
         Retrieve the total number of students based on a specific filter.
 
@@ -36,7 +36,7 @@ class StudentRepository:
                             - "college_code" (str | None): The college code to filter students by.
 
         Returns:
-            int: The total number of students that match the given filter.
+            dict: A dictionary containing the total number of students that match the given filter.
 
         Raises:
             ValueError: If more than one of "search_value", "program_code",
@@ -76,7 +76,7 @@ class StudentRepository:
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="students"))
 
     @staticmethod
-    def get_many_students(params):
+    def get_many_students(params) -> list[dict[str, str]]:
         """
         Retrieve a paginated list of students based on search and sorting parameters.
 
@@ -120,7 +120,8 @@ class StudentRepository:
                                     sort_order=sort_order),
                             (search_pattern, params["rows_per_page"], offset))
 
-    def create_student(student_data):
+    @staticmethod
+    def create_student(student_data) -> None:
         """
         Insert a new student record into the database.
 
@@ -144,7 +145,8 @@ class StudentRepository:
                                                      (student_data["idNumber"], student_data["firstName"], student_data["lastName"],
                                                       student_data["yearLevel"], student_data["gender"], student_data["programCode"]))
 
-    def delete_student(id_number: str):
+    @staticmethod
+    def delete_student(id_number: str) -> None:
         """
         Delete a student record from the database using their ID number.
 
@@ -157,7 +159,8 @@ class StudentRepository:
 
         db.execute_query(CommonQueries.DELETE_BY_ID.format(table="students", pk="id_number"), (id_number, ))
 
-    def edit_student_details(id_number: str, new_student_data):
+    @staticmethod
+    def edit_student_details(id_number: str, new_student_data) -> None:
         """
         Update an existing student's details in the database.
 
@@ -184,7 +187,7 @@ class StudentRepository:
                                                             id_number))  
 
     @staticmethod
-    def get_year_level_demographics(params):
+    def get_year_level_demographics(params) -> list[dict[str, str]]:
         """
         Retrieve the student count grouped by year level, optionally filtered by program or college.
 
@@ -220,7 +223,7 @@ class StudentRepository:
         return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS)
     
     @staticmethod
-    def get_gender_demographics(params):
+    def get_gender_demographics(params) -> list[dict[str, str]]:
         """
         Retrieve the student count grouped by gender, optionally filtered by program or college.
 

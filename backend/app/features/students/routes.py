@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, Response
 from .controllers import StudentController
 
 from flask_jwt_extended import jwt_required
@@ -7,7 +7,7 @@ student_bp = Blueprint("student_bp", __name__)
 
 @student_bp.route("/<string:id_number>", methods=["GET"])
 @jwt_required()
-def get_student_details(id_number: str):
+def get_student_details(id_number: str) -> tuple[Response, int]:
     """
     Retrieve detailed information about a specific student.
 
@@ -46,7 +46,7 @@ def get_student_details(id_number: str):
 
 @student_bp.route("/total-count", methods=["GET"])
 @jwt_required()
-def get_total_student_count():
+def get_total_student_count() -> tuple[Response, int]:
     """
     Retrieve the total number of students based on optional search filters.
 
@@ -77,7 +77,7 @@ def get_total_student_count():
 
 @student_bp.route("/", methods=["GET"])
 @jwt_required()
-def get_many_students():
+def get_many_students() -> tuple[Response, int]:
     """
     Retrieve details of different students based on pagination, optional search and sort filters.
 
@@ -128,7 +128,7 @@ def get_many_students():
 
 @student_bp.route("/", methods=["POST"])
 @jwt_required()
-def create_student():
+def create_student() -> tuple[Response, int]:
     """
     Create a new student record.
 
@@ -167,7 +167,7 @@ def create_student():
 
 @student_bp.route("/<string:id_number>", methods=["DELETE"])
 @jwt_required()
-def delete_student(id_number: str):
+def delete_student(id_number: str) -> tuple[Response, int]:
     """
     Delete a student record by its code.
 
@@ -196,7 +196,7 @@ def delete_student(id_number: str):
 
 @student_bp.route("/<string:id_number>", methods=["PUT"])
 @jwt_required()
-def edit_student_details(id_number: str):
+def edit_student_details(id_number: str) -> tuple[Response, int]:
     """
     Edit the details of an existing student.
 
@@ -239,7 +239,7 @@ def edit_student_details(id_number: str):
 
 @student_bp.route("/year-level-demographics", methods=["GET"])
 @jwt_required()
-def get_year_level_demographics():
+def get_year_level_demographics() -> tuple[Response, int]:
     """
     Retrieve student year-level demographics.
 
@@ -276,7 +276,7 @@ def get_year_level_demographics():
 
 @student_bp.route("/gender-demographics", methods=["GET"])
 @jwt_required()
-def get_gender_demographics():
+def get_gender_demographics() -> tuple[Response, int]:
     """
     Retrieve student gender demographics.
 

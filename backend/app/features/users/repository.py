@@ -5,7 +5,7 @@ from flask import current_app
 class UserRepository:
 
     @staticmethod
-    def get_user_by_email(email: str) -> dict | None:
+    def get_user_by_email(email: str) -> dict[str, str] | None:
         """
         Retrieve a user record from the database by email.
 
@@ -21,7 +21,7 @@ class UserRepository:
         return db.fetch_one(CommonQueries.GET_BY_SPECIFIC_COLUMN.format(table="users", column="email"), (email, ))
 
     @staticmethod
-    def user_signup(user_id, username, email, password_hash):
+    def user_signup(user_id, username, email, password_hash) -> None:
         """
         Insert a new user record into the database.
 
@@ -40,7 +40,7 @@ class UserRepository:
                                                      (user_id, username, email, password_hash))
         
     @staticmethod
-    def get_username(user_id):
+    def get_username(user_id) -> dict[str, str] | None:
         """
         Retrieve the username of a user by their user_id.
 

@@ -9,7 +9,7 @@ import uuid
 class UserServices:
 
     @staticmethod
-    def user_login_service(email: str, password: str):
+    def user_login_service(email: str, password: str) -> User:
         """
         Authenticate a user with email and password.
         
@@ -38,7 +38,7 @@ class UserServices:
         return None
     
     @staticmethod
-    def user_signup_service(user_signup_details):
+    def user_signup_service(user_signup_details) -> None:
         """
         Register a new user using the provided signup details.
 
@@ -56,7 +56,7 @@ class UserServices:
 
         UserRepository.user_signup(user_id, user_signup_details['username'], user_signup_details['email'], password_hash)
 
-    def get_username_service(user_id):
+    def get_username_service(user_id) -> str:
         """
         Get the username of a user using the user_id.
 

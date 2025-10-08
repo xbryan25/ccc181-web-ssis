@@ -5,7 +5,7 @@ from app.features.common.dataclasses import Program
 class ProgramServices:
 
     @staticmethod
-    def get_program_details_service(program_code: str):
+    def get_program_details_service(program_code: str) -> Program:
         """
         Get the details of a program using the program_code.
 
@@ -21,7 +21,7 @@ class ProgramServices:
         return Program(**row)
 
     @staticmethod
-    def get_total_program_count_service(params):
+    def get_total_program_count_service(params) -> int:
         """
         Retrieve the total program count, with optional search filters.
 
@@ -36,10 +36,10 @@ class ProgramServices:
             int: The total program count, with search filters being optionally applied.
         """
 
-        return ProgramRepository.get_total_program_count(params)
+        return ProgramRepository.get_total_program_count(params)["count"]
 
     @staticmethod
-    def get_many_programs_service(params):
+    def get_many_programs_service(params) -> list[Program]:
         """
         Retrieve details of different programs based on pagination, optional search and sort filters.
         
@@ -71,7 +71,7 @@ class ProgramServices:
         return program_dataclasses
 
     @staticmethod
-    def create_program_service(program_data):
+    def create_program_service(program_data) -> None:
         """
         Create a new program record.
         
@@ -86,7 +86,7 @@ class ProgramServices:
         ProgramRepository.create_program(program_data)
 
     @staticmethod
-    def delete_program_service(program_code: str):
+    def delete_program_service(program_code: str) -> None:
         """
         Delete a program record by its program_code.
 
@@ -97,7 +97,7 @@ class ProgramServices:
         ProgramRepository.delete_program(program_code)
 
     @staticmethod
-    def edit_program_details_service(program_code: str, new_program_data):
+    def edit_program_details_service(program_code: str, new_program_data) -> None:
         """
         Edit the details of an existing program.
         
@@ -113,7 +113,7 @@ class ProgramServices:
         ProgramRepository.edit_program_details(program_code, new_program_data)
 
     @staticmethod
-    def get_program_codes_service():
+    def get_program_codes_service() -> list[dict[str, str | list[str]]]:
         """
         Retrieve all program codes.
 

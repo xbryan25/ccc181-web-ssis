@@ -5,7 +5,7 @@ from app.features.common.dataclasses import College
 class CollegeServices:
 
     @staticmethod
-    def get_college_details_service(college_code: str):
+    def get_college_details_service(college_code: str) -> College:
         """
         Get the details of a college using the college_code.
 
@@ -21,7 +21,7 @@ class CollegeServices:
         return College(**row)
     
     @staticmethod
-    def get_total_college_count_service(params):
+    def get_total_college_count_service(params) -> int:
         """
         Retrieve the total college count, with optional search filters.
 
@@ -36,10 +36,10 @@ class CollegeServices:
             int: The total college count, with search filters being optionally applied.
         """
 
-        return CollegeRepository.get_total_college_count(params)
+        return CollegeRepository.get_total_college_count(params)["count"]
 
     @staticmethod
-    def get_many_colleges_service(params):
+    def get_many_colleges_service(params) -> list[College]:
         """
         Retrieve details of different colleges based on pagination, optional search and sort filters.
         
@@ -68,7 +68,7 @@ class CollegeServices:
         return college_dataclasses
 
     @staticmethod
-    def create_college_service(college_data):
+    def create_college_service(college_data) -> None:
         """
         Create a new college record.
         
@@ -82,7 +82,7 @@ class CollegeServices:
         CollegeRepository.create_college(college_data)
 
     @staticmethod
-    def delete_college_service(college_code: str):
+    def delete_college_service(college_code: str) -> None:
         """
         Delete a college record by its college_code.
 
@@ -93,7 +93,7 @@ class CollegeServices:
         CollegeRepository.delete_college(college_code)
 
     @staticmethod
-    def edit_college_details_service(college_code: str, new_college_data):
+    def edit_college_details_service(college_code: str, new_college_data) -> None:
         """
         Edit the details of an existing college.
         
@@ -108,7 +108,7 @@ class CollegeServices:
         CollegeRepository.edit_college_details(college_code, new_college_data)
 
     @staticmethod
-    def get_college_codes_service():
+    def get_college_codes_service() -> list[dict[str, str]]:
         """
         Retrieve all college codes.
 

@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from dataclasses import asdict
 
 import traceback
@@ -17,7 +17,7 @@ class StudentController:
  
 
     @staticmethod
-    def get_student_details_controller(id_number: str):
+    def get_student_details_controller(id_number: str) -> tuple[Response, int]:
         """Retrieve detailed information about a specific student."""
 
         try:
@@ -30,7 +30,7 @@ class StudentController:
             return jsonify({"errorMessage": str(e)}), 500
     
     @staticmethod
-    def get_total_student_count_controller():
+    def get_total_student_count_controller() -> tuple[Response, int]:
         """Retrieve the total number of students based on optional search filters."""
 
         try:
@@ -58,16 +58,16 @@ class StudentController:
                 params.update({"program_code": None})
                 params.update({"college_code": None})
 
-            total_student_count_dict: int = StudentServices.get_total_student_count_service(params)
+            total_student_count: int = StudentServices.get_total_student_count_service(params)
 
-            return jsonify({"totalCount": total_student_count_dict["count"]}), 200
+            return jsonify({"totalCount": total_student_count}), 200
 
         except Exception as e:
             traceback.print_exc()
             return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
-    def get_many_students_controller():
+    def get_many_students_controller() -> tuple[Response, int]:
         """Retrieve details of different students based on pagination, optional search and sort filters."""
 
         params = {
@@ -90,7 +90,7 @@ class StudentController:
             return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
-    def create_student_controller():
+    def create_student_controller() -> tuple[Response, int]:
         """Create a new student record."""
 
         entity_details = request.json
@@ -128,7 +128,7 @@ class StudentController:
             return jsonify({"errorMessage": str(e)}), 500
 
     @staticmethod
-    def delete_student_controller(id_number: str):
+    def delete_student_controller(id_number: str) -> tuple[Response, int]:
         """Delete a student record by its code."""
 
         try:
@@ -140,9 +140,8 @@ class StudentController:
             traceback.print_exc()
             return jsonify({"errorMessage": str(e)}), 500
 
-
     @staticmethod
-    def edit_student_details_controller(id_number: str):
+    def edit_student_details_controller(id_number: str) -> tuple[Response, int]:
         """Edit the details of an existing student."""
 
         entity_details = request.json
@@ -180,7 +179,7 @@ class StudentController:
             return jsonify({"errorMessage": str(e)}), 500
         
     @staticmethod
-    def get_year_level_demographics_controller():
+    def get_year_level_demographics_controller() -> tuple[Response, int]:
         """Retrieve student year-level demographics."""
 
         params = {
@@ -198,7 +197,7 @@ class StudentController:
             return jsonify({"errorMessage": str(e)}), 500
         
     @staticmethod
-    def get_gender_demographics_controller():
+    def get_gender_demographics_controller() -> tuple[Response, int]:
         """Retrieve student gender demographics."""
 
         params = {

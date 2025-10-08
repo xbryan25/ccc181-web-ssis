@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, Response
 from .controllers import CollegeController
 
 from flask_jwt_extended import jwt_required
@@ -7,7 +7,7 @@ college_bp = Blueprint("college_bp", __name__)
 
 @college_bp.route("/<string:college_code>", methods=["GET"])
 @jwt_required()
-def get_college_details(college_code: str):
+def get_college_details(college_code: str) -> tuple[Response, int]:
     """
     Retrieve detailed information about a specific college.
 
@@ -38,7 +38,7 @@ def get_college_details(college_code: str):
 
 @college_bp.route("/total-count", methods=["GET"])
 @jwt_required()
-def get_total_college_count():
+def get_total_college_count() -> tuple[Response, int]:
     """
     Retrieve the total number of colleges based on optional search filters.
 
@@ -68,7 +68,7 @@ def get_total_college_count():
 
 @college_bp.route("/", methods=["GET"])
 @jwt_required()
-def get_many_colleges():
+def get_many_colleges() -> tuple[Response, int]:
     """
     Retrieve details of different colleges based on pagination, optional search and sort filters.
 
@@ -111,7 +111,7 @@ def get_many_colleges():
 
 @college_bp.route("/", methods=["POST"])
 @jwt_required()
-def create_college():
+def create_college() -> tuple[Response, int]:
     """
     Create a new college record.
 
@@ -142,7 +142,7 @@ def create_college():
 
 @college_bp.route("/<string:college_code>", methods=["DELETE"])
 @jwt_required()
-def delete_college(college_code: str):
+def delete_college(college_code: str) -> tuple[Response, int]:
     """
     Delete a college record by its code.
 
@@ -171,7 +171,7 @@ def delete_college(college_code: str):
 
 @college_bp.route("/<string:college_code>", methods=["PUT"])
 @jwt_required()
-def edit_college_details(college_code: str):
+def edit_college_details(college_code: str) -> tuple[Response, int]:
     """
     Edit the details of an existing college.
 
@@ -206,7 +206,7 @@ def edit_college_details(college_code: str):
 
 @college_bp.route("/identifiers", methods=["GET"])
 @jwt_required()
-def get_college_codes():
+def get_college_codes() -> tuple[Response, int]:
     """
     Retrieve a list of all college identifiers.
 

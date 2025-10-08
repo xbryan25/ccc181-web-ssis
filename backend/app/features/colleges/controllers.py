@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from dataclasses import asdict
 
 import traceback
@@ -14,7 +14,7 @@ from psycopg.errors import UniqueViolation
 class CollegeController:
     
     @staticmethod
-    def get_college_details_controller(college_code: str):
+    def get_college_details_controller(college_code: str) -> tuple[Response, int]:
         """Retrieve detailed information about a specific college."""
 
         try:
@@ -27,7 +27,7 @@ class CollegeController:
             return jsonify({"error": str(e)}), 500
     
     @staticmethod
-    def get_total_college_count_controller():
+    def get_total_college_count_controller() -> tuple[Response, int]:
         """Retrieve the total number of colleges based on optional search filters."""
 
         try:
@@ -37,16 +37,16 @@ class CollegeController:
                 "search_type": request.args.get("searchType"),
             }
 
-            total_college_count_dict = CollegeServices.get_total_college_count_service(params)
+            total_college_count = CollegeServices.get_total_college_count_service(params)
 
-            return jsonify({"totalCount": total_college_count_dict["count"]}), 200
+            return jsonify({"totalCount": total_college_count}), 200
 
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
-    def get_many_colleges_controller():
+    def get_many_colleges_controller() -> tuple[Response, int]:
         "Retrieve details of different colleges based on pagination, optional search and sort filters."
 
         try:
@@ -69,7 +69,7 @@ class CollegeController:
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
-    def create_college_controller():
+    def create_college_controller() -> tuple[Response, int]:
         """Create a new college record."""
 
         entity_details = request.json
@@ -103,7 +103,7 @@ class CollegeController:
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
-    def delete_college_controller(college_code: str):
+    def delete_college_controller(college_code: str) -> tuple[Response, int]:
         """Delete a college record by its code."""
 
         try:
@@ -117,7 +117,7 @@ class CollegeController:
 
 
     @staticmethod
-    def edit_college_details_controller(college_code: str):
+    def edit_college_details_controller(college_code: str) -> tuple[Response, int]:
         """Edit the details of an existing college."""
 
         entity_details = request.json
@@ -151,7 +151,7 @@ class CollegeController:
             return jsonify({"error": str(e)}), 500
         
     @staticmethod
-    def get_college_codes_controller():
+    def get_college_codes_controller() -> tuple[Response, int]:
         """Retrieve a list of all college identifiers."""
 
         try:

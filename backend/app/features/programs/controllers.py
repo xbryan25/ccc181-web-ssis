@@ -1,4 +1,4 @@
-from flask import request, jsonify
+from flask import request, jsonify, Response
 from dataclasses import asdict
 
 import traceback
@@ -16,7 +16,7 @@ from psycopg.errors import UniqueViolation
 class ProgramController:
     
     @staticmethod
-    def get_program_details_controller(program_code: str):
+    def get_program_details_controller(program_code: str) -> tuple[Response, int]:
         """Retrieve detailed information about a specific program."""
 
         try:
@@ -29,7 +29,7 @@ class ProgramController:
             return jsonify({"error": str(e)}), 500
     
     @staticmethod
-    def get_total_program_count_controller():
+    def get_total_program_count_controller() -> tuple[Response, int]:
         """Retrieve the total number of programs based on optional search filters."""
 
         try:
@@ -49,16 +49,16 @@ class ProgramController:
             else:
                 params.update({"college_code": None})
 
-            total_program_count_dict = ProgramServices.get_total_program_count_service(params)
+            total_program_count = ProgramServices.get_total_program_count_service(params)
 
-            return jsonify({"totalCount": total_program_count_dict["count"]}), 200
+            return jsonify({"totalCount": total_program_count}), 200
 
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
-    def get_many_programs_controller():
+    def get_many_programs_controller() -> tuple[Response, int]:
         """Retrieve details of different programs based on pagination, optional search and sort filters."""
 
         params = {
@@ -81,7 +81,7 @@ class ProgramController:
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
-    def create_program_controller():
+    def create_program_controller() -> tuple[Response, int]:
         """Create a new program record."""
         
         entity_details = request.json
@@ -116,7 +116,7 @@ class ProgramController:
             return jsonify({"error": str(e)}), 500
 
     @staticmethod
-    def delete_program_controller(program_code: str):
+    def delete_program_controller(program_code: str) -> tuple[Response, int]:
         """Delete a program record by its code."""
 
         try:
@@ -130,7 +130,7 @@ class ProgramController:
 
 
     @staticmethod
-    def edit_program_details_controller(program_code: str):
+    def edit_program_details_controller(program_code: str) -> tuple[Response, int]:
         """Edit the details of an existing program."""
 
         entity_details = request.json
@@ -169,7 +169,7 @@ class ProgramController:
             return jsonify({"error": str(e)}), 500
         
     @staticmethod
-    def get_program_codes_controller():
+    def get_program_codes_controller() -> tuple[Response, int]:
         """Retrieve a list of all program identifiers."""
 
         try:

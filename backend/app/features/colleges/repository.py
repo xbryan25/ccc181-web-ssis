@@ -7,7 +7,7 @@ from flask import current_app
 class CollegeRepository:
 
     @staticmethod
-    def get_college_by_college_code(college_code: str) -> dict | None:
+    def get_college_by_college_code(college_code: str) -> dict[str, str] | None:
         """
         Retrieve a college record from the database by college code.
 
@@ -23,7 +23,7 @@ class CollegeRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
 
     @staticmethod
-    def get_total_college_count(params) -> int:
+    def get_total_college_count(params) -> dict[str, str]:
         """
         Retrieve the total number of colleges based on a specific filter.
 
@@ -35,7 +35,7 @@ class CollegeRepository:
                             - "college_code" (str | None): The college code to filter colleges by.
 
         Returns:
-            int: The total number of colleges that match the given filter.
+            dict: A dictionary containing the total number of colleges that match the given filter.
         """
 
         db = current_app.extensions['db']
@@ -57,8 +57,8 @@ class CollegeRepository:
         else:
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="colleges"))
 
-
-    def get_many_colleges(params):
+    @staticmethod
+    def get_many_colleges(params) -> list[dict[str, str]]:
         """
         Retrieve a paginated list of colleges based on search and sorting parameters.
 
@@ -102,7 +102,8 @@ class CollegeRepository:
                                     sort_order=sort_order),
                             (search_pattern, params["rows_per_page"], offset))
 
-    def create_college(college_data):
+    @staticmethod
+    def create_college(college_data) -> None:
         """
         Insert a new college record into the database.
 
@@ -118,7 +119,8 @@ class CollegeRepository:
         db.execute_query(CommonQueries.INSERT.format(table="colleges", columns="college_code, college_name", placeholders="%s, %s"),
                          (college_data["collegeCode"], college_data["collegeName"]))
 
-    def delete_college(college_code: str):
+    @staticmethod
+    def delete_college(college_code: str) -> None:
         """
         Delete a college record from the database using their college code.
 
@@ -130,7 +132,8 @@ class CollegeRepository:
 
         db.execute_query(CommonQueries.DELETE_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
 
-    def edit_college_details(college_code: str, new_college_data):
+    @staticmethod
+    def edit_college_details(college_code: str, new_college_data) -> None:
         """
         Update an existing college's details in the database.
 
@@ -147,8 +150,8 @@ class CollegeRepository:
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="colleges", 
                                                            set_clause="college_code = %s, college_name = %s", pk="college_code"), 
                                                            (new_college_data["collegeCode"], new_college_data["collegeName"], college_code))   
-        
-    def get_college_codes():
+    @staticmethod
+    def get_college_codes() -> list[dict[str, str]]:
         """
         Retrieve all college codes from the database.
 

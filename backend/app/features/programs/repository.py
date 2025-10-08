@@ -7,7 +7,7 @@ from flask import current_app
 class ProgramRepository:
 
     @staticmethod
-    def get_program_by_program_code(program_code: str) -> dict | None:
+    def get_program_by_program_code(program_code: str) -> dict[str, str] | None:
         """
         Retrieve a program record from the database by program code.
 
@@ -23,7 +23,7 @@ class ProgramRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="programs", pk="program_code"), (program_code, ))
 
     @staticmethod
-    def get_total_program_count(params) -> int:
+    def get_total_program_count(params) -> dict[str, str]:
         """
         Retrieve the total number of programs based on a specific filter.
 
@@ -35,7 +35,7 @@ class ProgramRepository:
                             - "college_code" (str | None): The college code to filter programs by.
 
         Returns:
-            int: The total number of programs that match the given filter.
+            dict: A dictionary containing the total number of programs that match the given filter.
 
         Raises:
             ValueError: If more than one of "search_value", or "college_code" is provided.
@@ -69,7 +69,8 @@ class ProgramRepository:
         else:
             return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="programs"))
 
-    def get_many_programs(params):
+    @staticmethod
+    def get_many_programs(params) -> list[dict[str, str]]:
         """
         Retrieve a paginated list of programs based on search and sorting parameters.
 
@@ -113,7 +114,8 @@ class ProgramRepository:
                                     sort_order=sort_order),
                             (search_pattern, params["rows_per_page"], offset))
 
-    def create_program(program_data):
+    @staticmethod
+    def create_program(program_data) -> None:
         """
         Insert a new program record into the database.
 
@@ -130,7 +132,8 @@ class ProgramRepository:
         db.execute_query(CommonQueries.INSERT.format(table="programs", columns="program_code, program_name, college_code", placeholders="%s, %s, %s"),
                          (program_data["programCode"], program_data["programName"], program_data["collegeCode"]))
 
-    def delete_program(program_code: str):
+    @staticmethod
+    def delete_program(program_code: str) -> None:
         """
         Delete a program record from the database using their program code.
 
@@ -142,7 +145,8 @@ class ProgramRepository:
 
         db.execute_query(CommonQueries.DELETE_BY_ID.format(table="programs", pk="program_code"), (program_code, ))
 
-    def edit_program_details(program_code: str, new_program_data):
+    @staticmethod
+    def edit_program_details(program_code: str, new_program_data) -> None:
         """
         Update an existing program's details in the database.
 
@@ -160,8 +164,9 @@ class ProgramRepository:
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="programs", 
                                                            set_clause="program_code = %s, program_name = %s, college_code = %s", pk="program_code"), 
                                                            (new_program_data["programCode"], new_program_data["programName"], new_program_data["collegeCode"], program_code))   
-
-    def get_program_codes():
+    
+    @staticmethod
+    def get_program_codes() -> list[dict[str, str | list[str]]]:
         """
         Retrieve all program codes and their associated college codes from the database.
 

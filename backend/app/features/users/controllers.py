@@ -1,4 +1,4 @@
-from flask import request, jsonify, make_response, current_app
+from flask import request, jsonify, make_response, current_app, Response
 
 from flask_jwt_extended import create_access_token, get_jwt_identity, set_access_cookies, unset_jwt_cookies, create_refresh_token, set_refresh_cookies, unset_refresh_cookies
 
@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 class UserController:
  
     @staticmethod
-    def user_login_controller():
+    def user_login_controller() -> tuple[Response, int]:
         """Generate JWT access and refresh tokens, and set them as HTTP-only cookies after validating user credentials."""
 
         user_login_details = request.json
@@ -45,7 +45,7 @@ class UserController:
             return jsonify({"error": str(e)}), 500
         
     @staticmethod
-    def user_logout_controller():
+    def user_logout_controller() -> tuple[Response, int]:
         """Unsets both access and refresh tokens."""
 
         try:
@@ -64,7 +64,7 @@ class UserController:
             return jsonify({"error": str(e)}), 500
         
     @staticmethod
-    def user_signup_controller():
+    def user_signup_controller() -> tuple[Response, int]:
         """Register a new user using signup details."""
 
         user_signup_details = request.json
@@ -79,7 +79,7 @@ class UserController:
             return jsonify({"error": str(e)}), 500
         
     @staticmethod
-    def get_current_user_controller():
+    def get_current_user_controller() -> tuple[Response, int]:
         "Retrieve the currently authenticated user's username."
 
         try:
@@ -97,7 +97,7 @@ class UserController:
             return jsonify({"error": str(e)}), 500
     
     @staticmethod
-    def refresh_access_token_controller():
+    def refresh_access_token_controller() -> tuple[Response, int]:
         "Generate a new access token using a valid refresh token."
 
         try: 
