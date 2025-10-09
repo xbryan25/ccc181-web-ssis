@@ -2,6 +2,8 @@ from .repository import CollegeRepository
 
 from app.features.common.dataclasses import College
 
+from app.exceptions.custom_exceptions import EntityNotFoundError
+
 class CollegeServices:
 
     @staticmethod
@@ -17,6 +19,9 @@ class CollegeServices:
         """
 
         row = CollegeRepository.get_college_by_college_code(college_code)
+
+        if not row:
+            raise EntityNotFoundError(f"College with the college_code '{college_code}' does not exist.")
 
         return College(**row)
     

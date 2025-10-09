@@ -2,6 +2,8 @@ from .repository import ProgramRepository
 
 from app.features.common.dataclasses import Program
 
+from app.exceptions.custom_exceptions import EntityNotFoundError
+
 class ProgramServices:
 
     @staticmethod
@@ -17,6 +19,9 @@ class ProgramServices:
         """
 
         row = ProgramRepository.get_program_by_program_code(program_code)
+
+        if not row:
+            raise EntityNotFoundError(f"Program with the program_code '{program_code}' does not exist.")
 
         return Program(**row)
 

@@ -11,6 +11,8 @@ from ..common.dataclasses.student import Student
 
 from app.utils import dict_keys_to_camel
 
+from app.exceptions.custom_exceptions import EntityNotFoundError
+
 from psycopg.errors import UniqueViolation
 
 class StudentController:
@@ -21,13 +23,17 @@ class StudentController:
         """Retrieve detailed information about a specific student."""
 
         try:
-            student_details: Student = StudentServices.get_student_details_service(id_number)
+            student_details: Student = StudentServices.get_student_details_service(id_number.strip())
 
             return jsonify(dict_keys_to_camel(asdict(student_details))), 200
 
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
     
     @staticmethod
     def get_total_student_count_controller() -> tuple[Response, int]:
@@ -64,7 +70,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": str(e)}), 500
 
     @staticmethod
     def get_many_students_controller() -> tuple[Response, int]:
@@ -87,7 +93,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": str(e)}), 500
 
     @staticmethod
     def create_student_controller() -> tuple[Response, int]:
@@ -115,17 +121,17 @@ class StudentController:
             constraint_name = e.diag.constraint_name
 
             if constraint_name == 'students_pkey':
-                return jsonify({"errorMessage": "ID number already exists."}), 500
+                return jsonify({"error": "ID number already exists."}), 500
             
             elif constraint_name == 'unique_full_name':
-                return jsonify({"errorMessage": "Name combination already exists."}), 500
+                return jsonify({"error": "Name combination already exists."}), 500
             
             else:
-                return jsonify({"errorMessage": "Something went wrong."}), 500
+                return jsonify({"error": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": str(e)}), 500
 
     @staticmethod
     def delete_student_controller(id_number: str) -> tuple[Response, int]:
@@ -138,7 +144,7 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": str(e)}), 500
 
     @staticmethod
     def edit_student_details_controller(id_number: str) -> tuple[Response, int]:
@@ -166,17 +172,17 @@ class StudentController:
             constraint_name = e.diag.constraint_name
 
             if constraint_name == 'students_pkey':
-                return jsonify({"errorMessage": "ID number already exists."}), 500
+                return jsonify({"error": "ID number already exists."}), 500
             
             elif constraint_name == 'unique_full_name':
-                return jsonify({"errorMessage": "Name combination already exists."}), 500
+                return jsonify({"error": "Name combination already exists."}), 500
             
             else:
-                return jsonify({"errorMessage": "Something went wrong."}), 500
+                return jsonify({"error": "Something went wrong."}), 500
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": str(e)}), 500
         
     @staticmethod
     def get_year_level_demographics_controller() -> tuple[Response, int]:
@@ -212,5 +218,5 @@ class StudentController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": str(e)}), 500
         

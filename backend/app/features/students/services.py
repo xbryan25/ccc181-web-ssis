@@ -4,6 +4,8 @@ from app.features.common.dataclasses import Student
 
 from app.utils import to_camel_case
 
+from app.exceptions.custom_exceptions import EntityNotFoundError
+
 class StudentServices:
 
     @staticmethod
@@ -19,6 +21,9 @@ class StudentServices:
         """
     
         row = StudentRepository.get_student_by_id(id_number)
+
+        if not row:
+            raise EntityNotFoundError(f"Student with the id_number '{id_number}' does not exist.")
 
         return Student(**row)
     

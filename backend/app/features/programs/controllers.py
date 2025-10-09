@@ -11,6 +11,8 @@ from ..common.dataclasses import Program
 
 from app.utils import dict_keys_to_camel
 
+from app.exceptions.custom_exceptions import EntityNotFoundError
+
 from psycopg.errors import UniqueViolation
 
 class ProgramController:
@@ -20,13 +22,17 @@ class ProgramController:
         """Retrieve detailed information about a specific program."""
 
         try:
-            program_details: Program = ProgramServices.get_program_details_service(program_code)
+            program_details: Program = ProgramServices.get_program_details_service(program_code.strip())
 
             return jsonify(dict_keys_to_camel(asdict(program_details))), 200
+        
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occured."}), 500
     
     @staticmethod
     def get_total_program_count_controller() -> tuple[Response, int]:

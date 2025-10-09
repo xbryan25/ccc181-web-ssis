@@ -9,6 +9,8 @@ from ..common.dataclasses import College
 
 from app.utils import dict_keys_to_camel
 
+from app.exceptions.custom_exceptions import EntityNotFoundError
+
 from psycopg.errors import UniqueViolation
 
 class CollegeController:
@@ -18,13 +20,17 @@ class CollegeController:
         """Retrieve detailed information about a specific college."""
 
         try:
-            college_details: College = CollegeServices.get_college_details_service(college_code)
+            college_details: College = CollegeServices.get_college_details_service(college_code.strip())
 
             return jsonify(dict_keys_to_camel(asdict(college_details))), 200
+        
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occured."}), 500
     
     @staticmethod
     def get_total_college_count_controller() -> tuple[Response, int]:
