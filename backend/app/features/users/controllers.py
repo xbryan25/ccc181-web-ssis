@@ -6,7 +6,13 @@ import traceback
 
 from .services import UserServices
 
+from app.utils import validate_email_format, validate_username_format, validate_password
+
+from app.exceptions.custom_exceptions import ValidationError
+
 from datetime import datetime, timedelta, timezone
+
+import re
 
 
 class UserController:
@@ -70,13 +76,24 @@ class UserController:
         user_signup_details = request.json
 
         try:
+            validate_email_format(user_signup_details['email'])
+
+            validate_username_format(user_signup_details['username'])
+
+            validate_password(user_signup_details['password'])
+
+            UserServices.validate_signup_details(user_signup_details['email'], user_signup_details['username'])
+
             UserServices.user_signup_service(user_signup_details)
             
             return jsonify({"messageTitle": "Signup successful.", "message": "Your account is ready. Enjoy using Sequence!"}), 201
         
+        except ValidationError as e:
+            return jsonify({"error": str(e)}), 400
+
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
         
     @staticmethod
     def get_current_user_controller() -> tuple[Response, int]:

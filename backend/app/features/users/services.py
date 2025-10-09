@@ -6,6 +6,8 @@ from werkzeug.security import generate_password_hash
 
 import uuid
 
+from app.exceptions.custom_exceptions import ValidationError
+
 class UserServices:
 
     @staticmethod
@@ -50,7 +52,7 @@ class UserServices:
                     - "password" (str): The password of the user.
         """
 
-        password_hash = generate_password_hash(user_signup_details['password'])
+        password_hash = generate_password_hash(user_signup_details['password'].strip())
 
         user_id = uuid.uuid4()
 
@@ -70,3 +72,49 @@ class UserServices:
         username_dict = UserRepository.get_username(user_id)
 
         return username_dict['username']
+    
+    @staticmethod
+    def validate_signup_details(email, username):
+        """
+        Validates email and username. If either email or username has already been taken, then ValidationError will be raised.
+
+        Args:
+            email (str): The email to be checked.
+            username (str): The username to be checked
+        """
+
+        if UserServices.check_email_if_it_exists_service(email):
+            raise ValidationError(f"The email '{email}' has already been taken.")
+        if UserServices.check_username_if_it_exists_service(username):
+            raise ValidationError(f"The username '{username}' has already been taken.")
+    
+    def check_email_if_it_exists_service(email) -> bool:
+        """
+        Checks if email has already been taken.
+
+        Args:
+            email (str): The email to be checked.
+
+        Returns:
+            bool: Returns True if the email has already been taken, otherwise False.
+        """
+
+        result_dict = UserRepository.check_email_if_it_exists(email)
+
+        return result_dict['exists']
+    
+    def check_username_if_it_exists_service(username) -> bool:
+        """
+        Checks if username has already been taken.
+
+        Args:
+            username (str): The username to be checked.
+
+        Returns:
+            bool: Returns True if the username has already been taken, otherwise False.
+        """
+
+        result_dict = UserRepository.check_username_if_it_exists(username)
+
+        return result_dict['exists']
+    

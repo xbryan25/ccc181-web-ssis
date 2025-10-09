@@ -55,4 +55,36 @@ class UserRepository:
         db = current_app.extensions['db']
 
         return db.fetch_one(CommonQueries.GET_COLUMN_BY_PK.format(column="username", table="users", pk="user_id"), (user_id, ))
+    
+    def check_email_if_it_exists(email) -> dict[str, bool]:
+        """
+        Check if the email has already been taken.
+
+        Args:
+            email (str): The email to be checked.
+
+        Returns:
+            dict: A dictionary containing the result of the existence of the email: 
+                {"exists": bool}
+        """
+
+        db = current_app.extensions['db']
+
+        return db.fetch_one(CommonQueries.CHECK_IF_EXISTS.format(table="users", column="email"), (email, ))
+    
+    def check_username_if_it_exists(username) -> dict[str, bool]:
+        """
+        Check if the username has already been taken.
+
+        Args:
+            username (str): The username to be checked.
+
+        Returns:
+            dict: A dictionary containing the result of the existence of the username: 
+                {"exists": bool}
+        """
+
+        db = current_app.extensions['db']
+
+        return db.fetch_one(CommonQueries.CHECK_IF_EXISTS.format(table="users", column="username"), (username, ))
         

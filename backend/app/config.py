@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 from datetime import timedelta
 
-from app.utils.get_cookie_max_age import get_cookie_max_age, get_refresh_cookie_max_age
+from app.utils import get_cookie_max_age, get_refresh_cookie_max_age
 
 load_dotenv()
 
