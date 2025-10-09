@@ -5,3 +5,7 @@ class ValidationError(Exception):
 class EntityNotFoundError(Exception):
     """Raised when an entity is not found."""
     pass
+
+class InvalidParameterError(ValidationError):
+    """Raised when a query parameter has an invalid or disallowed value."""
+    pass

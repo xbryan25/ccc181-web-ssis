@@ -9,7 +9,7 @@ from ..common.dataclasses import College
 
 from app.utils import dict_keys_to_camel
 
-from app.exceptions.custom_exceptions import EntityNotFoundError
+from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError
 
 from psycopg.errors import UniqueViolation
 
@@ -36,12 +36,21 @@ class CollegeController:
     def get_total_college_count_controller() -> tuple[Response, int]:
         """Retrieve the total number of colleges based on optional search filters."""
 
+        ALLOWED_SEARCH_BY = {"College Code", "College Name"}
+        ALLOWED_SEARCH_TYPE = {"Starts With", "Contains", "Ends With"}
+
         try:
             params = {
                 "search_value": request.args.get("searchValue"),
                 "search_by": request.args.get("searchBy"),
                 "search_type": request.args.get("searchType"),
             }
+
+            if params['search_by'] not in ALLOWED_SEARCH_BY:
+                raise InvalidParameterError(f"Invalid 'searchBy' value: '{params['search_by']}'. Must be one of: ['College Code', 'College Name'].")
+
+            if params["search_type"] not in ALLOWED_SEARCH_TYPE:
+                raise InvalidParameterError(f"Invalid 'searchType' value: '{params["search_type"]}'. Must be one of: ['Starts With', 'Contains', 'Ends With'].")
 
             total_college_count = CollegeServices.get_total_college_count_service(params)
 

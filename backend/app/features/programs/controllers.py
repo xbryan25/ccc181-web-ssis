@@ -11,7 +11,7 @@ from ..common.dataclasses import Program
 
 from app.utils import dict_keys_to_camel
 
-from app.exceptions.custom_exceptions import EntityNotFoundError
+from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError
 
 from psycopg.errors import UniqueViolation
 
@@ -38,6 +38,9 @@ class ProgramController:
     def get_total_program_count_controller() -> tuple[Response, int]:
         """Retrieve the total number of programs based on optional search filters."""
 
+        ALLOWED_SEARCH_BY = {"Program Code", "Program Name", "College Code"}
+        ALLOWED_SEARCH_TYPE = {"Starts With", "Contains", "Ends With"}
+
         try:
             params = {
                 "search_value": request.args.get("searchValue"),
@@ -45,15 +48,51 @@ class ProgramController:
                 "search_type": request.args.get("searchType"),
             }
 
+            # Validate search_by and search_type parameters
+
+            if params['search_by'] not in ALLOWED_SEARCH_BY:
+                raise InvalidParameterError(f"Invalid 'searchBy' value: '{params['search_by']}'. Must be one of: ['Program Code', 'Program Name', 'College Code'].")
+
+            if params["search_type"] not in ALLOWED_SEARCH_TYPE:
+                raise InvalidParameterError(f"Invalid 'searchType' value: '{params["search_type"]}'. Must be one of: ['Starts With', 'Contains', 'Ends With'].")
+
             filter_by = request.args.get("filterBy")
 
+            # Apply filter_by logic
+
             if filter_by:
-                dict_filter_by = json.loads(filter_by)
-                
-                if 'collegeCode' in dict_filter_by.keys():
-                    params.update({"college_code": dict_filter_by['collegeCode']})
+                try:
+                    dict_filter_by = json.loads(filter_by)
+                except json.JSONDecodeError:
+                    raise InvalidParameterError("'filterBy' must be a valid JSON object string.")
+
+                if not isinstance(dict_filter_by, dict):
+                    raise InvalidParameterError("'filterBy' must be a JSON object (e.g., {\"collegeCode\": \"CCS\"}).")
+
+                allowed_keys = {"collegeCode"}
+                keys_present = set(dict_filter_by.keys())
+
+                # Check for invalid keys
+                unknown_keys = keys_present - allowed_keys
+                if unknown_keys:
+                    raise InvalidParameterError(f"Invalid key(s) in 'filterBy': {', '.join(unknown_keys)}")
+
+                # Check that exactly one key is present
+                if len(keys_present) != 1:
+                    raise InvalidParameterError("'filterBy' must contain exactly 'collegeCode'.")
+
+                # Apply filter logic
+                if "collegeCode" in dict_filter_by:
+                    params.update({"college_code": dict_filter_by["collegeCode"]})
+
             else:
-                params.update({"college_code": None})
+                params.update({
+                    "college_code": None
+                })
+
+            # Only one of these should be present at a time
+            if sum(bool(x) for x in [params["search_value"], params["college_code"]]) > 1:
+                raise InvalidParameterError("Only one should exist at a time between 'searchValue', and 'collegeCode'.")
 
             total_program_count = ProgramServices.get_total_program_count_service(params)
 

@@ -11,7 +11,7 @@ from ..common.dataclasses.student import Student
 
 from app.utils import dict_keys_to_camel
 
-from app.exceptions.custom_exceptions import EntityNotFoundError
+from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError
 
 from psycopg.errors import UniqueViolation
 
@@ -29,7 +29,7 @@ class StudentController:
 
         except EntityNotFoundError as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()
@@ -39,6 +39,9 @@ class StudentController:
     def get_total_student_count_controller() -> tuple[Response, int]:
         """Retrieve the total number of students based on optional search filters."""
 
+        ALLOWED_SEARCH_BY = {"ID Number", "First Name", "Last Name", "Gender", "Year Level", "Program Code"}
+        ALLOWED_SEARCH_TYPE = {"Starts With", "Contains", "Ends With"}
+
         try:
             params = {
                 "search_value": request.args.get("searchValue"),
@@ -46,31 +49,71 @@ class StudentController:
                 "search_type": request.args.get("searchType"),
             }
 
+            # Validate search_by and search_type parameters
+
+            if params['search_by'] not in ALLOWED_SEARCH_BY:
+                raise InvalidParameterError(f"Invalid 'searchBy' value: '{params['search_by']}'. Must be one of: ['ID Number', 'First Name', 'Last Name', 'Gender', 'Year Level', 'Program Code'].")
+
+            if params["search_type"] not in ALLOWED_SEARCH_TYPE:
+                raise InvalidParameterError(f"Invalid 'searchType' value: '{params["search_type"]}'. Must be one of: ['Starts With', 'Contains', 'Ends With'].")
+
             filter_by = request.args.get("filterBy")
 
+            # Apply filter_by logic
+
             if filter_by:
+                try:
+                    dict_filter_by = json.loads(filter_by)
+                except json.JSONDecodeError:
+                    raise InvalidParameterError("'filterBy' must be a valid JSON object string.")
 
-                dict_filter_by = json.loads(filter_by)
+                if not isinstance(dict_filter_by, dict):
+                    raise InvalidParameterError("'filterBy' must be a JSON object (e.g., {\"programCode\": \"BSCS\"}).")
 
-                if 'programCode' in dict_filter_by.keys():
-                    params.update({"program_code": dict_filter_by['programCode']})
-                    params.update({"college_code": None})
+                allowed_keys = {"programCode", "collegeCode"}
+                keys_present = set(dict_filter_by.keys())
 
-                elif 'collegeCode' in dict_filter_by.keys():
-                    params.update({"program_code": None})
-                    params.update({"college_code": dict_filter_by['collegeCode']})
+                # Check for invalid keys
+                unknown_keys = keys_present - allowed_keys
+                if unknown_keys:
+                    raise InvalidParameterError(f"Invalid key(s) in 'filterBy': {', '.join(unknown_keys)}")
+
+                # Check that exactly one key is present
+                if len(keys_present) != 1:
+                    raise InvalidParameterError("'filterBy' must contain exactly one of 'programCode' or 'collegeCode'.")
+
+                # Apply filter logic
+                if "programCode" in dict_filter_by:
+                    params.update({
+                        "program_code": dict_filter_by["programCode"],
+                        "college_code": None
+                    })
+                elif "collegeCode" in dict_filter_by:
+                    params.update({
+                        "program_code": None,
+                        "college_code": dict_filter_by["collegeCode"]})
 
             else:
-                params.update({"program_code": None})
-                params.update({"college_code": None})
+                params.update({
+                    "program_code": None,
+                    "college_code": None
+                })
+
+            # Only one of these should be present at a time
+            if sum(bool(x) for x in [params["search_value"], params["program_code"], params["college_code"]]) > 1:
+                raise InvalidParameterError("Only one should exist at a time between 'searchValue', 'programCode', and 'collegeCode'.")
 
             total_student_count: int = StudentServices.get_total_student_count_service(params)
 
             return jsonify({"totalCount": total_student_count}), 200
+        
+        except InvalidParameterError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
     def get_many_students_controller() -> tuple[Response, int]:

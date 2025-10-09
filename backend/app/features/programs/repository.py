@@ -46,9 +46,6 @@ class ProgramRepository:
 
         db = current_app.extensions['db']
 
-        if sum(x is not None for x in [params["search_value"], params["college_code"]]) > 1:
-            raise ValueError("Only one should exist at a time between search_value, and college_code")
-
         if params["search_value"]:
 
             if params["search_type"] == "Starts With":
