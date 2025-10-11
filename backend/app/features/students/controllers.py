@@ -119,20 +119,52 @@ class StudentController:
     def get_many_students_controller() -> tuple[Response, int]:
         """Retrieve details of different students based on pagination, optional search and sort filters."""
 
-        params = {
+        ALLOWED_SEARCH_BY = {"ID Number", "First Name", "Last Name", "Year Level", "Gender", "Program Code"}
+        ALLOWED_SEARCH_TYPE = {"Starts With", "Contains", "Ends With"}
+        ALLOWED_SORT_FIELD = {"ID Number", "First Name", "Last Name", "Year Level", "Gender", "Program Code"}
+        ALLOWED_SORT_ORDER = {"Ascending", "Descending"}
+
+        try:
+            params = {
             "rows_per_page": int(request.args.get("rowsPerPage")),
             "page_number": int(request.args.get("pageNumber")),
-            "search_value": request.args.get("searchValue"),
+            "search_value": request.args.get("searchValue").strip(),
             "search_by": request.args.get("searchBy"),
             "search_type": request.args.get("searchType"),
             "sort_field": request.args.get("sortField"),
             "sort_order":request.args.get("sortOrder")
-        }
+            }
 
-        try:
+            if params['rows_per_page'] <= 0:
+                raise InvalidParameterError(f"Invalid 'rowsPerPage' value: '{params['rows_per_page']}'. Must be a positive integer.")
+            
+            if params['page_number'] <= 0:
+                raise InvalidParameterError(f"Invalid 'pageNumber' value: '{params['page_number']}'. Must be a positive integer.")
+            
+            if params['search_by'] not in ALLOWED_SEARCH_BY:
+                raise InvalidParameterError(f"Invalid 'searchBy' value: '{params['search_by']}'. Must be one of: ['ID Number', 'First Name', 'Last Name', 'Year Level', 'Gender', 'Program Code'].")
+
+            if params["search_type"] not in ALLOWED_SEARCH_TYPE:
+                raise InvalidParameterError(f"Invalid 'searchType' value: '{params["search_type"]}'. Must be one of: ['Starts With', 'Contains', 'Ends With'].")
+            
+            if params['sort_field'] not in ALLOWED_SORT_FIELD:
+                raise InvalidParameterError(f"Invalid 'sortField' value: '{params['sort_field']}'. Must be one of: ['ID Number', 'First Name', 'Last Name', 'Year Level', 'Gender', 'Program Code'].")
+
+            if params["sort_order"] not in ALLOWED_SORT_ORDER:
+                raise InvalidParameterError(f"Invalid 'sortOrder' value: '{params["sort_order"]}'. Must be one of: ['Ascending', 'Descending'].")
+
             students = StudentServices.get_many_students_service(params)
 
             return jsonify({"entities": [dict_keys_to_camel(asdict(student_details)) for student_details in students]}), 200
+        
+        except InvalidParameterError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
+        except (ValueError, TypeError) as e:
+            return jsonify({
+                "error": "Invalid query parameter. 'rowsPerPage' and 'pageNumber' must be positive integers."
+            }), 400
 
         except Exception as e:
             traceback.print_exc()
