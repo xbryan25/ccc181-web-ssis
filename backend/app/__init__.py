@@ -9,7 +9,7 @@ from .db.connection import Database
 jwt = JWTManager()
 
 
-def create_app():
+def create_app() -> Flask:
 
     app = Flask(__name__)
 

@@ -14,12 +14,19 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (
-    e: 'update:searchBy' | 'update:searchType' | 'update:sortField' | 'update:sortOrder',
-    value: string,
+    e: 'onProceed',
+    localState: {
+      searchBy: string;
+      searchType: string;
+      sortField: string;
+      sortOrder: string;
+    },
   ): void;
 }>();
 
 const isOpen = ref(false);
+
+const localState = reactive({ ...props.searchAndSortState });
 
 const entityPropertiesOptions: EntityPropertiesOptions = {
   students: ['ID Number', 'First Name', 'Last Name', 'Year Level', 'Gender', 'Program Code'],
@@ -33,9 +40,9 @@ const sortTypes = ['Ascending', 'Descending'];
 
 const getTextForTooltip = (): string => {
   if (props.dialogType === 'filter') {
-    return `Search By: ${props.searchAndSortState.searchBy} | Search Type: ${props.searchAndSortState.searchType}`;
+    return `Search By: ${localState.searchBy} | Search Type: ${localState.searchType}`;
   } else {
-    return `Sort Field: ${props.searchAndSortState.sortField} | Sort Order: ${props.searchAndSortState.sortOrder}`;
+    return `Sort Field: ${localState.sortField} | Sort Order: ${localState.sortOrder}`;
   }
 };
 </script>
@@ -92,21 +99,21 @@ const getTextForTooltip = (): string => {
                 :options="entityPropertiesOptions[props.entityType] ?? []"
                 :dialog-type="props.dialogType"
                 :column-position="'first'"
-                :search-and-sort-state="props.searchAndSortState"
-                @update:search-by="(value: string) => emit('update:searchBy', value)"
-                @update:search-type="(value: string) => emit('update:searchType', value)"
-                @update:sort-field="(value: string) => emit('update:sortField', value)"
-                @update:sort-order="(value: string) => emit('update:sortOrder', value)"
+                :search-and-sort-state="localState"
+                @update:search-by="(value: string) => (localState.searchBy = value)"
+                @update:search-type="(value: string) => (localState.searchType = value)"
+                @update:sort-field="(value: string) => (localState.sortField = value)"
+                @update:sort-order="(value: string) => (localState.sortOrder = value)"
               />
               <RadioSelectButtons
                 :options="props.dialogType === 'filter' ? filterTypes : sortTypes"
                 :dialog-type="props.dialogType"
                 :column-position="'second'"
-                :search-and-sort-state="props.searchAndSortState"
-                @update:search-by="(value: string) => emit('update:searchBy', value)"
-                @update:search-type="(value: string) => emit('update:searchType', value)"
-                @update:sort-field="(value: string) => emit('update:sortField', value)"
-                @update:sort-order="(value: string) => emit('update:sortOrder', value)"
+                :search-and-sort-state="localState"
+                @update:search-by="(value: string) => (localState.searchBy = value)"
+                @update:search-type="(value: string) => (localState.searchType = value)"
+                @update:sort-field="(value: string) => (localState.sortField = value)"
+                @update:sort-order="(value: string) => (localState.sortOrder = value)"
               />
             </div>
           </div>
@@ -128,22 +135,14 @@ const getTextForTooltip = (): string => {
             color="primary"
             variant="solid"
             class="cursor-pointer"
-            @click="isOpen = false"
+            @click="
+              isOpen = false;
+              emit('onProceed', localState);
+            "
             >Proceed</UButton
           >
         </div>
       </template>
     </UModal>
-
-    <!-- <Dialog v-model:visible="visible" modal class="w-[30rem]">
-      <template #header>
-        <h2 v-if="props.dialogType === 'filter'" class="text-3xl font-semibold">
-          Search Filters
-        </h2>
-
-        <h2 v-else class="text-3xl font-semibold">Sort Options</h2>
-      </template>
-      
-    </Dialog> -->
   </div>
 </template>
