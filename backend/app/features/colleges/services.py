@@ -80,8 +80,8 @@ class CollegeServices:
         Args:
             college_data (dict): A dictionary containing the details of the new college.
                 Expected keys include:
-                    - "collegeCode" (str): The unique code identifying the college.
-                    - "collegeName" (str): The name of the college.
+                    - "college_code" (str): The unique code identifying the college.
+                    - "college_name" (str): The name of the college.
         """
 
         CollegeRepository.create_college(college_data)

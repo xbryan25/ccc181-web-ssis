@@ -119,15 +119,15 @@ class ProgramRepository:
         Args:
             program_data (dict): A dictionary containing the program's details.
                 Expected keys include:
-                    - "programCode" (str): The unique code of the program.
-                    - "programName" (str): The name of the program.
-                    - "collegeCode" (str): The code of the academic program the student belongs to.
+                    - "program_code" (str): The unique code of the program.
+                    - "program_name" (str): The name of the program.
+                    - "college_code" (str): The code of the academic program the student belongs to.
         """
 
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.INSERT.format(table="programs", columns="program_code, program_name, college_code", placeholders="%s, %s, %s"),
-                         (program_data["programCode"], program_data["programName"], program_data["collegeCode"]))
+                         (program_data["program_code"], program_data["program_name"], program_data["college_code"]))
 
     @staticmethod
     def delete_program(program_code: str) -> None:

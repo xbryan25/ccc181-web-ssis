@@ -87,12 +87,12 @@ class StudentServices:
         Args:
             student_data (dict): A dictionary containing the details of the new student.
                 Expected keys include:
-                    - "idNumber" (str): The unique code identifying the student.
-                    - "firstName" (str): The first name of the student.
-                    - "lastName" (str): The last name of the student.
-                    - "yearLevel" (str): The year level of the student.
+                    - "id_number" (str): The unique code identifying the student.
+                    - "first_name" (str): The first name of the student.
+                    - "last_name" (str): The last name of the student.
+                    - "year_level" (str): The year level of the student.
                     - "gender" (str): The gender of the student.
-                    - "programCode" (str): The identifier of the program in which this student belongs to.
+                    - "program_code" (str): The identifier of the program in which this student belongs to.
         """
 
         StudentRepository.create_student(student_data=student_data)

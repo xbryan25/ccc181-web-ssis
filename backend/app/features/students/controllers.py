@@ -9,25 +9,34 @@ from .services import StudentServices
 
 from ..common.dataclasses.student import Student
 
-from app.utils import dict_keys_to_camel
+from app.utils import dict_keys_to_camel, validate_id_number, validate_name, validate_year_level, validate_gender, validate_program_code
 
-from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError
+from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError, ValidationError
 
-from psycopg.errors import UniqueViolation
+from psycopg.errors import UniqueViolation, ForeignKeyViolation
 
 class StudentController:
  
-
     @staticmethod
     def get_student_details_controller(id_number: str) -> tuple[Response, int]:
         """Retrieve detailed information about a specific student."""
 
         try:
+            validate_id_number(id_number)
+
             student_details: Student = StudentServices.get_student_details_service(id_number.strip())
 
             return jsonify(dict_keys_to_camel(asdict(student_details))), 200
 
         except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
+        except InvalidParameterError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
+        except ValidationError as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 400
 
@@ -176,16 +185,35 @@ class StudentController:
 
         entity_details = request.json
 
-        new_student_data = {
-            'idNumber': entity_details['entityDetails']['idNumber'],
-            'firstName': entity_details['entityDetails']['firstName'],
-            'lastName': entity_details['entityDetails']['lastName'],
-            'yearLevel': entity_details['entityDetails']['yearLevel'],
-            'gender': entity_details['entityDetails']['gender'].lower(),
-            'programCode': entity_details['entityDetails']['programCode']
-        }
-
         try:
+            new_student_data = {
+            'id_number': entity_details['entityDetails']['idNumber'],
+            'first_name': entity_details['entityDetails']['firstName'],
+            'last_name': entity_details['entityDetails']['lastName'],
+            'year_level': entity_details['entityDetails']['yearLevel'],
+            'gender': entity_details['entityDetails']['gender'],
+            'program_code': entity_details['entityDetails']['programCode']
+            }
+            
+            validate_id_number(new_student_data['id_number'])
+
+            validate_name(new_student_data['first_name'], "First")
+
+            validate_name(new_student_data['last_name'], "Last")
+
+            validate_year_level(new_student_data['year_level'])
+
+            validate_gender(new_student_data['gender'])
+
+            validate_program_code(new_student_data['program_code'])
+
+            new_student_data['id_number'] = new_student_data['id_number'].strip()
+            new_student_data['first_name'] = new_student_data['first_name'].strip()
+            new_student_data['last_name'] = new_student_data['last_name'].strip()
+            new_student_data['year_level'] = new_student_data['year_level'].strip()
+            new_student_data['gender'] = new_student_data['gender'].strip().lower()
+            new_student_data['program_code'] = new_student_data['program_code'].strip().upper()
+
             StudentServices.create_student_service(new_student_data)
 
             return jsonify({"message": "Student added successfully."}), 200
@@ -203,10 +231,22 @@ class StudentController:
             
             else:
                 return jsonify({"error": "Something went wrong."}), 500
+            
+        except KeyError as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The key {str(e)} doesn't exist in the body."}), 400
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+            
+        except ForeignKeyViolation as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The program_code '{new_student_data['program_code']}' doesn't exist in the 'programs' table."}), 400
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
     def delete_student_controller(id_number: str) -> tuple[Response, int]:

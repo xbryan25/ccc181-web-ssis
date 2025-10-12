@@ -83,9 +83,9 @@ class ProgramServices:
         Args:
             program_data (dict): A dictionary containing the details of the new program.
                 Expected keys include:
-                    - "programCode" (str): The unique code identifying the program.
-                    - "programName" (str): The name of the program.
-                    - "collegeCode" (str): The identifier of the college in which this program belongs to.
+                    - "program_code" (str): The unique code identifying the program.
+                    - "program_name" (str): The name of the program.
+                    - "college_code" (str): The identifier of the college in which this program belongs to.
         """
 
         ProgramRepository.create_program(program_data)

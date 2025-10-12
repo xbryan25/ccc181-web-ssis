@@ -9,11 +9,11 @@ from .services import ProgramServices
 
 from ..common.dataclasses import Program
 
-from app.utils import dict_keys_to_camel
+from app.utils import dict_keys_to_camel, validate_program_code, validate_program_name, validate_college_code
 
-from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError
+from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError, ValidationError
 
-from psycopg.errors import UniqueViolation
+from psycopg.errors import UniqueViolation, ForeignKeyViolation
 
 class ProgramController:
     
@@ -22,6 +22,8 @@ class ProgramController:
         """Retrieve detailed information about a specific program."""
 
         try:
+            validate_program_code(program_code)
+
             program_details: Program = ProgramServices.get_program_details_service(program_code.strip())
 
             return jsonify(dict_keys_to_camel(asdict(program_details))), 200
@@ -29,6 +31,14 @@ class ProgramController:
         except EntityNotFoundError as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+        
+        except InvalidParameterError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()
@@ -168,13 +178,23 @@ class ProgramController:
         
         entity_details = request.json
 
-        new_program_data = {
-            'programCode': entity_details['entityDetails']['programCode'],
-            'programName': entity_details['entityDetails']['programName'],
-            'collegeCode': entity_details['entityDetails']['collegeCode']
-        }
-
         try:
+            new_program_data = {
+            'program_code': entity_details['entityDetails']['programCode'],
+            'program_name': entity_details['entityDetails']['programName'],
+            'college_code': entity_details['entityDetails']['collegeCode']
+            }
+
+            validate_program_code(new_program_data['program_code'])
+
+            validate_program_name(new_program_data['program_name'])
+
+            validate_college_code(new_program_data['college_code'])
+
+            new_program_data['program_code'] = new_program_data['program_code'].strip().upper()
+            new_program_data['program_name'] = new_program_data['program_name'].strip()
+            new_program_data['college_code'] = new_program_data['college_code'].strip().upper()
+
             ProgramServices.create_program_service(new_program_data)
 
             return jsonify({"message": "Program added successfully."}), 200
@@ -193,6 +213,14 @@ class ProgramController:
             else:
                 return jsonify({"errorMessage": "Something went wrong."}), 500
 
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+            
+        except ForeignKeyViolation as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The college_code '{new_program_data['college_code']}' doesn't exist in the 'colleges' table."}), 400
+
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
@@ -209,7 +237,6 @@ class ProgramController:
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
-
 
     @staticmethod
     def edit_program_details_controller(program_code: str) -> tuple[Response, int]:

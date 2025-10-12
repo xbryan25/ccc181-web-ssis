@@ -110,14 +110,14 @@ class CollegeRepository:
         Args:
             college_data (dict): A dictionary containing the college's details.
                 Expected keys include:
-                    - "collegeCode" (str): The unique code of the college.
-                    - "collegeName" (str): The name of the college.
+                    - "college_code" (str): The unique code of the college.
+                    - "college_name" (str): The name of the college.
         """
 
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.INSERT.format(table="colleges", columns="college_code, college_name", placeholders="%s, %s"),
-                         (college_data["collegeCode"], college_data["collegeName"]))
+                         (college_data["college_code"], college_data["college_name"]))
 
     @staticmethod
     def delete_college(college_code: str) -> None:

@@ -125,12 +125,12 @@ class StudentRepository:
         Args:
             student_data (dict): A dictionary containing the student's details.
                 Expected keys include:
-                    - "idNumber" (str): The unique ID number of the student.
-                    - "firstName" (str): The student's first name.
-                    - "lastName" (str): The student's last name.
-                    - "yearLevel" (str): The student's year level (e.g., "1st Year").
+                    - "id_number" (str): The unique ID number of the student.
+                    - "first_name" (str): The student's first name.
+                    - "last_name" (str): The student's last name.
+                    - "year_level" (str): The student's year level (e.g., "1st Year").
                     - "gender" (str): The student's gender.
-                    - "programCode" (str): The code of the academic program the student belongs to.
+                    - "program_code" (str): The code of the academic program the student belongs to.
 
         """
 
@@ -139,8 +139,8 @@ class StudentRepository:
         db.execute_query(CommonQueries.INSERT.format(table="students", 
                                                      columns="id_number, first_name, last_name, year_level, gender, program_code",
                                                      placeholders="%s, %s, %s, %s, %s, %s"),
-                                                     (student_data["idNumber"], student_data["firstName"], student_data["lastName"],
-                                                      student_data["yearLevel"], student_data["gender"], student_data["programCode"]))
+                                                     (student_data["id_number"], student_data["first_name"], student_data["last_name"],
+                                                      student_data["year_level"], student_data["gender"], student_data["program_code"]))
 
     @staticmethod
     def delete_student(id_number: str) -> None:

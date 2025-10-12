@@ -7,9 +7,9 @@ from .services import CollegeServices
 
 from ..common.dataclasses import College
 
-from app.utils import dict_keys_to_camel
+from app.utils import dict_keys_to_camel, validate_college_name, validate_college_code
 
-from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError
+from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError, ValidationError
 
 from psycopg.errors import UniqueViolation
 
@@ -20,6 +20,8 @@ class CollegeController:
         """Retrieve detailed information about a specific college."""
 
         try:
+            validate_college_code(college_code)
+
             college_details: College = CollegeServices.get_college_details_service(college_code.strip())
 
             return jsonify(dict_keys_to_camel(asdict(college_details))), 200
@@ -27,6 +29,14 @@ class CollegeController:
         except EntityNotFoundError as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+        
+        except InvalidParameterError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()
@@ -125,12 +135,19 @@ class CollegeController:
 
         entity_details = request.json
 
-        new_college_data = {
-            'collegeCode': entity_details['entityDetails']['collegeCode'],
-            'collegeName': entity_details['entityDetails']['collegeName']
-        }
-
         try:
+            new_college_data = {
+            'college_code': entity_details['entityDetails']['collegeCode'],
+            'college_name': entity_details['entityDetails']['collegeName']
+            }
+
+            validate_college_code(new_college_data['college_code'])
+
+            validate_college_name(new_college_data['college_name'])
+
+            new_college_data['college_code'] = new_college_data['college_code'].strip().upper()
+            new_college_data['college_name'] = new_college_data['college_name'].strip()
+
             CollegeServices.create_college_service(new_college_data)
 
             return jsonify({"message": "College added successfully."}), 200
@@ -141,17 +158,21 @@ class CollegeController:
             constraint_name = e.diag.constraint_name
 
             if constraint_name == 'colleges_pkey':
-                return jsonify({"errorMessage": "College code already exists."}), 500
+                return jsonify({"error": "College code already exists."}), 400
             
             elif constraint_name == 'colleges_college_name_key':
-                return jsonify({"errorMessage": "College name already exists."}), 500
+                return jsonify({"error": "College name already exists."}), 400
             
             else:
-                return jsonify({"errorMessage": "Something went wrong."}), 500
-
+                return jsonify({"error": "An unexpected error occurred."}), 500
+            
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
     def delete_college_controller(college_code: str) -> tuple[Response, int]:
