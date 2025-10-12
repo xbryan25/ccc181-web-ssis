@@ -7,9 +7,13 @@ import json
 
 from .services import StudentServices
 
+from ..programs.services import ProgramServices
+
+from ..colleges.services import CollegeServices
+
 from ..common.dataclasses.student import Student
 
-from app.utils import dict_keys_to_camel, validate_id_number, validate_name, validate_year_level, validate_gender, validate_program_code
+from app.utils import dict_keys_to_camel, validate_id_number, validate_name, validate_year_level, validate_gender, validate_program_code, validate_college_code
 
 from app.exceptions.custom_exceptions import EntityNotFoundError, InvalidParameterError, ValidationError
 
@@ -373,35 +377,89 @@ class StudentController:
     def get_year_level_demographics_controller() -> tuple[Response, int]:
         """Retrieve student year-level demographics."""
 
-        params = {
-            "program_code": request.args.get("programCode"),
-            "college_code": request.args.get("collegeCode"),
-        }
-
         try:
+            params = {
+                "program_code": request.args.get("programCode"),
+                "college_code": request.args.get("collegeCode"),
+            }
+
+            validate_program_code(params["program_code"], can_be_none=True)
+            validate_college_code(params["college_code"], can_be_none=True)
+
+            if params['program_code']:
+                params['program_code'] = params['program_code'].strip().upper()
+                ProgramServices.get_program_details_service(params['program_code'])
+            
+            if params['college_code']:
+                params['college_code'] = params['college_code'].strip().upper()
+                CollegeServices.get_college_details_service(params['college_code'])
+
+            # Only one of these should be present at a time
+            if sum(bool(x) for x in [params["program_code"], params["college_code"]]) > 1:
+                raise InvalidParameterError("Only one should exist at a time between 'programCode', and 'collegeCode'.")
+
             year_level_demographics = StudentServices.get_year_level_demographics_service(params)
 
             return jsonify(year_level_demographics), 200
+        
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+
+        except InvalidParameterError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"errorMessage": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
         
     @staticmethod
     def get_gender_demographics_controller() -> tuple[Response, int]:
         """Retrieve student gender demographics."""
 
-        params = {
-            "program_code": request.args.get("programCode"),
-            "college_code": request.args.get("collegeCode"),
-        }
-
         try:
+            params = {
+                "program_code": request.args.get("programCode"),
+                "college_code": request.args.get("collegeCode"),
+            }
+
+            validate_program_code(params["program_code"], can_be_none=True)
+            validate_college_code(params["college_code"], can_be_none=True)
+
+            if params['program_code']:
+                params['program_code'] = params['program_code'].strip().upper()
+                ProgramServices.get_program_details_service(params['program_code'])
+            
+            if params['college_code']:
+                params['college_code'] = params['college_code'].strip().upper()
+                CollegeServices.get_college_details_service(params['college_code'])
+
+            # Only one of these should be present at a time
+            if sum(bool(x) for x in [params["program_code"], params["college_code"]]) > 1:
+                raise InvalidParameterError("Only one should exist at a time between 'programCode', and 'collegeCode'.")
+
             gender_demographics = StudentServices.get_gender_demographics_service(params)
 
             return jsonify(gender_demographics), 200
 
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+
+        except InvalidParameterError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
         

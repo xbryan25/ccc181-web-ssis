@@ -37,14 +37,6 @@ class StudentRepository:
 
         Returns:
             dict: A dictionary containing the total number of students that match the given filter.
-
-        Raises:
-            ValueError: If more than one of "search_value", "program_code",
-            or "college_code" is provided.
-
-        Note:
-            Only one of "search_value", "program_code", or "college_code"
-            should be provided at a time. Otherwise, a ValueError is raised.
         """
 
         db = current_app.extensions['db']
@@ -208,9 +200,6 @@ class StudentRepository:
 
         db = current_app.extensions['db']
 
-        if sum(x is not None for x in [params["program_code"], params["college_code"]]) > 1:
-            raise ValueError("Only one should exist at a time between program_code, and college_code")
-        
         if params["program_code"]:
             return db.fetch_all(StudentQueries.GET_YEAR_LEVEL_DEMOGRAPHICS_FROM_PROGRAM_CODE, (params["program_code"], ))
         
@@ -242,9 +231,6 @@ class StudentRepository:
         """
 
         db = current_app.extensions['db']
-
-        if sum(x is not None for x in [params["program_code"], params["college_code"]]) > 1:
-            raise ValueError("Only one should exist at a time between program_code, and college_code")
         
         if params["program_code"]:
             return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS_FROM_PROGRAM_CODE, (params["program_code"], ))

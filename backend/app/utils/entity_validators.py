@@ -12,8 +12,11 @@ NAME_REGEX = r"^[A-Za-z\s'-]{1,}$"
 ALLOWED_YEAR_LEVELS = {"1st", "2nd", "3rd", "4th", "4th+"}
 ALLOWED_GENDERS = {"male", "female", "others", "prefer not to say"}
 
-def validate_college_code(college_code: str) -> None:
+def validate_college_code(college_code: str, can_be_none: bool = False) -> None:
     """Validates inputted college code according to COLLEGE_CODE_REGEX."""
+
+    if not college_code and can_be_none:
+        return
 
     if not college_code:
         raise ValidationError("College code cannot be blank.")
@@ -46,8 +49,11 @@ def validate_college_name(college_name: str) -> None:
     if not re.match(COLLEGE_NAME_REGEX, college_name):
         raise ValidationError(f"The college_name '{college_name}' is not in the proper format.")
     
-def validate_program_code(program_code: str) -> None:
+def validate_program_code(program_code: str, can_be_none: bool = False) -> None:
     """Validates inputted program code according to PROGRAM_CODE_REGEX."""
+
+    if not program_code and can_be_none:
+        return
 
     if not program_code:
         raise ValidationError("Program code cannot be blank.")
