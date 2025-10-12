@@ -253,9 +253,23 @@ class StudentController:
         """Delete a student record by its code."""
 
         try:
-            StudentServices.delete_student_service(id_number)
+            validate_id_number(id_number)
+            
+            # Check if ID number exists or not
+            StudentServices.get_student_details_service(id_number.strip())
+
+            # If it exists, delete it
+            StudentServices.delete_student_service(id_number.strip())
 
             return jsonify({"message": "Student deleted successfully."}), 200
+        
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()

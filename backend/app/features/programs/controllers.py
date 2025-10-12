@@ -230,9 +230,23 @@ class ProgramController:
         """Delete a program record by its code."""
 
         try:
-            ProgramServices.delete_program_service(program_code)
+            validate_program_code(program_code)
+
+            # Check if program code exists or not
+            ProgramServices.get_program_details_service(program_code.strip().upper())
+
+            # If it exists, delete it
+            ProgramServices.delete_program_service(program_code.strip().upper())
 
             return jsonify({"message": "Program deleted successfully."}), 200
+        
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()

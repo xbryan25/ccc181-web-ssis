@@ -22,7 +22,7 @@ class CollegeController:
         try:
             validate_college_code(college_code)
 
-            college_details: College = CollegeServices.get_college_details_service(college_code.strip())
+            college_details: College = CollegeServices.get_college_details_service(college_code.strip().upper())
 
             return jsonify(dict_keys_to_camel(asdict(college_details))), 200
         
@@ -179,14 +179,27 @@ class CollegeController:
         """Delete a college record by its code."""
 
         try:
-            CollegeServices.delete_college_service(college_code)
+            validate_college_code(college_code)
+
+            # Check if college code exists or not
+            CollegeServices.get_college_details_service(college_code.strip().upper())
+
+            # If it exists, delete it
+            CollegeServices.delete_college_service(college_code.strip().upper())
 
             return jsonify({"message": "College deleted successfully."}), 200
+        
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
 
         except Exception as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
-
 
     @staticmethod
     def edit_college_details_controller(college_code: str) -> tuple[Response, int]:
