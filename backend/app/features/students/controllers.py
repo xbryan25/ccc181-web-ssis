@@ -281,16 +281,42 @@ class StudentController:
 
         entity_details = request.json
 
-        new_student_data = {
-            'idNumber': entity_details['entityDetails']['idNumber'],
-            'firstName': entity_details['entityDetails']['firstName'],
-            'lastName': entity_details['entityDetails']['lastName'],
-            'yearLevel': entity_details['entityDetails']['yearLevel'],
-            'gender': entity_details['entityDetails']['gender'].lower(),
-            'programCode': entity_details['entityDetails']['programCode']
-        }
-
         try:
+            new_student_data = {
+            'id_number': entity_details['entityDetails']['idNumber'],
+            'first_name': entity_details['entityDetails']['firstName'],
+            'last_name': entity_details['entityDetails']['lastName'],
+            'year_level': entity_details['entityDetails']['yearLevel'],
+            'gender': entity_details['entityDetails']['gender'],
+            'program_code': entity_details['entityDetails']['programCode']
+            }
+
+            validate_id_number(id_number)
+
+            id_number = id_number.strip()
+
+            # Check if ID number exists or not
+            StudentServices.get_student_details_service(id_number)
+
+            validate_id_number(new_student_data['id_number'])
+
+            validate_name(new_student_data['first_name'], "First")
+
+            validate_name(new_student_data['last_name'], "Last")
+
+            validate_year_level(new_student_data['year_level'])
+
+            validate_gender(new_student_data['gender'])
+
+            validate_program_code(new_student_data['program_code'])
+
+            new_student_data['id_number'] = new_student_data['id_number'].strip()
+            new_student_data['first_name'] = new_student_data['first_name'].strip()
+            new_student_data['last_name'] = new_student_data['last_name'].strip()
+            new_student_data['year_level'] = new_student_data['year_level'].strip()
+            new_student_data['gender'] = new_student_data['gender'].strip().lower()
+            new_student_data['program_code'] = new_student_data['program_code'].strip().upper()
+
             StudentServices.edit_student_details_service(id_number, new_student_data)
 
             return jsonify({"message": "Student edited successfully."}), 200
@@ -308,6 +334,36 @@ class StudentController:
             
             else:
                 return jsonify({"error": "Something went wrong."}), 500
+            
+        except UniqueViolation as e:
+            traceback.print_exc()
+
+            constraint_name = e.diag.constraint_name
+
+            if constraint_name == 'students_pkey':
+                return jsonify({"error": "ID number already exists."}), 500
+            
+            elif constraint_name == 'unique_full_name':
+                return jsonify({"error": "Name combination already exists."}), 500
+            
+            else:
+                return jsonify({"error": "Something went wrong."}), 500
+            
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+            
+        except KeyError as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The key {str(e)} doesn't exist in the body."}), 400
+        
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+            
+        except ForeignKeyViolation as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The program_code '{new_student_data['program_code']}' doesn't exist in the 'programs' table."}), 400
 
         except Exception as e:
             traceback.print_exc()

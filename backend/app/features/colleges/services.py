@@ -106,8 +106,8 @@ class CollegeServices:
             college_code (str): The current unique code identifying the college to be updated.
             college_data (dict): A dictionary containing the details of the updated college.
                 Expected keys include:
-                    - "collegeCode" (str): The updated college code of the college.
-                    - "collegeName" (str): The updated name of the college.
+                    - "college_code" (str): The updated college code of the college.
+                    - "college_name" (str): The updated name of the college.
         """
 
         CollegeRepository.edit_college_details(college_code, new_college_data)

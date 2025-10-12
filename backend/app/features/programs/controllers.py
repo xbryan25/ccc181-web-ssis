@@ -212,6 +212,10 @@ class ProgramController:
             
             else:
                 return jsonify({"errorMessage": "Something went wrong."}), 500
+            
+        except KeyError as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The key {str(e)} doesn't exist in the body."}), 400
 
         except ValidationError as e:
             traceback.print_exc()
@@ -223,7 +227,7 @@ class ProgramController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
     def delete_program_controller(program_code: str) -> tuple[Response, int]:
@@ -250,7 +254,7 @@ class ProgramController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
     def edit_program_details_controller(program_code: str) -> tuple[Response, int]:
@@ -258,13 +262,30 @@ class ProgramController:
 
         entity_details = request.json
 
-        new_program_data = {
-            'programCode': entity_details['entityDetails']['programCode'],
-            'programName': entity_details['entityDetails']['programName'],
-            'collegeCode': entity_details['entityDetails']['collegeCode']
-        }
-
         try:
+            new_program_data = {
+            'program_code': entity_details['entityDetails']['programCode'],
+            'program_name': entity_details['entityDetails']['programName'],
+            'college_code': entity_details['entityDetails']['collegeCode']
+            }
+
+            validate_program_code(program_code)
+
+            program_code = program_code.strip().upper()
+
+            # Check if program code exists or not
+            ProgramServices.get_program_details_service(program_code)
+
+            validate_program_code(new_program_data['program_code'])
+
+            validate_program_name(new_program_data['program_name'])
+
+            validate_college_code(new_program_data['college_code'])
+
+            new_program_data['program_code'] = new_program_data['program_code'].strip().upper()
+            new_program_data['program_name'] = new_program_data['program_name'].strip()
+            new_program_data['college_code'] = new_program_data['college_code'].strip().upper()
+
             ProgramServices.edit_program_details_service(program_code, new_program_data)
 
             return jsonify({"message": "Program edited successfully."}), 200
@@ -282,14 +303,26 @@ class ProgramController:
             
             else:
                 return jsonify({"errorMessage": "Something went wrong."}), 500
+            
+        except EntityNotFoundError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 500
+        
+        except KeyError as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The key {str(e)} doesn't exist in the body."}), 400
+
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+            
+        except ForeignKeyViolation as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The college_code '{new_program_data['college_code']}' doesn't exist in the 'colleges' table."}), 400
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
-
-        except Exception as e:
-            traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
         
     @staticmethod
     def get_program_codes_controller() -> tuple[Response, int]:

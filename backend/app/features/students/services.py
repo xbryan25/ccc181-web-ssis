@@ -117,12 +117,12 @@ class StudentServices:
             id_number (str): The current unique code identifying the student to be updated.
             new_student_data (dict): A dictionary containing the details of the updated program.
                 Expected keys include:
-                    - "idNumber" (str): The updated ID number of the student.
-                    - "firstName" (str): The updated first name of the student.
-                    - "lastName" (str): The updated last name of the student.
-                    - "yearLevel" (str): The updated year level of the student.
+                    - "id_number" (str): The updated ID number of the student.
+                    - "first_name" (str): The updated first name of the student.
+                    - "last_name" (str): The updated last name of the student.
+                    - "year_level" (str): The updated year level of the student.
                     - "gender" (str): The updated gender of the student.
-                    - "programCode" (str): The identifier of the program in which this student belongs to.
+                    - "program_code" (str): The identifier of the program in which this student belongs to.
         """
 
         StudentRepository.edit_student_details(id_number=id_number, new_student_data=new_student_data)

@@ -151,16 +151,16 @@ class ProgramRepository:
             program_code (str): The unique program code of the program to update.
             new_program_data (dict): A dictionary containing the updated program information.
                 Expected keys include:
-                    - "programCode" (str): The unique code of the program.
-                    - "programName" (str): The name of the program.
-                    - "collegeCode" (str): The code of the academic program the student belongs to.
+                    - "program_code" (str): The unique code of the program.
+                    - "program_name" (str): The name of the program.
+                    - "college_code" (str): The code of the academic program the student belongs to.
         """
 
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="programs", 
                                                            set_clause="program_code = %s, program_name = %s, college_code = %s", pk="program_code"), 
-                                                           (new_program_data["programCode"], new_program_data["programName"], new_program_data["collegeCode"], program_code))   
+                                                           (new_program_data["program_code"], new_program_data["program_name"], new_program_data["college_code"], program_code))   
     
     @staticmethod
     def get_program_codes() -> list[dict[str, str | list[str]]]:

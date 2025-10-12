@@ -110,9 +110,9 @@ class ProgramServices:
             program_code (str): The current unique code identifying the program to be updated.
             program_data (dict): A dictionary containing the details of the updated program.
                 Expected keys include:
-                    - "programCode" (str): The updated program code of the program.
-                    - "programName" (str): The updated name of the program.
-                    - "collegeCode" (str): The identifier of the college in which this program belongs to.
+                    - "program_code" (str): The updated program code of the program.
+                    - "program_name" (str): The updated name of the program.
+                    - "college_code" (str): The identifier of the college in which this program belongs to.
         """
 
         ProgramRepository.edit_program_details(program_code, new_program_data)

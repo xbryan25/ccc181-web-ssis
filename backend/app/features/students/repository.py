@@ -165,12 +165,12 @@ class StudentRepository:
             id_number (str): The unique ID number of the student to update.
             new_student_data (dict): A dictionary containing the updated student information.
                 Expected keys include:
-                    - "idNumber" (str): The updated ID number of the student.
-                    - "firstName" (str): The updated first name.
-                    - "lastName" (str): The updated last name.
-                    - "yearLevel" (str): The updated year level.
+                    - "id_number" (str): The updated ID number of the student.
+                    - "first_name" (str): The updated first name.
+                    - "last_name" (str): The updated last name.
+                    - "year_level" (str): The updated year level.
                     - "gender" (str): The updated gender.
-                    - "programCode" (str): The updated program code.
+                    - "program_code" (str): The updated program code.
 
         """
 
@@ -179,8 +179,8 @@ class StudentRepository:
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="students", 
                                                            set_clause="id_number = %s, first_name = %s, last_name = %s, " \
                                                            "year_level = %s, gender = %s, program_code = %s", pk="id_number"), 
-                                                           (new_student_data["idNumber"], new_student_data["firstName"], new_student_data["lastName"],
-                                                            new_student_data["yearLevel"], new_student_data["gender"], new_student_data["programCode"], 
+                                                           (new_student_data["id_number"], new_student_data["first_name"], new_student_data["last_name"],
+                                                            new_student_data["year_level"], new_student_data["gender"], new_student_data["program_code"], 
                                                             id_number))  
 
     @staticmethod

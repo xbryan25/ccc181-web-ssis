@@ -165,7 +165,11 @@ class CollegeController:
             
             else:
                 return jsonify({"error": "An unexpected error occurred."}), 500
-            
+        
+        except KeyError as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The key {str(e)} doesn't exist in the body."}), 400
+
         except ValidationError as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 400
@@ -199,7 +203,7 @@ class CollegeController:
 
         except Exception as e:
             traceback.print_exc()
-            return jsonify({"error": str(e)}), 500
+            return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
     def edit_college_details_controller(college_code: str) -> tuple[Response, int]:
@@ -207,12 +211,26 @@ class CollegeController:
 
         entity_details = request.json
 
-        new_college_data = {
-            'collegeCode': entity_details['entityDetails']['collegeCode'],
-            'collegeName': entity_details['entityDetails']['collegeName']
-        }
-
         try:
+            new_college_data = {
+                'college_code': entity_details['entityDetails']['collegeCode'],
+                'college_name': entity_details['entityDetails']['collegeName']
+            }
+            
+            validate_college_code(college_code)
+
+            college_code = college_code.strip().upper()
+
+            # Check if college code exists or not
+            CollegeServices.get_college_details_service(college_code)
+
+            validate_college_code(new_college_data['college_code'])
+
+            validate_college_name(new_college_data['college_name'])
+
+            new_college_data['college_code'] = new_college_data['college_code'].strip().upper()
+            new_college_data['college_name'] = new_college_data['college_name'].strip()
+
             CollegeServices.edit_college_details_service(college_code, new_college_data)
 
             return jsonify({"message": "College edited successfully."}), 200
@@ -231,9 +249,21 @@ class CollegeController:
             else:
                 return jsonify({"errorMessage": "Something went wrong."}), 500
 
-        except Exception as e:
+        except EntityNotFoundError as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
+        
+        except KeyError as e:
+            traceback.print_exc()
+            return jsonify({"error": f"The key {str(e)} doesn't exist in the body."}), 400
+
+        except ValidationError as e:
+            traceback.print_exc()
+            return jsonify({"error": str(e)}), 400
+
+        except Exception as e:
+            traceback.print_exc()
+            return jsonify({"error": "An unexpected error occurred."}), 500
         
     @staticmethod
     def get_college_codes_controller() -> tuple[Response, int]:

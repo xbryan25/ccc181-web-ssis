@@ -141,15 +141,15 @@ class CollegeRepository:
             college_code (str): The unique college code of the college to update.
             new_college_data (dict): A dictionary containing the updated college information.
                 Expected keys include:
-                    - "collegeCode" (str): The unique code of the college.
-                    - "collegeName" (str): The name of the college.
+                    - "college_code" (str): The unique code of the college.
+                    - "college_name" (str): The name of the college.
         """
 
         db = current_app.extensions['db']
 
         db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="colleges", 
                                                            set_clause="college_code = %s, college_name = %s", pk="college_code"), 
-                                                           (new_college_data["collegeCode"], new_college_data["collegeName"], college_code))   
+                                                           (new_college_data["college_code"], new_college_data["college_name"], college_code))   
     @staticmethod
     def get_college_codes() -> list[dict[str, str]]:
         """
