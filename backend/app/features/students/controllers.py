@@ -64,10 +64,10 @@ class StudentController:
 
             # Validate search_by and search_type parameters
 
-            if params['search_by'] not in ALLOWED_SEARCH_BY:
+            if params['search_by'] and params['search_by'] not in ALLOWED_SEARCH_BY:
                 raise InvalidParameterError(f"Invalid 'searchBy' value: '{params['search_by']}'. Must be one of: ['ID Number', 'First Name', 'Last Name', 'Gender', 'Year Level', 'Program Code'].")
 
-            if params["search_type"] not in ALLOWED_SEARCH_TYPE:
+            if params['search_type'] and params["search_type"] not in ALLOWED_SEARCH_TYPE:
                 raise InvalidParameterError(f"Invalid 'searchType' value: '{params["search_type"]}'. Must be one of: ['Starts With', 'Contains', 'Ends With'].")
 
             filter_by = request.args.get("filterBy")

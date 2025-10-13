@@ -32,11 +32,13 @@ const selectedProgramCode = ref({
   label: '',
 });
 
-const studentsTotalCount: Ref<number> = ref(0);
+const studentsTotalCount: Ref<number | string> = ref<number | string>('-');
 
 const yearLevelData = ref<{ label: string | undefined; value: number | undefined }[]>([]);
 
 const genderData = ref<{ label: string | undefined; value: number | undefined }[]>([]);
+
+const isLoading = ref(true);
 
 onMounted(async () => {
   const programCodesDetailsData: UseProgramCodesResponse[] = (await useEntityIds(
@@ -58,6 +60,8 @@ onMounted(async () => {
   genderData.value = formatForGenderDonutChart(
     await useGenderDemographics({ programCode: selectedProgramCode.value.label }),
   );
+
+  isLoading.value = false;
 });
 
 watch(
@@ -87,7 +91,7 @@ watch(
     <USelectMenu
       v-model="selectedProgramCode"
       :items="programCodeOptions"
-      class="w-75"
+      class="w-75 h-8"
       :ui="{
         trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
         label: 'text-primary',
@@ -114,8 +118,9 @@ watch(
     <div class="flex flex-col xl:flex-row gap-10 w-full pt-5">
       <div class="flex-1 flex flex-col items-center gap-3 max-w-full">
         <h3 class="font-bold text-xl">Year Level</h3>
-        <VisBulletLegend :items="yearLevelLegendItems" />
-        <VisSingleContainer :data="yearLevelData" class="h-50 max-w-100">
+        <USkeleton v-if="isLoading" class="h-50 w-100 max-w-100" />
+        <VisBulletLegend v-if="!isLoading" :items="yearLevelLegendItems" />
+        <VisSingleContainer v-if="!isLoading" :data="yearLevelData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>
@@ -123,8 +128,9 @@ watch(
 
       <div class="flex-1 flex flex-col items-center gap-3">
         <h3 class="font-bold text-xl">Gender</h3>
-        <VisBulletLegend :items="genderLegendItems" />
-        <VisSingleContainer :data="genderData" class="h-50 max-w-100">
+        <USkeleton v-if="isLoading" class="h-50 w-100 max-w-100" />
+        <VisBulletLegend v-if="!isLoading" :items="genderLegendItems" />
+        <VisSingleContainer v-if="!isLoading" :data="genderData" class="h-50 max-w-100">
           <VisTooltip :triggers="triggers" />
           <VisDonut :value="value" />
         </VisSingleContainer>
