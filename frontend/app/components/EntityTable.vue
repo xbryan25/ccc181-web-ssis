@@ -264,15 +264,15 @@ watch(
     emit('update:sortField', newSortField);
     emit('update:sortOrder', newSortOrder);
   },
+  { immediate: true },
 );
 
-// These watches 'watch' any changes from [entity].vue
+// These watches 'watch' any changes from [entity].vue and update internal state
 
 watch(
   () => props.searchValue,
   (newValue) => {
     internalSearchValue.value = newValue;
-    emit('update:searchValue', newValue);
   },
 );
 
@@ -280,7 +280,6 @@ watch(
   () => props.searchBy,
   (newValue) => {
     internalSearchBy.value = newValue;
-    emit('update:searchBy', newValue);
   },
 );
 
@@ -288,7 +287,6 @@ watch(
   () => props.searchType,
   (newValue) => {
     internalSearchType.value = newValue;
-    emit('update:searchType', newValue);
   },
 );
 
@@ -296,7 +294,6 @@ watch(
   () => props.sortField,
   (newValue) => {
     internalSortField.value = newValue;
-    emit('update:sortField', newValue);
   },
 );
 
@@ -304,7 +301,6 @@ watch(
   () => props.sortOrder,
   (newValue) => {
     internalSortOrder.value = newValue;
-    emit('update:sortOrder', newValue);
   },
 );
 
@@ -334,27 +330,26 @@ onMounted(() => {
   updatePagination();
 
   // This watch function 'watches' any changes in table filters and pagination, doesn't include parent changes
-  watch(
-    [
-      () => rowsPerPage.value,
-      () => pageNumber.value,
-      () => internalSearchValue.value,
-      () => internalSearchBy.value,
-      () => internalSearchType.value,
-      () => internalSortField.value,
-      () => internalSortOrder.value,
-    ],
-    () => {
-      router.replace({
-        query: updateUrl(),
-      });
-
-      isLoading.value = true;
-
-      debouncedLoadEntities();
-    },
-    { immediate: true },
-  );
+  // nextTick ensures that watcher setup will be delayed after validation is done
+  nextTick(() => {
+    watch(
+      [
+        () => rowsPerPage.value,
+        () => pageNumber.value,
+        () => internalSearchValue.value,
+        () => internalSearchBy.value,
+        () => internalSearchType.value,
+        () => internalSortField.value,
+        () => internalSortOrder.value,
+      ],
+      () => {
+        router.replace({ query: updateUrl() });
+        isLoading.value = true;
+        debouncedLoadEntities();
+      },
+      { immediate: true },
+    );
+  });
 
   window.addEventListener('resize', updatePagination);
 });

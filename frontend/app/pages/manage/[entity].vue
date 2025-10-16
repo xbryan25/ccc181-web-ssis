@@ -81,7 +81,12 @@ const onProceed = (localState: {
       @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
       @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
       @update:sort-field="(value: string) => (searchAndSortState.sortField = value)"
-      @update:sort-order="(value: string) => (searchAndSortState.sortOrder = value)"
+      @update:sort-order="
+        (value: string) => {
+          searchAndSortState.sortOrder = value;
+          console.log(`after mount: ${value}`);
+        }
+      "
       @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
     />
   </div>
