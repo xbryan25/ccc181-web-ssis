@@ -66,6 +66,7 @@ const onProceed = (localState: {
           sortOrder: string;
         }) => onProceed(localState)
       "
+      @update:search-value="(searchValue) => (searchAndSortState.searchValue = searchValue)"
     />
 
     <EntityTable

@@ -109,7 +109,7 @@ const updateUrl = () => {
   newQuery.sortOrder = internalSortOrder.value;
 
   if (internalSearchValue.value !== '') {
-    newQuery.search = internalSearchValue.value;
+    newQuery.searchValue = internalSearchValue.value;
     newQuery.searchBy = internalSearchBy.value;
     newQuery.searchType = internalSearchType.value;
   }
@@ -190,6 +190,69 @@ const checkIfBeyondPageLimit = () => {
   }
 };
 
+const validateUrlInput = () => {
+  const totalPages = Math.ceil(totalEntityCount.value / rowsPerPage.value);
+
+  const allowedStudentFields = [
+    'ID Number',
+    'First Name',
+    'Last Name',
+    'Year Level',
+    'Gender',
+    'Program Code',
+  ];
+
+  const allowedProgramFields = ['Program Code', 'Program Name', 'College Code'];
+
+  const allowedCollegeFields = ['College Code', 'College Name'];
+
+  const allowedSearchType = ['Starts With', 'Contains', 'Ends With'];
+
+  const allowedSortOrder = ['Ascending', 'Descending'];
+
+  if (pageNumber.value > totalPages) {
+    pageNumber.value = totalPages;
+  } else if (pageNumber.value < 1) {
+    pageNumber.value = 1;
+  }
+
+  if (props.entityType === 'students') {
+    internalSortField.value = allowedStudentFields.includes(internalSortField.value)
+      ? internalSortField.value
+      : 'ID Number';
+  } else if (props.entityType === 'programs') {
+    internalSortField.value = allowedProgramFields.includes(internalSortField.value)
+      ? internalSortField.value
+      : 'Program Code';
+  } else if (props.entityType === 'colleges') {
+    internalSortField.value = allowedCollegeFields.includes(internalSortField.value)
+      ? internalSortField.value
+      : 'College Code';
+  }
+
+  internalSortOrder.value = allowedSortOrder.includes(internalSortOrder.value)
+    ? internalSortOrder.value
+    : 'Ascending';
+
+  if (props.entityType === 'students') {
+    internalSearchBy.value = allowedStudentFields.includes(internalSearchBy.value)
+      ? internalSearchBy.value
+      : 'ID Number';
+  } else if (props.entityType === 'programs') {
+    internalSearchBy.value = allowedProgramFields.includes(internalSearchBy.value)
+      ? internalSearchBy.value
+      : 'Program Code';
+  } else if (props.entityType === 'colleges') {
+    internalSearchBy.value = allowedCollegeFields.includes(internalSearchBy.value)
+      ? internalSearchBy.value
+      : 'College Code';
+  }
+
+  internalSearchType.value = allowedSearchType.includes(internalSearchType.value)
+    ? internalSearchType.value
+    : 'Starts With';
+};
+
 // This watch function emits changes to [entity.vue]
 
 watch(
@@ -260,11 +323,13 @@ watch(
 onMounted(() => {
   pageNumber.value = Number(route.query.page) || pageNumber.value;
 
-  internalSearchValue.value = String(route.query.search || internalSearchValue.value);
+  internalSearchValue.value = String(route.query.searchValue || internalSearchValue.value);
   internalSearchBy.value = String(route.query.searchBy || internalSearchBy.value);
   internalSearchType.value = String(route.query.searchType || internalSearchType.value);
   internalSortField.value = String(route.query.sortField || internalSortField.value);
   internalSortOrder.value = String(route.query.sortOrder || internalSortOrder.value);
+
+  validateUrlInput();
 
   updatePagination();
 
