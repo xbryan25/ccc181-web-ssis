@@ -56,6 +56,7 @@ class UserRepository:
 
         return db.fetch_one(CommonQueries.GET_COLUMN_BY_PK.format(column="username", table="users", pk="user_id"), (user_id, ))
     
+    @staticmethod
     def check_email_if_it_exists(email) -> dict[str, bool]:
         """
         Check if the email has already been taken.
@@ -72,6 +73,7 @@ class UserRepository:
 
         return db.fetch_one(CommonQueries.CHECK_IF_EXISTS.format(table="users", column="email"), (email, ))
     
+    @staticmethod
     def check_username_if_it_exists(username) -> dict[str, bool]:
         """
         Check if the username has already been taken.

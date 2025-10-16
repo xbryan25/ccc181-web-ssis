@@ -11,7 +11,7 @@ from app.exceptions.custom_exceptions import ValidationError
 class UserServices:
 
     @staticmethod
-    def user_login_service(email: str, password: str) -> User:
+    def user_login_service(email: str, password: str) -> User | None:
         """
         Authenticate a user with email and password.
         
@@ -58,6 +58,7 @@ class UserServices:
 
         UserRepository.user_signup(user_id, user_signup_details['username'], user_signup_details['email'], password_hash)
 
+    @staticmethod
     def get_username_service(user_id) -> str:
         """
         Get the username of a user using the user_id.
@@ -88,6 +89,7 @@ class UserServices:
         if UserServices.check_username_if_it_exists_service(username):
             raise ValidationError(f"The username '{username}' has already been taken.")
     
+    @staticmethod
     def check_email_if_it_exists_service(email) -> bool:
         """
         Checks if email has already been taken.
@@ -103,6 +105,7 @@ class UserServices:
 
         return result_dict['exists']
     
+    @staticmethod
     def check_username_if_it_exists_service(username) -> bool:
         """
         Checks if username has already been taken.

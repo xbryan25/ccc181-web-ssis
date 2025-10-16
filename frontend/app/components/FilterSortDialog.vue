@@ -45,6 +45,16 @@ const getTextForTooltip = (): string => {
     return `Sort Field: ${localState.sortField} | Sort Order: ${localState.sortOrder}`;
   }
 };
+
+// Watcher for searchAndSortState changes
+watch(
+  () => props.searchAndSortState,
+  (newVal) => {
+    console.log(newVal);
+    Object.assign(localState, newVal);
+  },
+  { deep: true, immediate: true },
+);
 </script>
 
 <template>

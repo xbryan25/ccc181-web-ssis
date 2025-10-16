@@ -1,9 +1,9 @@
 <script setup lang="ts">
-const studentTotalCount = ref(0);
+const studentTotalCount = ref<number | string>('-');
 
-const programTotalCount = ref(0);
+const programTotalCount = ref<number | string>('-');
 
-const collegeTotalCount = ref(0);
+const collegeTotalCount = ref<number | string>('-');
 
 const entitiesTotalCounts = [
   {
