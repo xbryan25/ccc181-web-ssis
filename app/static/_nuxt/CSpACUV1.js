@@ -1,0 +1,1 @@
+import{_ as t}from"./aQDyBCvh.js";import{_ as o}from"./DlAUqK2U.js";import{c,o as n,b as r}from"#entry";const s={},_={class:"flex justify-center items-center h-screen"};function a(m,f){const e=t;return n(),c("div",_,[r(e)])}const d=o(s,[["render",a]]);export{d as default};

@@ -1,4 +1,4 @@
-from flask import Flask, current_app, jsonify, request
+from flask import Flask, current_app, jsonify, request, render_template, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -6,12 +6,16 @@ from .config import Config
 
 from .db.connection import Database
 
+import os
+
 jwt = JWTManager()
 
 
 def create_app() -> Flask:
 
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="static", template_folder="templates")
+
+    NUXT_ASSETS_DIR = os.path.join(os.path.dirname(__file__), "static", "_nuxt")
 
     app.config.from_object(Config)
 
@@ -45,5 +49,18 @@ def create_app() -> Flask:
     @jwt.expired_token_loader
     def custom_expired_token_callback(jwt_header, jwt_payload):
         return jsonify({"error": "Session expired. Please log in again."}), 401
+    
+    @app.route('/_nuxt/<path:filename>')
+    def nuxt_static(filename):
+        return send_from_directory(NUXT_ASSETS_DIR, filename)
+
+    # Serve index.html for any non-API route
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def catch_all(path):
+        # Prevent catching API routes
+        if path.startswith("api/"):
+            return jsonify({"error": "Not Found"}), 404
+        return render_template('index.html')
 
     return app
