@@ -183,14 +183,16 @@ const debouncedGetTotalEntityCount = useDebounceFn(async () => {
 }, 200); // 700ms debounce
 
 const checkIfBeyondPageLimit = () => {
-  const totalPages = Math.ceil(totalEntityCount.value / rowsPerPage.value);
+  const totalPages = Math.ceil(totalEntityCount.value / rowsPerPage.value) || 1;
 
-  if (totalPages > 0) {
-    pageNumber.value = 1;
-  }
-
+  // If current page exceeds total pages, clamp it down
   if (pageNumber.value > totalPages) {
     pageNumber.value = totalPages;
+  }
+
+  // If there are no records, reset to page 1
+  if (totalEntityCount.value === 0) {
+    pageNumber.value = 1;
   }
 };
 

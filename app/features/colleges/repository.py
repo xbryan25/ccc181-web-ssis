@@ -93,7 +93,7 @@ class CollegeRepository:
         else:
             sort_order = "DESC"
 
-        offset = (params["page_number"] - 1) * params["rows_per_page"]
+        offset = 0 if params["page_number"] <= 0 else (params["page_number"] - 1) * params["rows_per_page"]
 
         return db.fetch_all(CommonQueries.GET_MANY
                             .format(table="colleges", 
