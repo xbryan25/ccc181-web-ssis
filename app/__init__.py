@@ -13,8 +13,9 @@ jwt = JWTManager()
 
 def create_app() -> Flask:
 
-    app = Flask(__name__, static_folder="static", template_folder="templates")
+    app = Flask(__name__, static_folder="static", template_folder="templates")  
 
+    NUXT_DIST_DIR = os.path.join(os.path.dirname(__file__), "static")  
     NUXT_ASSETS_DIR = os.path.join(os.path.dirname(__file__), "static", "_nuxt")
 
     app.config.from_object(Config)
@@ -53,6 +54,10 @@ def create_app() -> Flask:
     @app.route('/_nuxt/<path:filename>')
     def nuxt_static(filename):
         return send_from_directory(NUXT_ASSETS_DIR, filename)
+    
+    @app.route('/favicon.svg')
+    def favicon_svg():
+        return send_from_directory(NUXT_DIST_DIR, 'favicon.svg')
 
     # Serve index.html for any non-API route
     @app.route('/', defaults={'path': ''})
