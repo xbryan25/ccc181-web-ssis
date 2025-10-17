@@ -148,10 +148,10 @@ class StudentController:
             "sort_order":request.args.get("sortOrder")
             }
 
-            if params['rows_per_page'] <= 0:
+            if params['rows_per_page'] < 0:
                 raise InvalidParameterError(f"Invalid 'rowsPerPage' value: '{params['rows_per_page']}'. Must be a positive integer.")
             
-            if params['page_number'] <= 0:
+            if params['page_number'] < 0:
                 raise InvalidParameterError(f"Invalid 'pageNumber' value: '{params['page_number']}'. Must be a positive integer.")
             
             if params['search_by'] not in ALLOWED_SEARCH_BY:

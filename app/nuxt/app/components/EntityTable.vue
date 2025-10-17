@@ -185,6 +185,10 @@ const debouncedGetTotalEntityCount = useDebounceFn(async () => {
 const checkIfBeyondPageLimit = () => {
   const totalPages = Math.ceil(totalEntityCount.value / rowsPerPage.value);
 
+  if (totalPages > 0) {
+    pageNumber.value = 1;
+  }
+
   if (pageNumber.value > totalPages) {
     pageNumber.value = totalPages;
   }
@@ -309,8 +313,8 @@ watch(
   (newVal) => {
     if (newVal) {
       isLoading.value = true;
-      debouncedGetTotalEntityCount();
       debouncedLoadEntities();
+      debouncedGetTotalEntityCount();
       emit('disableCreateEntitySubmit');
     }
   },
@@ -346,6 +350,7 @@ onMounted(() => {
         router.replace({ query: updateUrl() });
         isLoading.value = true;
         debouncedLoadEntities();
+        debouncedGetTotalEntityCount();
       },
       { immediate: true },
     );
@@ -368,8 +373,8 @@ onBeforeUnmount(() => {
     :selected-entity="selectedEntity"
     @on-submit="
       isLoading = true;
-      debouncedGetTotalEntityCount();
       debouncedLoadEntities();
+      debouncedGetTotalEntityCount();
     "
   />
 
