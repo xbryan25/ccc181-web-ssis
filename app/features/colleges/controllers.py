@@ -241,13 +241,13 @@ class CollegeController:
             constraint_name = e.diag.constraint_name
 
             if constraint_name == 'colleges_pkey':
-                return jsonify({"errorMessage": "College code already exists."}), 500
+                return jsonify({"error": "College code already exists."}), 500
             
             elif constraint_name == 'colleges_college_name_key':
-                return jsonify({"errorMessage": "College name already exists."}), 500
+                return jsonify({"error": "College name already exists."}), 500
             
             else:
-                return jsonify({"errorMessage": "Something went wrong."}), 500
+                return jsonify({"error": "Something went wrong."}), 500
 
         except EntityNotFoundError as e:
             traceback.print_exc()

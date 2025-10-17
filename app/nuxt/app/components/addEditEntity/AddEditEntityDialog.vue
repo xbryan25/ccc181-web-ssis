@@ -52,7 +52,7 @@ async function onSubmit(newEntity: Student | Program | College) {
     }
 
     if (typeof error === 'object' && error !== null && 'data' in error) {
-      errorMessage = (error as any).data.errorMessage;
+      errorMessage = (error as any).data.error;
     }
 
     toast.add({
