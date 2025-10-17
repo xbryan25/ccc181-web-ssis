@@ -205,13 +205,13 @@ class ProgramController:
             constraint_name = e.diag.constraint_name
 
             if constraint_name == 'programs_pkey':
-                return jsonify({"errorMessage": "Program code already exists."}), 500
+                return jsonify({"error": "Program code already exists."}), 500
             
             elif constraint_name == 'programs_program_name_key':
-                return jsonify({"errorMessage": "Program name already exists."}), 500
+                return jsonify({"error": "Program name already exists."}), 500
             
             else:
-                return jsonify({"errorMessage": "Something went wrong."}), 500
+                return jsonify({"error": "Something went wrong."}), 500
             
         except KeyError as e:
             traceback.print_exc()
@@ -296,13 +296,13 @@ class ProgramController:
             constraint_name = e.diag.constraint_name
 
             if constraint_name == 'programs_pkey':
-                return jsonify({"errorMessage": "Program code already exists."}), 500
+                return jsonify({"error": "Program code already exists."}), 500
             
             elif constraint_name == 'programs_program_name_key':
-                return jsonify({"errorMessage": "Program name already exists."}), 500
+                return jsonify({"error": "Program name already exists."}), 500
             
             else:
-                return jsonify({"errorMessage": "Something went wrong."}), 500
+                return jsonify({"error": "Something went wrong."}), 500
             
         except EntityNotFoundError as e:
             traceback.print_exc()
