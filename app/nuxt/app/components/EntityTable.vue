@@ -28,6 +28,7 @@ const isOpenConfirmDeleteDialog = ref(false);
 const selectedEntity = ref('');
 
 const showImageModal = ref(false);
+const currentAvatarUrlToDisplay = ref('');
 
 const internalSearchValue = ref(props.searchValue);
 const internalSearchBy = ref(props.searchBy);
@@ -80,8 +81,10 @@ const UAvatar = resolveComponent('UAvatar') as DefineComponent;
 
 const tableButtons = { UButton, UDropdownMenu };
 
-const showAvatar = () => {
+const showAvatar = (avatarUrl: string) => {
   showImageModal.value = true;
+
+  currentAvatarUrlToDisplay.value = avatarUrl;
 };
 
 const studentTableColumns = getStudentsTableColumns(
@@ -444,7 +447,11 @@ onBeforeUnmount(() => {
 
   <UModal v-model:open="showImageModal">
     <template #content>
-      <img src="https://github.com/benjamincanac.png" alt="Avatar" class="max-w-full h-auto" />
+      <NuxtImg
+        :src="currentAvatarUrlToDisplay"
+        alt="Avatar"
+        class="max-w-full max-h-200 object-contain"
+      />
     </template>
   </UModal>
 </template>

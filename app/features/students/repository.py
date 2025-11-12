@@ -23,7 +23,7 @@ class StudentRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="students", pk="id_number"), (id_number, ))
 
     @staticmethod
-    def get_total_student_count(params) -> dict[str, str]:
+    def get_total_student_count(params) -> dict[str, int]:
         """
         Retrieve the total number of students based on a specific filter.
 

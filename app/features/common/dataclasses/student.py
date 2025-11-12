@@ -7,5 +7,6 @@ class Student:
     last_name: str
     year_level: str
     gender: str
+    avatar_url: str
     program_code: str
     

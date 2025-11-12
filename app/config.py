@@ -31,3 +31,5 @@ class Config:
     # in days
     REFRESH_COOKIE_MAX_AGE = get_refresh_cookie_max_age()
 
+    SUPABASE_URL=os.getenv("SUPABASE_URL")
+    SUPABASE_SERVICE_KEY=os.getenv("SUPABASE_SERVICE_KEY")

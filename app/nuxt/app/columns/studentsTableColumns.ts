@@ -3,12 +3,10 @@ import type { DefineComponent } from "vue";
 import type { Student } from "~/types";
 import { getRowItems } from "#imports";
 
-
-
 export function getStudentsTableColumns(callbacks :{
   openEditDialog: (row: Student) => void;
   openConfirmDeleteDialog: (row: Student) => void;
- }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent}, UAvatar: DefineComponent, onAvatarClick: () => void) { 
+ }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent}, UAvatar: DefineComponent, onAvatarClick: (avatarUrl: string) => void) { 
 
   const {UButton, UDropdownMenu} = components
 
@@ -23,41 +21,8 @@ export function getStudentsTableColumns(callbacks :{
         },
       },
 
-      
-      // cell: ({ row }: { row: Row<Student> }) => {
-      //   return h(
-      //     "div",
-      //     h(
-      //       UDropdownMenu,
-      //       {
-      //         content: {
-      //           align: "end",
-      //         },
-      //         items: getRowItems<Student>(row, callbacks),
-      //         "aria-label": "Actions dropdown",
-      //       },
-      //       () =>
-      //         h(UButton, {
-      //           icon: "i-lucide-ellipsis-vertical",
-      //           color: "neutral",
-      //           variant: "ghost",
-      //           class: "ml-auto",
-      //           "aria-label": "Actions dropdown",
-      //         })
-      //     )
-      //   );
-      // },
+      cell: ({ row }: { row: Row<Student> }) => h(UAvatar, { src: `${row.original.avatarUrl}`, size: "3xl", ui: {image: "cursor-pointer"}, onClick: () => onAvatarClick(row.original.avatarUrl)})
 
-      cell: () => h(UAvatar, { src: "https://github.com/benjamincanac.png", size: "3xl", ui: {image: "cursor-pointer"}, onClick: () => onAvatarClick()})
-
-      // cell: () => h(UAvatar, { src: "https://placehold.co/50" }, () =>
-      //         h(UButton, {
-      //           icon: "i-lucide-ellipsis-vertical",
-      //           color: "neutral",
-      //           variant: "ghost",
-      //           class: "ml-auto",
-      //           "aria-label": "Actions dropdown",
-      //         }))
     },
     {
       accessorKey: "idNumber",

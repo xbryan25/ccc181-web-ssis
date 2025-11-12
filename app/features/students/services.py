@@ -1,3 +1,5 @@
+from flask import current_app
+
 from .repository import StudentRepository
 
 from app.features.common.dataclasses import Student
@@ -5,6 +7,8 @@ from app.features.common.dataclasses import Student
 from app.utils import to_camel_case
 
 from app.exceptions.custom_exceptions import EntityNotFoundError
+
+from supabase import create_client, Client
 
 class StudentServices:
 

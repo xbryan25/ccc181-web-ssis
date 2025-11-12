@@ -11,6 +11,7 @@ dataclasses = "*"
 psycopg = "*"
 uuid = "*"
 flask-jwt-extended = "*"
+supabase = "*"
 
 [dev-packages]
 

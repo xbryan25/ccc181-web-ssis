@@ -6,6 +6,7 @@ export interface Student {
   lastName: string;
   yearLevel: YearLevel;
   gender: Gender;
+  avatarUrl: string;
   programCode: string;
 };
 
