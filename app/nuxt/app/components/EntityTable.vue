@@ -27,6 +27,8 @@ const isOpenEditDialog = ref(false);
 const isOpenConfirmDeleteDialog = ref(false);
 const selectedEntity = ref('');
 
+const showImageModal = ref(false);
+
 const internalSearchValue = ref(props.searchValue);
 const internalSearchBy = ref(props.searchBy);
 const internalSearchType = ref(props.searchType);
@@ -74,8 +76,13 @@ const entitiesData = ref<Student[] | Program[] | College[]>([]);
 
 const UButton = resolveComponent('UButton') as DefineComponent;
 const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
+const UAvatar = resolveComponent('UAvatar') as DefineComponent;
 
 const tableButtons = { UButton, UDropdownMenu };
+
+const showAvatar = () => {
+  showImageModal.value = true;
+};
 
 const studentTableColumns = getStudentsTableColumns(
   {
@@ -83,6 +90,8 @@ const studentTableColumns = getStudentsTableColumns(
     openConfirmDeleteDialog: (row: Student) => openConfirmDeleteDialog(row),
   },
   tableButtons,
+  UAvatar,
+  showAvatar,
 );
 
 const programsTableColumns = getProgramsTableColumns(
@@ -432,4 +441,10 @@ onBeforeUnmount(() => {
       :total="totalEntityCount"
     />
   </div>
+
+  <UModal v-model:open="showImageModal">
+    <template #content>
+      <img src="https://github.com/benjamincanac.png" alt="Avatar" class="max-w-full h-auto" />
+    </template>
+  </UModal>
 </template>
