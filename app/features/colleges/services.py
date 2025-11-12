@@ -4,6 +4,8 @@ from app.features.common.dataclasses import College
 
 from app.exceptions.custom_exceptions import EntityNotFoundError
 
+from typing import Any
+
 class CollegeServices:
 
     @staticmethod
@@ -18,7 +20,7 @@ class CollegeServices:
             College: A College dataclass instance if a college has the given college_code, otherwise None.
         """
 
-        row = CollegeRepository.get_college_by_college_code(college_code)
+        row: dict[str, Any] | None = CollegeRepository.get_college_by_college_code(college_code)
 
         if not row:
             raise EntityNotFoundError(f"College with the college_code '{college_code}' does not exist.")
@@ -41,7 +43,9 @@ class CollegeServices:
             int: The total college count, with search filters being optionally applied.
         """
 
-        return CollegeRepository.get_total_college_count(params)["count"]
+        # return CollegeRepository.get_total_college_count(params)["count"]
+
+        return 0
 
     @staticmethod
     def get_many_colleges_service(params) -> list[College]:

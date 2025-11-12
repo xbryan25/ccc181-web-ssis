@@ -139,9 +139,9 @@ class StudentController:
 
         try:
             params = {
-            "rows_per_page": int(request.args.get("rowsPerPage")),
-            "page_number": int(request.args.get("pageNumber")),
-            "search_value": request.args.get("searchValue").strip(),
+            "rows_per_page": int(request.args.get("rowsPerPage", 10)),
+            "page_number": int(request.args.get("pageNumber", 1)),
+            "search_value": (request.args.get("searchValue") or "").strip(),
             "search_by": request.args.get("searchBy"),
             "search_type": request.args.get("searchType"),
             "sort_field": request.args.get("sortField"),
@@ -187,7 +187,9 @@ class StudentController:
     def create_student_controller() -> tuple[Response, int]:
         """Create a new student record."""
 
-        entity_details = request.json
+        entity_details = request.json or {}
+
+        new_student_data = {}
 
         try:
             new_student_data = {
@@ -283,7 +285,9 @@ class StudentController:
     def edit_student_details_controller(id_number: str) -> tuple[Response, int]:
         """Edit the details of an existing student."""
 
-        entity_details = request.json
+        entity_details = request.json or {}
+
+        new_student_data = {}
 
         try:
             new_student_data = {
@@ -339,20 +343,6 @@ class StudentController:
             else:
                 return jsonify({"error": "Something went wrong."}), 500
             
-        except UniqueViolation as e:
-            traceback.print_exc()
-
-            constraint_name = e.diag.constraint_name
-
-            if constraint_name == 'students_pkey':
-                return jsonify({"error": "ID number already exists."}), 500
-            
-            elif constraint_name == 'unique_full_name':
-                return jsonify({"error": "Name combination already exists."}), 500
-            
-            else:
-                return jsonify({"error": "Something went wrong."}), 500
-            
         except EntityNotFoundError as e:
             traceback.print_exc()
             return jsonify({"error": str(e)}), 500
@@ -379,8 +369,8 @@ class StudentController:
 
         try:
             params = {
-                "program_code": request.args.get("programCode"),
-                "college_code": request.args.get("collegeCode"),
+                "program_code": request.args.get("programCode") or "",
+                "college_code": request.args.get("collegeCode") or "",
             }
 
             validate_program_code(params["program_code"], can_be_none=True)
@@ -424,8 +414,8 @@ class StudentController:
 
         try:
             params = {
-                "program_code": request.args.get("programCode"),
-                "college_code": request.args.get("collegeCode"),
+                "program_code": request.args.get("programCode") or "",
+                "college_code": request.args.get("collegeCode") or "",
             }
 
             validate_program_code(params["program_code"], can_be_none=True)

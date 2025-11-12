@@ -85,9 +85,9 @@ class CollegeController:
 
         try:
             params = {
-                "rows_per_page": int(request.args.get("rowsPerPage")),
-                "page_number": int(request.args.get("pageNumber")),
-                "search_value": request.args.get("searchValue").strip(),
+                "rows_per_page": int(request.args.get("rowsPerPage", 10)),
+                "page_number": int(request.args.get("pageNumber", 1)),
+                "search_value": (request.args.get("searchValue") or "").strip(),
                 "search_by": request.args.get("searchBy"),
                 "search_type": request.args.get("searchType"),
                 "sort_field": request.args.get("sortField"),
@@ -133,12 +133,12 @@ class CollegeController:
     def create_college_controller() -> tuple[Response, int]:
         """Create a new college record."""
 
-        entity_details = request.json
+        entity_details = request.json or {}
 
         try:
             new_college_data = {
-            'college_code': entity_details['entityDetails']['collegeCode'],
-            'college_name': entity_details['entityDetails']['collegeName']
+                'college_code': entity_details['entityDetails']['collegeCode'],
+                'college_name': entity_details['entityDetails']['collegeName']
             }
 
             validate_college_code(new_college_data['college_code'])
@@ -209,7 +209,7 @@ class CollegeController:
     def edit_college_details_controller(college_code: str) -> tuple[Response, int]:
         """Edit the details of an existing college."""
 
-        entity_details = request.json
+        entity_details = request.json or {}
 
         try:
             new_college_data = {
