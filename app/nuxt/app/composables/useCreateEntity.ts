@@ -5,9 +5,9 @@ type CreateEntityResponse = {
 }
 
 export function useCreateEntity(entityType: string, entityDetails: Student | Program | College){
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { $apiFetch } = useNuxtApp();
 
-  return $fetch<CreateEntityResponse>(`${apiUrl}/api/${entityType}/`, {
+  return $apiFetch<CreateEntityResponse>(`/api/${entityType}/`, {
     method: 'POST',
     credentials: 'include',
     body: {

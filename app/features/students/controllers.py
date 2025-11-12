@@ -74,7 +74,7 @@ class StudentController:
 
             # Apply filter_by logic
 
-            if filter_by:
+            if filter_by and filter_by != '{}':
                 try:
                     dict_filter_by = json.loads(filter_by)
                 except json.JSONDecodeError:

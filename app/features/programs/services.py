@@ -145,9 +145,9 @@ class ProgramServices:
                 
                 grouped_program_codes[program_code_details['college_code']]['programCodes'].sort()
 
-        none_college_code = grouped_program_codes.pop(None)
+        if None in grouped_program_codes:
+            none_college_code = grouped_program_codes.pop(None)
 
-        if none_college_code:
             # Rename None to "N/A"
 
             grouped_program_codes.update({"N/A": none_college_code})

@@ -10,9 +10,10 @@ export function useEntityDetails<T extends keyof EntityTypeMap>(
   entityType: T,
   entityId: string
 ): Promise<EntityTypeMap[T]> {
-  const apiUrl = import.meta.env.VITE_API_URL
 
-  return $fetch<EntityTypeMap[T]>(`${apiUrl}/api/${entityType}/${entityId}`, {
+  const { $apiFetch } = useNuxtApp();
+
+  return $apiFetch<EntityTypeMap[T]>(`/api/${entityType}/${entityId}`, {
     method: 'GET',
     credentials: 'include',
   })

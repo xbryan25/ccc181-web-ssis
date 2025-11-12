@@ -4,9 +4,9 @@ type DeleteEntityResponse = {
 }
 
 export function useDeleteEntity(entityType: string, entityId: string){
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { $apiFetch } = useNuxtApp();
 
-  return $fetch<DeleteEntityResponse>(`${apiUrl}/api/${entityType}/${entityId}`, {
+  return $apiFetch<DeleteEntityResponse>(`/api/${entityType}/${entityId}`, {
     method: 'DELETE',
     credentials: 'include',
   });

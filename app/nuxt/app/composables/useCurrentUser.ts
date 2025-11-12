@@ -3,21 +3,11 @@ type CurrentUserResponse = {
     username: string
 }
 
-export function useCurrentUser(loadType: string, cookie?) {
-  const apiUrl = import.meta.env.VITE_API_URL;
+export function useCurrentUser() {
+  	const { $apiFetch } = useNuxtApp();
 
-  // If loadType === 'server', it is run during SSR
-  // else, run during client
-
-  if (loadType == 'client'){
-		return $fetch<CurrentUserResponse>(`${apiUrl}/api/user/me`, {
-			method: 'GET',
-			credentials: 'include',
-		});
-	} else{
-		return $fetch<CurrentUserResponse>(`${apiUrl}/api/user/me`, {
-			method: 'GET',
-			headers: { cookie },
-		})
-	}
+  	return $apiFetch<CurrentUserResponse>(`/api/user/me`, {
+		method: 'GET',
+		credentials: 'include',
+	});
 }
