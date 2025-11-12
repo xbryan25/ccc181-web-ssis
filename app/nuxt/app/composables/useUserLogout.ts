@@ -5,9 +5,9 @@ type UserLogoutResponse = {
 }
 
 export function useUserLogout(){
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { $apiFetch } = useNuxtApp();
 
-  return $fetch<UserLogoutResponse>(`${apiUrl}/api/user/logout`, {
+  return $apiFetch<UserLogoutResponse>(`/api/user/logout`, {
     method: 'POST',
     credentials: 'include',
   });

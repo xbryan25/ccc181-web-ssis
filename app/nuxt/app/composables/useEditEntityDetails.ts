@@ -5,11 +5,10 @@ type EditEntityResponse = {
 }
 
 export function useEditEntityDetails(entityType: string, entityDetails: Student | Program | College, selectedEntity: string){
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { $apiFetch } = useNuxtApp();
 
-
-  return $fetch<EditEntityResponse>(`${apiUrl}/api/${entityType}/${selectedEntity}`, {
-    method: 'PUT',
+  return $apiFetch<EditEntityResponse>(`/api/${entityType}/${selectedEntity}`, {
+    method: 'PATCH',
     credentials: 'include',
     body: {
       entityDetails

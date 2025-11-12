@@ -10,7 +10,6 @@ definePageMeta({
     // Ensure id is a string
     if (typeof entity !== 'string') return false;
 
-    console.log(entity);
     return ['students', 'programs', 'colleges'].includes(entity);
   },
   middleware: auth,
@@ -84,7 +83,6 @@ const onProceed = (localState: {
       @update:sort-order="
         (value: string) => {
           searchAndSortState.sortOrder = value;
-          console.log(`after mount: ${value}`);
         }
       "
       @disable-create-entity-submit="() => (createEntitySubmitRef = false)"

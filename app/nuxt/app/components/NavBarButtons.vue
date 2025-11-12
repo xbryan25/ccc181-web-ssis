@@ -10,21 +10,18 @@ const props = defineProps<{
 
 const route: RouteLocationNormalizedGeneric = useRoute();
 
-console.log(props.url);
-
 const isActive = () => {
   if (props.url.endsWith(route.path)) {
-    console.log(true);
     return true;
   } else {
     return false;
   }
 };
 
-watch(
-  () => props.isCollapsed,
-  (newVal) => console.log(newVal),
-);
+// watch(
+//   () => props.isCollapsed,
+//   (newVal) => console.log(newVal),
+// );
 </script>
 
 <template>

@@ -23,7 +23,7 @@ class CollegeRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
 
     @staticmethod
-    def get_total_college_count(params) -> dict[str, str]:
+    def get_total_college_count(params) -> dict[str, int]:
         """
         Retrieve the total number of colleges based on a specific filter.
 

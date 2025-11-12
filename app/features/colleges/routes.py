@@ -169,7 +169,7 @@ def delete_college(college_code: str) -> tuple[Response, int]:
 
     return CollegeController.delete_college_controller(college_code)
 
-@college_bp.route("/<string:college_code>", methods=["PUT"])
+@college_bp.route("/<string:college_code>", methods=["PATCH"])
 @jwt_required()
 def edit_college_details(college_code: str) -> tuple[Response, int]:
     """

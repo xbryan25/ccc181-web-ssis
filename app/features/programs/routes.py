@@ -175,7 +175,7 @@ def delete_program(program_code: str) -> tuple[Response, int]:
 
     return ProgramController.delete_program_controller(program_code)
 
-@program_bp.route("/<string:program_code>", methods=["PUT"])
+@program_bp.route("/<string:program_code>", methods=["PATCH"])
 @jwt_required()
 def edit_program_details(program_code: str) -> tuple[Response, int]:
     """
