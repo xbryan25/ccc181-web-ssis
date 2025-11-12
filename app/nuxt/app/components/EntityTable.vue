@@ -84,7 +84,7 @@ const tableButtons = { UButton, UDropdownMenu };
 const showAvatar = (avatarUrl: string) => {
   showImageModal.value = true;
 
-  currentAvatarUrlToDisplay.value = avatarUrl;
+  currentAvatarUrlToDisplay.value = avatarUrl ? avatarUrl : 'images/noAvatar.jpg';
 };
 
 const studentTableColumns = getStudentsTableColumns(
@@ -445,12 +445,12 @@ onBeforeUnmount(() => {
     />
   </div>
 
-  <UModal v-model:open="showImageModal">
+  <UModal v-model:open="showImageModal" :ui="{ content: 'max-w-100' }">
     <template #content>
       <NuxtImg
         :src="currentAvatarUrlToDisplay"
         alt="Avatar"
-        class="max-w-full max-h-200 object-contain"
+        class="max-w-100 max-h-100 object-contain"
       />
     </template>
   </UModal>
