@@ -4,6 +4,8 @@ import type { Gender, Student, StudentFormState, UseProgramCodesResponse } from 
 import { validateForm, capitalizeFirstWord, formatProgramCodesForSelectMenu } from '#imports';
 import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
 
+type BasicSelectMenuItem = string | { label?: string; type?: 'label' | 'separator' };
+
 const props = defineProps<{
   dialogType: string;
   selectedEntity?: string;
@@ -23,6 +25,8 @@ const state = reactive<StudentFormState>({
     label: '',
   },
 });
+
+const searchValue: Ref<string> = ref<string>('');
 
 const emit = defineEmits<{
   (e: 'onSubmit', newEntity: Student): void;
@@ -63,6 +67,7 @@ const genderOptions = ref([
 ]);
 
 const programCodeOptions = ref<SelectMenuItem[]>([]);
+let programCodesDetailsData: UseProgramCodesResponse[];
 
 let hasCalled = false;
 
@@ -78,9 +83,7 @@ onMounted(async () => {
     state.programCode.label = entityData.programCode ? entityData.programCode : '';
   }
 
-  const programCodesDetailsData: UseProgramCodesResponse[] = (await useEntityIds(
-    'programs',
-  )) as UseProgramCodesResponse[];
+  programCodesDetailsData = (await useEntityIds('programs')) as UseProgramCodesResponse[];
 
   programCodeOptions.value = formatProgramCodesForSelectMenu(programCodesDetailsData);
 
@@ -101,6 +104,48 @@ const transformStudentState = (event: FormSubmitEvent<StudentFormState>) => {
     programCode: event.data.programCode.label,
   });
 };
+
+const getTextFromSelectMenuItem = (item: BasicSelectMenuItem): string => {
+  if (typeof item === 'string') return item;
+  if (item.type === 'label' || !item.type) return item.label ?? '';
+  return '';
+};
+
+const filteredItems = computed(() => {
+  if (!searchValue.value.trim()) return programCodeOptions.value;
+
+  const lower = searchValue.value.toLowerCase();
+  const result: BasicSelectMenuItem[] = [];
+  let currentGroupHasMatch = false;
+  let currentGroupLabel: BasicSelectMenuItem | null = null;
+
+  for (const item of programCodeOptions.value as BasicSelectMenuItem[]) {
+    if (typeof item === 'object' && item?.type === 'label') {
+      currentGroupLabel = item;
+      currentGroupHasMatch = false;
+      continue;
+    }
+
+    if (typeof item === 'object' && item?.type === 'separator') {
+      if (currentGroupHasMatch) result.push(item);
+      currentGroupHasMatch = false;
+      continue;
+    }
+
+    const text = getTextFromSelectMenuItem(item);
+
+    if (text.toLowerCase().includes(lower)) {
+      if (currentGroupLabel && !result.includes(currentGroupLabel)) {
+        result.push(currentGroupLabel);
+      }
+      result.push(item);
+      currentGroupHasMatch = true;
+    }
+  }
+
+  result.pop();
+  return result;
+});
 </script>
 
 <template>
@@ -139,7 +184,9 @@ const transformStudentState = (event: FormSubmitEvent<StudentFormState>) => {
       <UFormField label="Program Code" name="programCode" class="flex-1">
         <USelectMenu
           v-model="state.programCode"
-          :items="programCodeOptions"
+          v-model:search-term="searchValue"
+          :items="filteredItems"
+          ignore-filter
           class="w-full"
           :ui="{
             trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
