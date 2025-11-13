@@ -182,9 +182,9 @@ class ProgramController:
 
         try:
             new_program_data = {
-                'program_code': entity_details['entityDetails']['programCode'],
-                'program_name': entity_details['entityDetails']['programName'],
-                'college_code': entity_details['entityDetails']['collegeCode']
+                'program_code': entity_details['programCode'],
+                'program_name': entity_details['programName'],
+                'college_code': entity_details['collegeCode']['label']
             }
 
             validate_program_code(new_program_data['program_code'])

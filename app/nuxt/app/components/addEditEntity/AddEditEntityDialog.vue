@@ -45,9 +45,6 @@ async function onSubmit(newEntity: StudentFormState | ProgramFormState | College
     let data: { message: string } = { message: '' };
 
     if (props.dialogType === 'add') {
-      console.log(props.entityType);
-      console.log(isStudentFormState(newEntity));
-
       if (props.entityType === 'students' && isStudentFormState(newEntity)) {
         const studentFormData = new FormData();
         studentFormData.append('idNumber', newEntity.idNumber);
