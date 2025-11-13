@@ -194,7 +194,7 @@ def delete_student(id_number: str) -> tuple[Response, int]:
 
     return StudentController.delete_student_controller(id_number)
 
-@student_bp.route("/<string:id_number>", methods=["PUT"])
+@student_bp.route("/<string:id_number>", methods=["PATCH"])
 @jwt_required()
 def edit_student_details(id_number: str) -> tuple[Response, int]:
     """

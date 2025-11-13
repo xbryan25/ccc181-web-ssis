@@ -27,6 +27,9 @@ const isOpenEditDialog = ref(false);
 const isOpenConfirmDeleteDialog = ref(false);
 const selectedEntity = ref('');
 
+const showImageModal = ref(false);
+const currentAvatarUrlToDisplay = ref('');
+
 const internalSearchValue = ref(props.searchValue);
 const internalSearchBy = ref(props.searchBy);
 const internalSearchType = ref(props.searchType);
@@ -74,8 +77,15 @@ const entitiesData = ref<Student[] | Program[] | College[]>([]);
 
 const UButton = resolveComponent('UButton') as DefineComponent;
 const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
+const UAvatar = resolveComponent('UAvatar') as DefineComponent;
 
 const tableButtons = { UButton, UDropdownMenu };
+
+const showAvatar = (avatarUrl: string) => {
+  showImageModal.value = true;
+
+  currentAvatarUrlToDisplay.value = avatarUrl ? avatarUrl : 'images/noAvatar.jpg';
+};
 
 const studentTableColumns = getStudentsTableColumns(
   {
@@ -83,6 +93,8 @@ const studentTableColumns = getStudentsTableColumns(
     openConfirmDeleteDialog: (row: Student) => openConfirmDeleteDialog(row),
   },
   tableButtons,
+  UAvatar,
+  showAvatar,
 );
 
 const programsTableColumns = getProgramsTableColumns(
@@ -156,8 +168,10 @@ const updatePagination = () => {
 };
 
 const calculateRows = () => {
-  const row = document.querySelector('table tbody tr');
-  const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
+  // const row = document.querySelector('table tbody tr');
+  // const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
+
+  const rowHeight = props.entityType === 'students' ? 81 : 64;
 
   const availableHeight = window.innerHeight - reservedHeight;
 
@@ -432,4 +446,14 @@ onBeforeUnmount(() => {
       :total="totalEntityCount"
     />
   </div>
+
+  <UModal v-model:open="showImageModal" :ui="{ content: 'max-w-100' }">
+    <template #content>
+      <NuxtImg
+        :src="currentAvatarUrlToDisplay"
+        alt="Avatar"
+        class="max-w-100 max-h-100 object-contain"
+      />
+    </template>
+  </UModal>
 </template>

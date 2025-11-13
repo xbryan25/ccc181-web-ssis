@@ -145,11 +145,15 @@ class ProgramServices:
                 
                 grouped_program_codes[program_code_details['college_code']]['programCodes'].sort()
 
+        if None in grouped_program_codes:
+            none_college_code = grouped_program_codes.pop(None)
 
-        # Rename None to "N/A"
-        grouped_program_codes["N/A"] = grouped_program_codes.pop(None)
-        grouped_program_codes["N/A"]['collegeCode'] = "N/A"
+            # Rename None to "N/A"
 
+            grouped_program_codes.update({"N/A": none_college_code})
+            grouped_program_codes["N/A"]['collegeCode'] = "N/A"
+
+        
         # Return list of values of the dict
         return list(grouped_program_codes.values())
     

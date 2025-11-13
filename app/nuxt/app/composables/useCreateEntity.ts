@@ -1,17 +1,16 @@
-import type { Student, Program, College } from "~/types";
+
+import type { ProgramFormState, CollegeFormState } from "~/types";
 
 type CreateEntityResponse = {
     message: string
 }
 
-export function useCreateEntity(entityType: string, entityDetails: Student | Program | College){
-  const apiUrl = import.meta.env.VITE_API_URL;
+export function useCreateEntity(entityType: string, options: { entityDetails?: ProgramFormState | CollegeFormState; studentFormData?: FormData }){
+  const { $apiFetch } = useNuxtApp();
 
-  return $fetch<CreateEntityResponse>(`${apiUrl}/api/${entityType}/`, {
+  return $apiFetch<CreateEntityResponse>(`/api/${entityType}/`, {
     method: 'POST',
     credentials: 'include',
-    body: {
-      entityDetails
-    },
+    body: options.entityDetails ?? options.studentFormData 
   });
 };

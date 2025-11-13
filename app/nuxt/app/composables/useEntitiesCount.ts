@@ -11,9 +11,9 @@ export function useEntitiesCount(entityType: string,
                                     filterBy?: Record<string, string | number>
                                 }){
 
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { $apiFetch } = useNuxtApp();
 
-  return $fetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}/total-count`, {
+  return $apiFetch<UseEntitiesResponse>(`/api/${entityType}/total-count`, {
     method: 'GET',
     credentials: 'include',
     query: {

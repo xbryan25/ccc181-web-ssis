@@ -29,7 +29,8 @@ export default defineNuxtConfig({
     '@nuxt/devtools',
     '@nuxt/icon',
     '@nuxt/eslint',
-    '@nuxt/ui'
+    '@nuxt/ui',
+    '@nuxt/image'
   ],
   devServer: {
     host: '127.0.0.1',

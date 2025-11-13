@@ -74,7 +74,7 @@ class StudentController:
 
             # Apply filter_by logic
 
-            if filter_by:
+            if filter_by and filter_by != '{}':
                 try:
                     dict_filter_by = json.loads(filter_by)
                 except json.JSONDecodeError:
@@ -139,9 +139,9 @@ class StudentController:
 
         try:
             params = {
-            "rows_per_page": int(request.args.get("rowsPerPage")),
-            "page_number": int(request.args.get("pageNumber")),
-            "search_value": request.args.get("searchValue").strip(),
+            "rows_per_page": int(request.args.get("rowsPerPage", 10)),
+            "page_number": int(request.args.get("pageNumber", 1)),
+            "search_value": (request.args.get("searchValue") or "").strip(),
             "search_by": request.args.get("searchBy"),
             "search_type": request.args.get("searchType"),
             "sort_field": request.args.get("sortField"),
@@ -185,19 +185,21 @@ class StudentController:
 
     @staticmethod
     def create_student_controller() -> tuple[Response, int]:
-        """Create a new student record."""
+        """Create a new student record. If avatar is provided, upload to Supabase bucket."""
 
-        entity_details = request.json
+        new_student_data = {}
 
         try:
             new_student_data = {
-            'id_number': entity_details['entityDetails']['idNumber'],
-            'first_name': entity_details['entityDetails']['firstName'],
-            'last_name': entity_details['entityDetails']['lastName'],
-            'year_level': entity_details['entityDetails']['yearLevel'],
-            'gender': entity_details['entityDetails']['gender'],
-            'program_code': entity_details['entityDetails']['programCode']
+                "id_number": request.form.get("idNumber", "-"),
+                "first_name": request.form.get("firstName", "-"),
+                "last_name": request.form.get("lastName", "-"),
+                "year_level": request.form.get("yearLevel", "-"),
+                "gender": request.form.get("gender", "-"),
+                "program_code": request.form.get("programCode", "-")
             }
+
+            student_avatar = request.files.get('avatar')
             
             validate_id_number(new_student_data['id_number'])
 
@@ -218,7 +220,7 @@ class StudentController:
             new_student_data['gender'] = new_student_data['gender'].strip().lower()
             new_student_data['program_code'] = new_student_data['program_code'].strip().upper()
 
-            StudentServices.create_student_service(new_student_data)
+            StudentServices.create_student_service(new_student_data, student_avatar)
 
             return jsonify({"message": "Student added successfully."}), 200
 
@@ -283,17 +285,20 @@ class StudentController:
     def edit_student_details_controller(id_number: str) -> tuple[Response, int]:
         """Edit the details of an existing student."""
 
-        entity_details = request.json
+        new_student_data = {}
 
         try:
             new_student_data = {
-            'id_number': entity_details['entityDetails']['idNumber'],
-            'first_name': entity_details['entityDetails']['firstName'],
-            'last_name': entity_details['entityDetails']['lastName'],
-            'year_level': entity_details['entityDetails']['yearLevel'],
-            'gender': entity_details['entityDetails']['gender'],
-            'program_code': entity_details['entityDetails']['programCode']
+                "existing_avatar_url": request.form.get("existingAvatarUrl"),
+                "id_number": request.form.get("idNumber", "-"),
+                "first_name": request.form.get("firstName", "-"),
+                "last_name": request.form.get("lastName", "-"),
+                "year_level": request.form.get("yearLevel", "-"),
+                "gender": request.form.get("gender", "-"),
+                "program_code": request.form.get("programCode", "-")
             }
+
+            new_student_avatar = request.files.get('avatar')
 
             validate_id_number(id_number)
 
@@ -321,24 +326,10 @@ class StudentController:
             new_student_data['gender'] = new_student_data['gender'].strip().lower()
             new_student_data['program_code'] = new_student_data['program_code'].strip().upper()
 
-            StudentServices.edit_student_details_service(id_number, new_student_data)
+            StudentServices.edit_student_details_service(id_number, new_student_data, new_student_avatar)
 
             return jsonify({"message": "Student edited successfully."}), 200
         
-        except UniqueViolation as e:
-            traceback.print_exc()
-
-            constraint_name = e.diag.constraint_name
-
-            if constraint_name == 'students_pkey':
-                return jsonify({"error": "ID number already exists."}), 500
-            
-            elif constraint_name == 'unique_full_name':
-                return jsonify({"error": "Name combination already exists."}), 500
-            
-            else:
-                return jsonify({"error": "Something went wrong."}), 500
-            
         except UniqueViolation as e:
             traceback.print_exc()
 
@@ -379,8 +370,8 @@ class StudentController:
 
         try:
             params = {
-                "program_code": request.args.get("programCode"),
-                "college_code": request.args.get("collegeCode"),
+                "program_code": request.args.get("programCode") or "",
+                "college_code": request.args.get("collegeCode") or "",
             }
 
             validate_program_code(params["program_code"], can_be_none=True)
@@ -424,8 +415,8 @@ class StudentController:
 
         try:
             params = {
-                "program_code": request.args.get("programCode"),
-                "college_code": request.args.get("collegeCode"),
+                "program_code": request.args.get("programCode") or "",
+                "college_code": request.args.get("collegeCode") or "",
             }
 
             validate_program_code(params["program_code"], can_be_none=True)

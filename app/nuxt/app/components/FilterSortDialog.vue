@@ -50,7 +50,6 @@ const getTextForTooltip = (): string => {
 watch(
   () => props.searchAndSortState,
   (newVal) => {
-    console.log(newVal);
     Object.assign(localState, newVal);
   },
   { deep: true, immediate: true },

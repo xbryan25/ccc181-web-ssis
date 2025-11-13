@@ -1,7 +1,7 @@
 import os
 
 # Result will be in minutes
-def get_cookie_max_age(default: str = 5) -> int:
+def get_cookie_max_age(default: int = 5) -> int:
     value = os.getenv("COOKIE_MAX_AGE", default)
 
     try:
@@ -11,7 +11,7 @@ def get_cookie_max_age(default: str = 5) -> int:
         return int(default) * 60
     
 # Result will be in days
-def get_refresh_cookie_max_age(default: str = 1) -> int:
+def get_refresh_cookie_max_age(default: int = 1) -> int:
     value = os.getenv("REFRESH_COOKIE_MAX_AGE", default)
 
     try:

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Program, ProgramFormState, UseCollegeCodesResponse } from '~/types';
+import type { ProgramFormState, UseCollegeCodesResponse } from '~/types';
 
 import { validateForm, formatCollegeCodesForSelectMenu } from '#imports';
 import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
@@ -18,7 +18,7 @@ const state = reactive<ProgramFormState>({
 });
 
 const emit = defineEmits<{
-  (e: 'onSubmit', newEntity: Program): void;
+  (e: 'onSubmit', newEntity: ProgramFormState): void;
   (e: 'onClose' | 'onSubmitError'): void;
 }>();
 
@@ -52,7 +52,7 @@ const transformProgramState = (event: FormSubmitEvent<ProgramFormState>) => {
   emit('onSubmit', {
     programCode: event.data.programCode,
     programName: event.data.programName,
-    collegeCode: event.data.collegeCode.label,
+    collegeCode: event.data.collegeCode,
   });
 };
 </script>

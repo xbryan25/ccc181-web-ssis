@@ -128,9 +128,9 @@ class ProgramController:
         try:
             
             params = {
-                "rows_per_page": int(request.args.get("rowsPerPage")),
-                "page_number": int(request.args.get("pageNumber")),
-                "search_value": request.args.get("searchValue").strip(),
+                "rows_per_page": int(request.args.get("rowsPerPage", 10)),
+                "page_number": int(request.args.get("pageNumber", 1)),
+                "search_value": ((request.args.get("searchValue")) or "").strip(),
                 "search_by": request.args.get("searchBy"),
                 "search_type": request.args.get("searchType"),
                 "sort_field": request.args.get("sortField"),
@@ -176,13 +176,15 @@ class ProgramController:
     def create_program_controller() -> tuple[Response, int]:
         """Create a new program record."""
         
-        entity_details = request.json
+        entity_details = request.json or {}
+
+        new_program_data = {}
 
         try:
             new_program_data = {
-            'program_code': entity_details['entityDetails']['programCode'],
-            'program_name': entity_details['entityDetails']['programName'],
-            'college_code': entity_details['entityDetails']['collegeCode']
+                'program_code': entity_details['programCode'],
+                'program_name': entity_details['programName'],
+                'college_code': entity_details['collegeCode']['label']
             }
 
             validate_program_code(new_program_data['program_code'])
@@ -260,7 +262,9 @@ class ProgramController:
     def edit_program_details_controller(program_code: str) -> tuple[Response, int]:
         """Edit the details of an existing program."""
 
-        entity_details = request.json
+        entity_details = request.json or {}
+
+        new_program_data = {}
 
         try:
             new_program_data = {

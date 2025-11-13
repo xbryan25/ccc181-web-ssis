@@ -55,6 +55,24 @@ def create_app() -> Flask:
     def nuxt_static(filename):
         return send_from_directory(NUXT_ASSETS_DIR, filename)
     
+    @app.route("/images/<path:filename>")
+    def nuxt_images(filename):
+        return send_from_directory(os.path.join(NUXT_DIST_DIR, "images"), filename)
+
+    @app.route("/_ipx/<path:path>")
+    def ipx_passthrough(path):
+        """
+        Redirects Nuxt Image IPX optimization URLs (e.g., /_ipx/s_96x96/images/noAvatar.jpg)
+        to serve actual static images.
+        """
+        # Example path: "_/images/noAvatar.jpg" → we need everything after "images/"
+        parts = path.split("/images/", 1)
+        if len(parts) == 2:
+            filename = parts[1]
+            return send_from_directory(os.path.join(NUXT_DIST_DIR, "images"), filename)
+
+        return jsonify({"error": "Invalid IPX path"}), 404
+    
     @app.route('/favicon.svg')
     def favicon_svg():
         return send_from_directory(NUXT_DIST_DIR, 'favicon.svg')

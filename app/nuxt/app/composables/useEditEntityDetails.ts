@@ -1,18 +1,15 @@
-import type { Student, Program, College } from "~/types";
+import type { ProgramFormState, CollegeFormState } from "~/types";
 
 type EditEntityResponse = {
     message: string
 }
 
-export function useEditEntityDetails(entityType: string, entityDetails: Student | Program | College, selectedEntity: string){
-  const apiUrl = import.meta.env.VITE_API_URL;
+export function useEditEntityDetails(entityType: string, options: { entityDetails?: ProgramFormState | CollegeFormState; studentFormData?: FormData }, selectedEntity: string){
+  const { $apiFetch } = useNuxtApp();
 
-
-  return $fetch<EditEntityResponse>(`${apiUrl}/api/${entityType}/${selectedEntity}`, {
-    method: 'PUT',
+ return $apiFetch<EditEntityResponse>(`/api/${entityType}/${selectedEntity}`, {
+    method: 'PATCH',
     credentials: 'include',
-    body: {
-      entityDetails
-    },
+    body: options.entityDetails ?? options.studentFormData 
   });
 };

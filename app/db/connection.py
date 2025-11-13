@@ -1,7 +1,7 @@
 from flask import current_app
 
 import psycopg
-from psycopg.rows import dict_row
+from psycopg.rows import dict_row, TupleRow, DictRow
 
 from typing import Any
 
@@ -23,8 +23,8 @@ class Database:
             user=current_app.config["DB_USER"],
             password=current_app.config["DB_PASS"],
             host=current_app.config["DB_HOST"],
-            row_factory=dict_row
-        )
+            row_factory=dict_row # type: ignore[arg-type]
+        ) 
 
     def execute_query(self, query, params=None) -> None:
         """For INSERT, UPDATE, DELETE queries."""
@@ -36,7 +36,7 @@ class Database:
             self.conn.rollback()
             raise e
 
-    def fetch_all(self, query, params=None) -> list[dict[str, Any]]:
+    def fetch_all(self, query, params=None) -> list[TupleRow]:
         """For SELECT queries returning multiple rows."""
         try:
             with self.conn.cursor() as cur:
@@ -45,7 +45,7 @@ class Database:
         except Exception as e:
             raise e
 
-    def fetch_one(self, query, params=None) -> dict[str, Any]:
+    def fetch_one(self, query, params=None) -> TupleRow | None:
         """For SELECT queries returning a single row."""
         try:
             with self.conn.cursor() as cur:

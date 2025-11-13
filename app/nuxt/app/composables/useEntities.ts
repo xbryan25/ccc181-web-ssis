@@ -15,9 +15,9 @@ export function useEntities(entityType: string,
                                 sortOrder?: string
                             }){
 
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { $apiFetch } = useNuxtApp();
 
-  return $fetch<UseEntitiesResponse>(`${apiUrl}/api/${entityType}/`, {
+  return $apiFetch<UseEntitiesResponse>(`/api/${entityType}/`, {
     method: 'GET',
     credentials: 'include',
     query: {

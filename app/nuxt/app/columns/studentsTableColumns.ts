@@ -3,15 +3,27 @@ import type { DefineComponent } from "vue";
 import type { Student } from "~/types";
 import { getRowItems } from "#imports";
 
-
 export function getStudentsTableColumns(callbacks :{
   openEditDialog: (row: Student) => void;
   openConfirmDeleteDialog: (row: Student) => void;
- }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent }) { 
+ }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent}, UAvatar: DefineComponent, onAvatarClick: (avatarUrl: string) => void) { 
 
   const {UButton, UDropdownMenu} = components
 
   return [
+    {
+      id: "actions",
+
+      meta: {
+        class: {
+          th: "w-20",
+          td: "w-20 text-md",
+        },
+      },
+
+      cell: ({ row }: { row: Row<Student> }) => h(UAvatar, { src: row.original.avatarUrl || '/images/noAvatar.jpg', size: "3xl", ui: {image: "cursor-pointer"}, onClick: () => onAvatarClick(row.original.avatarUrl)})
+
+    },
     {
       accessorKey: "idNumber",
       header: "ID Number",

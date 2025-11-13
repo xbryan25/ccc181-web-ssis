@@ -9,9 +9,9 @@ type UseProgramCodesResponse = {
 
 export function useEntityIds(entityType: string){
 
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const { $apiFetch } = useNuxtApp();
 
-  return $fetch<UseCollegeCodesResponse[] | UseProgramCodesResponse[]>(`${apiUrl}/api/${entityType}/identifiers`, {
+  return $apiFetch<UseCollegeCodesResponse[] | UseProgramCodesResponse[]>(`/api/${entityType}/identifiers`, {
     method: 'GET',
     credentials: 'include',
   });
