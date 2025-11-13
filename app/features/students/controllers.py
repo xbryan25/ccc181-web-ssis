@@ -185,21 +185,21 @@ class StudentController:
 
     @staticmethod
     def create_student_controller() -> tuple[Response, int]:
-        """Create a new student record."""
-
-        entity_details = request.json or {}
+        """Create a new student record. If avatar is provided, upload to Supabase bucket."""
 
         new_student_data = {}
 
         try:
             new_student_data = {
-            'id_number': entity_details['entityDetails']['idNumber'],
-            'first_name': entity_details['entityDetails']['firstName'],
-            'last_name': entity_details['entityDetails']['lastName'],
-            'year_level': entity_details['entityDetails']['yearLevel'],
-            'gender': entity_details['entityDetails']['gender'],
-            'program_code': entity_details['entityDetails']['programCode']
+                "id_number": request.form.get("idNumber", "-"),
+                "first_name": request.form.get("firstName", "-"),
+                "last_name": request.form.get("lastName", "-"),
+                "year_level": request.form.get("yearLevel", "-"),
+                "gender": request.form.get("gender", "-"),
+                "program_code": request.form.get("programCode", "-")
             }
+
+            student_avatar = request.files.get('avatar')
             
             validate_id_number(new_student_data['id_number'])
 
@@ -220,7 +220,7 @@ class StudentController:
             new_student_data['gender'] = new_student_data['gender'].strip().lower()
             new_student_data['program_code'] = new_student_data['program_code'].strip().upper()
 
-            StudentServices.create_student_service(new_student_data)
+            StudentServices.create_student_service(new_student_data, student_avatar)
 
             return jsonify({"message": "Student added successfully."}), 200
 

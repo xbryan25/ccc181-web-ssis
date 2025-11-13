@@ -11,6 +11,8 @@ export interface Student {
 };
 
 export interface StudentFormState {
+  avatar: File | null
+  existingAvatarUrl: string
   idNumber: string;
   firstName: string;
   lastName: string;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { College, CollegeFormState } from '~/types';
+import type { CollegeFormState } from '~/types';
 
 import { validateForm } from '#imports';
 
@@ -14,7 +14,7 @@ const state = reactive<CollegeFormState>({
 });
 
 const emit = defineEmits<{
-  (e: 'onSubmit', newEntity: College): void;
+  (e: 'onSubmit', newEntity: CollegeFormState): void;
   (e: 'onClose' | 'onSubmitError'): void;
 }>();
 

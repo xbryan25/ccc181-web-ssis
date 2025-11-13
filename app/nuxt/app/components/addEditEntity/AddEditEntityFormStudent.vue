@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Gender, Student, StudentFormState, UseProgramCodesResponse } from '~/types';
+import type { Gender, StudentFormState, UseProgramCodesResponse } from '~/types';
 
 import { validateForm, capitalizeFirstWord, formatProgramCodesForSelectMenu } from '#imports';
 import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
@@ -12,6 +12,8 @@ const props = defineProps<{
 }>();
 
 const state = reactive<StudentFormState>({
+  avatar: null,
+  existingAvatarUrl: '',
   idNumber: '',
   firstName: '',
   lastName: '',
@@ -28,8 +30,12 @@ const state = reactive<StudentFormState>({
 
 const searchValue: Ref<string> = ref<string>('');
 
+const maxFileSize = 2 * 1024 * 1024; // 2MB
+
+const toast = useToast();
+
 const emit = defineEmits<{
-  (e: 'onSubmit', newEntity: Student): void;
+  (e: 'onSubmit', newEntity: StudentFormState): void;
   (e: 'onClose' | 'onSubmitError'): void;
 }>();
 
@@ -71,37 +77,16 @@ let programCodesDetailsData: UseProgramCodesResponse[];
 
 let hasCalled = false;
 
-onMounted(async () => {
-  if (props.dialogType === 'edit') {
-    const entityData = await useEntityDetails('students', props.selectedEntity as string);
-
-    state.idNumber = entityData.idNumber;
-    state.firstName = entityData.firstName;
-    state.lastName = entityData.lastName;
-    state.yearLevel.label = entityData.yearLevel;
-    state.gender.label = capitalizeFirstWord(entityData.gender) as Gender;
-    state.programCode.label = entityData.programCode ? entityData.programCode : '';
-  }
-
-  programCodesDetailsData = (await useEntityIds('programs')) as UseProgramCodesResponse[];
-
-  programCodeOptions.value = formatProgramCodesForSelectMenu(programCodesDetailsData);
-
-  if (state.programCode.label === '') {
-    state.programCode.label = programCodesDetailsData[0]?.programCodes[0] as string;
-  }
-
-  hasCalled = true;
-});
-
 const transformStudentState = (event: FormSubmitEvent<StudentFormState>) => {
   emit('onSubmit', {
+    avatar: event.data.avatar,
+    existingAvatarUrl: event.data.existingAvatarUrl,
     idNumber: event.data.idNumber,
     firstName: event.data.firstName,
     lastName: event.data.lastName,
-    yearLevel: event.data.yearLevel.label,
-    gender: event.data.gender.label,
-    programCode: event.data.programCode.label,
+    yearLevel: event.data.yearLevel,
+    gender: event.data.gender,
+    programCode: event.data.programCode,
   });
 };
 
@@ -146,6 +131,46 @@ const filteredItems = computed(() => {
   result.pop();
   return result;
 });
+
+watch(
+  () => state.avatar,
+  (newAvatar: File | null) => {
+    if (!newAvatar) return;
+
+    if (newAvatar.size > maxFileSize) {
+      state.avatar = null;
+
+      toast.add({
+        title: 'File Size Limit Exceeded',
+        description: `Image was skipped because it exceed the 2 MB size limit.`,
+        color: 'error',
+      });
+    }
+  },
+);
+
+onMounted(async () => {
+  if (props.dialogType === 'edit') {
+    const entityData = await useEntityDetails('students', props.selectedEntity as string);
+
+    state.idNumber = entityData.idNumber;
+    state.firstName = entityData.firstName;
+    state.lastName = entityData.lastName;
+    state.yearLevel.label = entityData.yearLevel;
+    state.gender.label = capitalizeFirstWord(entityData.gender) as Gender;
+    state.programCode.label = entityData.programCode ? entityData.programCode : '';
+  }
+
+  programCodesDetailsData = (await useEntityIds('programs')) as UseProgramCodesResponse[];
+
+  programCodeOptions.value = formatProgramCodesForSelectMenu(programCodesDetailsData);
+
+  if (state.programCode.label === '') {
+    state.programCode.label = programCodesDetailsData[0]?.programCodes[0] as string;
+  }
+
+  hasCalled = true;
+});
 </script>
 
 <template>
@@ -156,6 +181,17 @@ const filteredItems = computed(() => {
     @submit="(event) => transformStudentState(event)"
     @error="emit('onSubmitError')"
   >
+    <UFormField label="Avatar (not required)" name="avatar" class="flex-1">
+      <UFileUpload
+        v-model="state.avatar"
+        accept="image/*"
+        label="Drop your image here"
+        description="SVG, PNG, JPG or GIF (max. 2MB)"
+        icon="i-lucide-image"
+        class="w-full min-h-48"
+      />
+    </UFormField>
+
     <div class="flex gap-4 w-full">
       <UFormField label="ID Number" name="idNumber" class="flex-1">
         <UInput v-model="state.idNumber" />

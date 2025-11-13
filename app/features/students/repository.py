@@ -240,3 +240,17 @@ class StudentRepository:
 
         return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS)
     
+    @staticmethod
+    def update_avatar_url(id_number, avatar_url) -> None:
+        """
+        Update avatar_url in students table if not None.
+
+        Args:
+            id_number (str): The ID number of the student.
+            avatar_url (str): The URL of the avatar of the student stored in Supabase bucket.
+        """
+
+        db = current_app.extensions['db']
+
+        db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="students", set_clause="avatar_url = %s", pk="id_number"),
+                         (avatar_url, id_number))

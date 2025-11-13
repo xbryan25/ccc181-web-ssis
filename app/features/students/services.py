@@ -4,7 +4,7 @@ from .repository import StudentRepository
 
 from app.features.common.dataclasses import Student
 
-from app.utils import to_camel_case
+from app.utils import to_camel_case, upload_images_to_bucket_from_add_book_service
 
 from app.exceptions.custom_exceptions import EntityNotFoundError
 
@@ -84,7 +84,7 @@ class StudentServices:
         return student_dataclasses
 
     @staticmethod
-    def create_student_service(student_data) -> None:
+    def create_student_service(student_data, student_avatar) -> None:
         """
         Create a new student record.
         
@@ -97,9 +97,28 @@ class StudentServices:
                     - "year_level" (str): The year level of the student.
                     - "gender" (str): The gender of the student.
                     - "program_code" (str): The identifier of the program in which this student belongs to.
+            student_avatar (FileStorage | None): The uploaded avatar image file, if provided.
         """
 
         StudentRepository.create_student(student_data=student_data)
+
+        id_number = student_data['id_number']
+
+        if student_avatar:
+
+            supabase: Client = create_client(
+                current_app.config.get("SUPABASE_URL", ""),
+                current_app.config.get("SUPABASE_SERVICE_KEY", ""),
+            )
+
+            bucket_name = current_app.config.get("SUPABASE_BUCKET_NAME", "avatars")
+
+            avatar_url = upload_images_to_bucket_from_add_book_service(
+                supabase, student_avatar, bucket_name
+            )
+
+            StudentRepository.update_avatar_url(id_number, avatar_url)
+            
 
     @staticmethod
     def delete_student_service(id_number: str) -> None:
