@@ -12,7 +12,7 @@ export interface Student {
 
 export interface StudentFormState {
   avatar: File | null
-  existingAvatarUrl: string
+  existingAvatarUrl: string | null
   idNumber: string;
   firstName: string;
   lastName: string;

@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const state = reactive<StudentFormState>({
   avatar: null,
-  existingAvatarUrl: '',
+  existingAvatarUrl: null,
   idNumber: '',
   firstName: '',
   lastName: '',
@@ -153,6 +153,7 @@ onMounted(async () => {
   if (props.dialogType === 'edit') {
     const entityData = await useEntityDetails('students', props.selectedEntity as string);
 
+    state.existingAvatarUrl = entityData.avatarUrl;
     state.idNumber = entityData.idNumber;
     state.firstName = entityData.firstName;
     state.lastName = entityData.lastName;
@@ -181,7 +182,29 @@ onMounted(async () => {
     @submit="(event) => transformStudentState(event)"
     @error="emit('onSubmitError')"
   >
-    <UFormField label="Avatar (not required)" name="avatar" class="flex-1">
+    <UFormField
+      v-if="props.dialogType === 'edit' && state.existingAvatarUrl"
+      label="Existing Avatar"
+      name="existingAvatar"
+      class="w-full min-h-48"
+    >
+      <div class="flex items-center justify-center w-full">
+        <NuxtImg :src="`${state.existingAvatarUrl}`" class="rounded-full w-45 h-45 object-cover" />
+        <UButton
+          class="absolute -top-1.5 -right-1.5 w-5 h-5 p-0 flex items-center justify-center rounded-full bg-inverted text-xs cursor-pointer"
+          type="button"
+          @click="state.existingAvatarUrl = null"
+        >
+          <Icon name="i-lucide:x" class="w-4 h-4" />
+        </UButton>
+      </div>
+    </UFormField>
+
+    <UFormField
+      :label="`${props.dialogType === 'edit' ? 'New Avatar' : 'Avatar (not required)'}`"
+      name="avatar"
+      class="flex-1"
+    >
       <UFileUpload
         v-model="state.avatar"
         accept="image/*"

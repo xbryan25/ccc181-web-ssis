@@ -6,7 +6,7 @@ from datetime import datetime
 
 from uuid import uuid4
 
-def upload_images_to_bucket_from_add_book_service(
+def upload_images_to_bucket(
     supabase_client,
     avatar,
     bucket_name,
@@ -41,3 +41,12 @@ def upload_images_to_bucket_from_add_book_service(
     )
 
     return public_url
+
+
+def delete_images_from_bucket(supabase_client, bucket_name, supabase_url, current_avatar_url):
+
+    # If there's a current avatar, delete in bucket
+    if current_avatar_url:
+        # Extract bucket path
+        file_path = current_avatar_url.replace(f"{supabase_url}/storage/v1/object/public/{bucket_name}/", "")
+        supabase_client.storage.from_(bucket_name).remove([file_path])

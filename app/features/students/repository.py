@@ -241,6 +241,19 @@ class StudentRepository:
         return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS)
     
     @staticmethod
+    def get_avatar_url(id_number) -> dict[str, str]:
+        """
+        Retrieve avatar_url of a student.
+
+        Args:
+            id_number (str): The ID number of the student.
+        """
+
+        db = current_app.extensions['db']
+
+        return db.fetch_one(CommonQueries.GET_COLUMN_BY_PK.format(column="avatar_url", table="students", pk="id_number"), (id_number,))
+    
+    @staticmethod
     def update_avatar_url(id_number, avatar_url) -> None:
         """
         Update avatar_url in students table if not None.

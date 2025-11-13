@@ -63,11 +63,36 @@ async function onSubmit(newEntity: StudentFormState | ProgramFormState | College
         data = await useCreateEntity(props.entityType, { entityDetails: newEntity });
       }
     } else {
-      data = await useEditEntityDetails(
-        props.entityType,
-        newEntity,
-        props.selectedEntity as string,
-      );
+      if (props.entityType === 'students' && isStudentFormState(newEntity)) {
+        const studentFormData = new FormData();
+
+        studentFormData.append('idNumber', newEntity.idNumber);
+        studentFormData.append('firstName', newEntity.firstName);
+        studentFormData.append('lastName', newEntity.lastName);
+        studentFormData.append('yearLevel', newEntity.yearLevel.label);
+        studentFormData.append('gender', newEntity.gender.label);
+        studentFormData.append('programCode', newEntity.programCode.label);
+
+        if (newEntity.avatar) {
+          studentFormData.append('avatar', newEntity.avatar);
+        }
+
+        if (newEntity.existingAvatarUrl) {
+          studentFormData.append('existingAvatarUrl', newEntity.existingAvatarUrl);
+        }
+
+        data = await useEditEntityDetails(
+          props.entityType,
+          { studentFormData },
+          props.selectedEntity as string,
+        );
+      } else if (!isStudentFormState(newEntity)) {
+        data = await useEditEntityDetails(
+          props.entityType,
+          { entityDetails: newEntity },
+          props.selectedEntity as string,
+        );
+      }
     }
 
     toast.add({
