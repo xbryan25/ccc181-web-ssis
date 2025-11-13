@@ -59,7 +59,7 @@ The application uses Docker to orchestrate containers and ensure reproducible de
 
 | Page | Preview |
 |------|----------|
-| Login Page | ![Login Page Screenshot](assets/screenshots/login_page_screenshot.png) |
+| Login Page | ![Login Page Screenshot](assets/screenshots/login_page.png) |
 | Manage Students Page | ![Manage Students Page Screenshot](assets/screenshots/manage_students_page.png) |
 | Manage Programs Page | ![Manage Students Page Screenshot](assets/screenshots/manage_programs_page.png) |
 | Statistics Page | ![Statistics Page Screenshot](assets/screenshots/statistics_page.png) |

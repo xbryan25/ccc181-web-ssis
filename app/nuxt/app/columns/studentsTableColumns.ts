@@ -21,7 +21,7 @@ export function getStudentsTableColumns(callbacks :{
         },
       },
 
-      cell: ({ row }: { row: Row<Student> }) => h(UAvatar, { src: `${row.original.avatarUrl ? row.original.avatarUrl : 'images/noAvatar.jpg'}`, size: "3xl", ui: {image: "cursor-pointer"}, onClick: () => onAvatarClick(row.original.avatarUrl)})
+      cell: ({ row }: { row: Row<Student> }) => h(UAvatar, { src: row.original.avatarUrl || '/images/noAvatar.jpg', size: "3xl", ui: {image: "cursor-pointer"}, onClick: () => onAvatarClick(row.original.avatarUrl)})
 
     },
     {

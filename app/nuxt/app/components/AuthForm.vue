@@ -80,14 +80,14 @@ const onSubmit = async (event: FormSubmitEvent<typeof state>) => {
         class="text-base font-bold text-primary cursor-pointer"
         @click="navigateTo('/login')"
       >
-        Sign Up
+        Sign In
       </p>
       <p
         v-else
         class="text-base font-bold text-primary cursor-pointer"
         @click="navigateTo('/signup')"
       >
-        Sign In
+        Sign Up
       </p>
     </div>
   </div>
