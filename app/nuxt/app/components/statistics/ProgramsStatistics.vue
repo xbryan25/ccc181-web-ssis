@@ -4,9 +4,10 @@ import { Donut } from '@unovis/ts';
 import type { SelectMenuItem } from '@nuxt/ui';
 import type { UseProgramCodesResponse } from '~/types';
 
+type BasicSelectMenuItem = string | { label?: string; type?: 'label' | 'separator' };
+
 const triggers = {
   [Donut.selectors.segment]: (d: { data: { label: string; value: number } }) => {
-    console.log(d);
     return `${d.data.label}: ${d.data.value}`;
   },
 };
@@ -32,6 +33,11 @@ const selectedProgramCode = ref({
   label: '',
 });
 
+const isDropdownOpen = ref(false);
+
+const searchValue: Ref<string> = ref<string>('');
+const effectiveSearchValue = ref('');
+
 const studentsTotalCount: Ref<number | string> = ref<number | string>('-');
 
 const yearLevelData = ref<{ label: string | undefined; value: number | undefined }[]>([]);
@@ -39,6 +45,49 @@ const yearLevelData = ref<{ label: string | undefined; value: number | undefined
 const genderData = ref<{ label: string | undefined; value: number | undefined }[]>([]);
 
 const isLoading = ref(true);
+
+const getTextFromSelectMenuItem = (item: BasicSelectMenuItem): string => {
+  if (typeof item === 'string') return item;
+  if (item.type === 'label' || !item.type) return item.label ?? '';
+  return '';
+};
+
+const filteredItems = computed(() => {
+  if (!searchValue.value.trim()) return programCodeOptions.value;
+
+  const lower = searchValue.value.toLowerCase();
+  const result: BasicSelectMenuItem[] = [];
+  let currentGroupHasMatch = false;
+  let currentGroupLabel: BasicSelectMenuItem | null = null;
+
+  for (const item of programCodeOptions.value as BasicSelectMenuItem[]) {
+    if (typeof item === 'object' && item?.type === 'label') {
+      currentGroupLabel = item;
+      currentGroupHasMatch = false;
+      continue;
+    }
+
+    if (typeof item === 'object' && item?.type === 'separator') {
+      if (currentGroupHasMatch) result.push(item);
+      currentGroupHasMatch = false;
+      continue;
+    }
+
+    const text = getTextFromSelectMenuItem(item);
+
+    if (text.toLowerCase().includes(lower)) {
+      if (currentGroupLabel && !result.includes(currentGroupLabel)) {
+        result.push(currentGroupLabel);
+      }
+      result.push(item);
+      currentGroupHasMatch = true;
+    }
+  }
+
+  result.pop();
+
+  return result;
+});
 
 onMounted(async () => {
   const programCodesDetailsData: UseProgramCodesResponse[] = (await useEntityIds(
@@ -80,6 +129,24 @@ watch(
     );
   },
 );
+
+watch(searchValue, (newVal) => {
+  if (newVal === '') {
+    searchValue.value = effectiveSearchValue.value;
+  } else {
+    effectiveSearchValue.value = newVal;
+  }
+});
+
+watch(
+  () => isDropdownOpen.value,
+  (newVal) => {
+    if (newVal) {
+      searchValue.value = '';
+      effectiveSearchValue.value = '';
+    }
+  },
+);
 </script>
 
 <template>
@@ -90,12 +157,15 @@ watch(
 
     <USelectMenu
       v-model="selectedProgramCode"
-      :items="programCodeOptions"
+      v-model:search-term="searchValue"
+      :items="filteredItems"
+      ignore-filter
       class="w-75 h-8"
       :ui="{
         trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
         label: 'text-primary',
       }"
+      @update:open="isDropdownOpen = $event"
     />
 
     <UPageCard

@@ -28,7 +28,10 @@ const state = reactive<StudentFormState>({
   },
 });
 
+const isDropdownOpen = ref(false);
+
 const searchValue: Ref<string> = ref<string>('');
+const effectiveSearchValue = ref('');
 
 const maxFileSize = 2 * 1024 * 1024; // 2MB
 
@@ -149,6 +152,24 @@ watch(
   },
 );
 
+watch(searchValue, (newVal) => {
+  if (newVal === '') {
+    searchValue.value = effectiveSearchValue.value;
+  } else {
+    effectiveSearchValue.value = newVal;
+  }
+});
+
+watch(
+  () => isDropdownOpen.value,
+  (newVal) => {
+    if (newVal) {
+      searchValue.value = '';
+      effectiveSearchValue.value = '';
+    }
+  },
+);
+
 onMounted(async () => {
   if (props.dialogType === 'edit') {
     const entityData = await useEntityDetails('students', props.selectedEntity as string);
@@ -251,6 +272,7 @@ onMounted(async () => {
             trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
             label: 'text-primary',
           }"
+          @update:open="isDropdownOpen = $event"
         />
       </UFormField>
     </div>
