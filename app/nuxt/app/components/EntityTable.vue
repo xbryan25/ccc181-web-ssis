@@ -168,8 +168,10 @@ const updatePagination = () => {
 };
 
 const calculateRows = () => {
-  const row = document.querySelector('table tbody tr');
-  const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
+  // const row = document.querySelector('table tbody tr');
+  // const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
+
+  const rowHeight = props.entityType === 'students' ? 81 : 64;
 
   const availableHeight = window.innerHeight - reservedHeight;
 
