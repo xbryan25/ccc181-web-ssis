@@ -23,7 +23,7 @@ class StudentRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="students", pk="id_number"), (id_number, ))
 
     @staticmethod
-    def get_total_student_count(params) -> dict[str, str]:
+    def get_total_student_count(params) -> dict[str, int]:
         """
         Retrieve the total number of students based on a specific filter.
 
@@ -240,3 +240,30 @@ class StudentRepository:
 
         return db.fetch_all(StudentQueries.GET_GENDER_DEMOGRAPHICS)
     
+    @staticmethod
+    def get_avatar_url(id_number) -> dict[str, str]:
+        """
+        Retrieve avatar_url of a student.
+
+        Args:
+            id_number (str): The ID number of the student.
+        """
+
+        db = current_app.extensions['db']
+
+        return db.fetch_one(CommonQueries.GET_COLUMN_BY_PK.format(column="avatar_url", table="students", pk="id_number"), (id_number,))
+    
+    @staticmethod
+    def update_avatar_url(id_number, avatar_url) -> None:
+        """
+        Update avatar_url in students table if not None.
+
+        Args:
+            id_number (str): The ID number of the student.
+            avatar_url (str): The URL of the avatar of the student stored in Supabase bucket.
+        """
+
+        db = current_app.extensions['db']
+
+        db.execute_query(CommonQueries.UPDATE_BY_ID.format(table="students", set_clause="avatar_url = %s", pk="id_number"),
+                         (avatar_url, id_number))

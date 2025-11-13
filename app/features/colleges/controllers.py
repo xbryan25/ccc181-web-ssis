@@ -137,8 +137,8 @@ class CollegeController:
 
         try:
             new_college_data = {
-                'college_code': entity_details['entityDetails']['collegeCode'],
-                'college_name': entity_details['entityDetails']['collegeName']
+                'college_code': entity_details['collegeCode'],
+                'college_name': entity_details['collegeName']
             }
 
             validate_college_code(new_college_data['college_code'])
@@ -213,8 +213,8 @@ class CollegeController:
 
         try:
             new_college_data = {
-                'college_code': entity_details['entityDetails']['collegeCode'],
-                'college_name': entity_details['entityDetails']['collegeName']
+                'college_code': entity_details['collegeCode'],
+                'college_name': entity_details['collegeName']
             }
             
             validate_college_code(college_code)

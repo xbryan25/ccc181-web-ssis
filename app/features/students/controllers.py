@@ -185,21 +185,21 @@ class StudentController:
 
     @staticmethod
     def create_student_controller() -> tuple[Response, int]:
-        """Create a new student record."""
-
-        entity_details = request.json or {}
+        """Create a new student record. If avatar is provided, upload to Supabase bucket."""
 
         new_student_data = {}
 
         try:
             new_student_data = {
-            'id_number': entity_details['entityDetails']['idNumber'],
-            'first_name': entity_details['entityDetails']['firstName'],
-            'last_name': entity_details['entityDetails']['lastName'],
-            'year_level': entity_details['entityDetails']['yearLevel'],
-            'gender': entity_details['entityDetails']['gender'],
-            'program_code': entity_details['entityDetails']['programCode']
+                "id_number": request.form.get("idNumber", "-"),
+                "first_name": request.form.get("firstName", "-"),
+                "last_name": request.form.get("lastName", "-"),
+                "year_level": request.form.get("yearLevel", "-"),
+                "gender": request.form.get("gender", "-"),
+                "program_code": request.form.get("programCode", "-")
             }
+
+            student_avatar = request.files.get('avatar')
             
             validate_id_number(new_student_data['id_number'])
 
@@ -220,7 +220,7 @@ class StudentController:
             new_student_data['gender'] = new_student_data['gender'].strip().lower()
             new_student_data['program_code'] = new_student_data['program_code'].strip().upper()
 
-            StudentServices.create_student_service(new_student_data)
+            StudentServices.create_student_service(new_student_data, student_avatar)
 
             return jsonify({"message": "Student added successfully."}), 200
 
@@ -285,19 +285,20 @@ class StudentController:
     def edit_student_details_controller(id_number: str) -> tuple[Response, int]:
         """Edit the details of an existing student."""
 
-        entity_details = request.json or {}
-
         new_student_data = {}
 
         try:
             new_student_data = {
-            'id_number': entity_details['entityDetails']['idNumber'],
-            'first_name': entity_details['entityDetails']['firstName'],
-            'last_name': entity_details['entityDetails']['lastName'],
-            'year_level': entity_details['entityDetails']['yearLevel'],
-            'gender': entity_details['entityDetails']['gender'],
-            'program_code': entity_details['entityDetails']['programCode']
+                "existing_avatar_url": request.form.get("existingAvatarUrl"),
+                "id_number": request.form.get("idNumber", "-"),
+                "first_name": request.form.get("firstName", "-"),
+                "last_name": request.form.get("lastName", "-"),
+                "year_level": request.form.get("yearLevel", "-"),
+                "gender": request.form.get("gender", "-"),
+                "program_code": request.form.get("programCode", "-")
             }
+
+            new_student_avatar = request.files.get('avatar')
 
             validate_id_number(id_number)
 
@@ -325,7 +326,7 @@ class StudentController:
             new_student_data['gender'] = new_student_data['gender'].strip().lower()
             new_student_data['program_code'] = new_student_data['program_code'].strip().upper()
 
-            StudentServices.edit_student_details_service(id_number, new_student_data)
+            StudentServices.edit_student_details_service(id_number, new_student_data, new_student_avatar)
 
             return jsonify({"message": "Student edited successfully."}), 200
         

@@ -43,9 +43,7 @@ class CollegeServices:
             int: The total college count, with search filters being optionally applied.
         """
 
-        # return CollegeRepository.get_total_college_count(params)["count"]
-
-        return 0
+        return CollegeRepository.get_total_college_count(params)["count"]
 
     @staticmethod
     def get_many_colleges_service(params) -> list[College]:

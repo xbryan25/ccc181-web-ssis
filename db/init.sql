@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS students (
     last_name TEXT NOT NULL,
     year_level year_level_enum NOT NULL,
     gender gender_enum NOT NULL,
+    avatar_url TEXT,
     program_code TEXT REFERENCES programs (program_code) ON UPDATE CASCADE ON DELETE SET NULL,
     CONSTRAINT unique_full_name UNIQUE (first_name, last_name)
 );

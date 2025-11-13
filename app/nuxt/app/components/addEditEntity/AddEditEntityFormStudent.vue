@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Gender, Student, StudentFormState, UseProgramCodesResponse } from '~/types';
+import type { Gender, StudentFormState, UseProgramCodesResponse } from '~/types';
 
 import { validateForm, capitalizeFirstWord, formatProgramCodesForSelectMenu } from '#imports';
 import type { FormSubmitEvent, SelectMenuItem } from '@nuxt/ui';
@@ -12,6 +12,8 @@ const props = defineProps<{
 }>();
 
 const state = reactive<StudentFormState>({
+  avatar: null,
+  existingAvatarUrl: null,
   idNumber: '',
   firstName: '',
   lastName: '',
@@ -26,10 +28,17 @@ const state = reactive<StudentFormState>({
   },
 });
 
+const isDropdownOpen = ref(false);
+
 const searchValue: Ref<string> = ref<string>('');
+const effectiveSearchValue = ref('');
+
+const maxFileSize = 2 * 1024 * 1024; // 2MB
+
+const toast = useToast();
 
 const emit = defineEmits<{
-  (e: 'onSubmit', newEntity: Student): void;
+  (e: 'onSubmit', newEntity: StudentFormState): void;
   (e: 'onClose' | 'onSubmitError'): void;
 }>();
 
@@ -71,37 +80,16 @@ let programCodesDetailsData: UseProgramCodesResponse[];
 
 let hasCalled = false;
 
-onMounted(async () => {
-  if (props.dialogType === 'edit') {
-    const entityData = await useEntityDetails('students', props.selectedEntity as string);
-
-    state.idNumber = entityData.idNumber;
-    state.firstName = entityData.firstName;
-    state.lastName = entityData.lastName;
-    state.yearLevel.label = entityData.yearLevel;
-    state.gender.label = capitalizeFirstWord(entityData.gender) as Gender;
-    state.programCode.label = entityData.programCode ? entityData.programCode : '';
-  }
-
-  programCodesDetailsData = (await useEntityIds('programs')) as UseProgramCodesResponse[];
-
-  programCodeOptions.value = formatProgramCodesForSelectMenu(programCodesDetailsData);
-
-  if (state.programCode.label === '') {
-    state.programCode.label = programCodesDetailsData[0]?.programCodes[0] as string;
-  }
-
-  hasCalled = true;
-});
-
 const transformStudentState = (event: FormSubmitEvent<StudentFormState>) => {
   emit('onSubmit', {
+    avatar: event.data.avatar,
+    existingAvatarUrl: event.data.existingAvatarUrl,
     idNumber: event.data.idNumber,
     firstName: event.data.firstName,
     lastName: event.data.lastName,
-    yearLevel: event.data.yearLevel.label,
-    gender: event.data.gender.label,
-    programCode: event.data.programCode.label,
+    yearLevel: event.data.yearLevel,
+    gender: event.data.gender,
+    programCode: event.data.programCode,
   });
 };
 
@@ -146,6 +134,65 @@ const filteredItems = computed(() => {
   result.pop();
   return result;
 });
+
+watch(
+  () => state.avatar,
+  (newAvatar: File | null) => {
+    if (!newAvatar) return;
+
+    if (newAvatar.size > maxFileSize) {
+      state.avatar = null;
+
+      toast.add({
+        title: 'File Size Limit Exceeded',
+        description: `Image was skipped because it exceed the 2 MB size limit.`,
+        color: 'error',
+      });
+    }
+  },
+);
+
+watch(searchValue, (newVal) => {
+  if (newVal === '') {
+    searchValue.value = effectiveSearchValue.value;
+  } else {
+    effectiveSearchValue.value = newVal;
+  }
+});
+
+watch(
+  () => isDropdownOpen.value,
+  (newVal) => {
+    if (newVal) {
+      searchValue.value = '';
+      effectiveSearchValue.value = '';
+    }
+  },
+);
+
+onMounted(async () => {
+  if (props.dialogType === 'edit') {
+    const entityData = await useEntityDetails('students', props.selectedEntity as string);
+
+    state.existingAvatarUrl = entityData.avatarUrl;
+    state.idNumber = entityData.idNumber;
+    state.firstName = entityData.firstName;
+    state.lastName = entityData.lastName;
+    state.yearLevel.label = entityData.yearLevel;
+    state.gender.label = capitalizeFirstWord(entityData.gender) as Gender;
+    state.programCode.label = entityData.programCode ? entityData.programCode : '';
+  }
+
+  programCodesDetailsData = (await useEntityIds('programs')) as UseProgramCodesResponse[];
+
+  programCodeOptions.value = formatProgramCodesForSelectMenu(programCodesDetailsData);
+
+  if (state.programCode.label === '') {
+    state.programCode.label = programCodesDetailsData[0]?.programCodes[0] as string;
+  }
+
+  hasCalled = true;
+});
 </script>
 
 <template>
@@ -156,9 +203,44 @@ const filteredItems = computed(() => {
     @submit="(event) => transformStudentState(event)"
     @error="emit('onSubmitError')"
   >
+    <UFormField
+      v-if="props.dialogType === 'edit' && state.existingAvatarUrl"
+      label="Existing Avatar"
+      name="existingAvatar"
+      class="w-full min-h-48"
+    >
+      <div class="flex items-center justify-center w-full">
+        <NuxtImg :src="`${state.existingAvatarUrl}`" class="rounded-full w-45 h-45 object-cover" />
+        <UButton
+          class="absolute -top-1.5 -right-1.5 w-5 h-5 p-0 flex items-center justify-center rounded-full bg-inverted text-xs cursor-pointer"
+          type="button"
+          @click="state.existingAvatarUrl = null"
+        >
+          <Icon name="i-lucide:x" class="w-4 h-4" />
+        </UButton>
+      </div>
+    </UFormField>
+
+    <UFormField
+      :label="`${props.dialogType === 'edit' ? 'New Avatar' : 'Avatar (not required)'}`"
+      name="avatar"
+      class="flex-1"
+    >
+      <UFileUpload
+        v-model="state.avatar"
+        accept="image/*"
+        label="Drop your image here"
+        description="SVG, PNG, JPG or GIF (max. 2MB)"
+        icon="i-lucide-image"
+        position="inside"
+        layout="list"
+        class="w-full min-h-36"
+      />
+    </UFormField>
+
     <div class="flex gap-4 w-full">
       <UFormField label="ID Number" name="idNumber" class="flex-1">
-        <UInput v-model="state.idNumber" />
+        <UInput v-model="state.idNumber" class="w-full" />
       </UFormField>
 
       <UFormField label="Year Level" name="yearLevel" class="flex-1">
@@ -167,12 +249,12 @@ const filteredItems = computed(() => {
     </div>
 
     <div class="flex gap-4">
-      <UFormField label="First Name" name="firstName">
-        <UInput v-model="state.firstName" />
+      <UFormField label="First Name" name="firstName" class="flex-1">
+        <UInput v-model="state.firstName" class="w-full" />
       </UFormField>
 
-      <UFormField label="Last Name" name="lastName">
-        <UInput v-model="state.lastName" />
+      <UFormField label="Last Name" name="lastName" class="flex-1">
+        <UInput v-model="state.lastName" class="w-full" />
       </UFormField>
     </div>
 
@@ -192,6 +274,7 @@ const filteredItems = computed(() => {
             trailingIcon: 'group-data-[state=open]:rotate-180 transition-transform duration-200',
             label: 'text-primary',
           }"
+          @update:open="isDropdownOpen = $event"
         />
       </UFormField>
     </div>

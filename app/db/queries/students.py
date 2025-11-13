@@ -3,6 +3,26 @@
 class StudentQueries:
 
     GET_STUDENT_DETAILS = "SELECT * FROM students WHERE id_number = %s"
+
+    INSERT_STUDENT_DETAILS = """
+        INSERT INTO students (
+            id_number,
+            first_name,
+            last_name,
+            year_level,
+            gender,
+            program_code
+        )
+        VALUES (
+            %s,
+            %s,
+            %s,
+            %s,
+            %s,
+            %s
+        ) RETURNING id_number
+    """
+
     GET_YEAR_LEVEL_DEMOGRAPHICS = """SELECT yrlvl.year_level, 
                                         COUNT(s.year_level) AS count 
                                     FROM unnest(enum_range(NULL::year_level_enum)) AS yrlvl(year_level)

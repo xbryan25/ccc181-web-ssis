@@ -1,10 +1,14 @@
+from flask import current_app
+
 from .repository import StudentRepository
 
 from app.features.common.dataclasses import Student
 
-from app.utils import to_camel_case
+from app.utils import to_camel_case, upload_images_to_bucket, delete_images_from_bucket
 
 from app.exceptions.custom_exceptions import EntityNotFoundError
+
+from supabase import create_client, Client
 
 class StudentServices:
 
@@ -80,7 +84,7 @@ class StudentServices:
         return student_dataclasses
 
     @staticmethod
-    def create_student_service(student_data) -> None:
+    def create_student_service(student_data, student_avatar) -> None:
         """
         Create a new student record.
         
@@ -93,25 +97,55 @@ class StudentServices:
                     - "year_level" (str): The year level of the student.
                     - "gender" (str): The gender of the student.
                     - "program_code" (str): The identifier of the program in which this student belongs to.
+            student_avatar (FileStorage | None): The uploaded avatar image file, if provided.
         """
 
         StudentRepository.create_student(student_data=student_data)
 
+        id_number = student_data['id_number']
+
+        if student_avatar:
+
+            supabase: Client = create_client(
+                current_app.config.get("SUPABASE_URL", ""),
+                current_app.config.get("SUPABASE_SERVICE_KEY", ""),
+            )
+
+            bucket_name = current_app.config.get("SUPABASE_BUCKET_NAME", "avatars")
+
+            avatar_url = upload_images_to_bucket(
+                supabase, student_avatar, bucket_name
+            )
+
+            StudentRepository.update_avatar_url(id_number, avatar_url)
+            
+
     @staticmethod
     def delete_student_service(id_number: str) -> None:
         """
-        Delete a student record by its id_number.
+        Delete a student record and avatar by its id_number.
 
         Args:
             id_number (str): id_number of the student to be deleted.
         """
 
+        supabase: Client = create_client(
+                current_app.config.get("SUPABASE_URL", ""),
+                current_app.config.get("SUPABASE_SERVICE_KEY", ""),
+            )
+
+        bucket_name = current_app.config.get("SUPABASE_BUCKET_NAME", "avatars")
+
+        current_avatar_url = StudentRepository.get_avatar_url(id_number)['avatar_url']
+
+        delete_images_from_bucket(supabase, bucket_name, current_app.config.get("SUPABASE_URL", ""), current_avatar_url)
+
         StudentRepository.delete_student(id_number=id_number)
 
     @staticmethod
-    def edit_student_details_service(id_number: str, new_student_data) -> None:
+    def edit_student_details_service(id_number: str, new_student_data, new_student_avatar) -> None:
         """
-        Edit the details of an existing student.
+        Edit the details and avatar of an existing student.
         
         Args:
             id_number (str): The current unique code identifying the student to be updated.
@@ -126,6 +160,34 @@ class StudentServices:
         """
 
         StudentRepository.edit_student_details(id_number=id_number, new_student_data=new_student_data)
+
+        id_number = new_student_data['id_number']
+
+        supabase: Client = create_client(
+                current_app.config.get("SUPABASE_URL", ""),
+                current_app.config.get("SUPABASE_SERVICE_KEY", ""),
+            )
+
+        bucket_name = current_app.config.get("SUPABASE_BUCKET_NAME", "avatars")
+
+        current_avatar_url = StudentRepository.get_avatar_url(id_number)['avatar_url']
+
+        if new_student_avatar:
+
+            delete_images_from_bucket(supabase, bucket_name, current_app.config.get("SUPABASE_URL", ""), current_avatar_url)
+
+            avatar_url = upload_images_to_bucket(
+                supabase, new_student_avatar, bucket_name
+            )
+
+            StudentRepository.update_avatar_url(id_number, avatar_url)
+
+        elif not new_student_avatar and not new_student_data["existing_avatar_url"]:
+
+            delete_images_from_bucket(supabase, bucket_name, current_app.config.get("SUPABASE_URL", ""), current_avatar_url)
+
+            StudentRepository.update_avatar_url(id_number, None)
+
 
     @staticmethod
     def get_year_level_demographics_service(params) -> list[dict[str, int | str]]:
