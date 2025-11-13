@@ -232,7 +232,9 @@ onMounted(async () => {
         label="Drop your image here"
         description="SVG, PNG, JPG or GIF (max. 2MB)"
         icon="i-lucide-image"
-        class="w-full min-h-48"
+        position="inside"
+        layout="list"
+        class="w-full min-h-36"
       />
     </UFormField>
 
