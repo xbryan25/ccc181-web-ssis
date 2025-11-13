@@ -1,6 +1,6 @@
 # Sequence, a full-stack simple student information system (SSIS)
 
-Sequence is a full-stack simple student information system (SSIS) built using Nuxt (Vue 3), Flask (Python), and PostgreSQL. It is made in accordance with the requirements of CCC181. 
+Sequence is a full-stack simple student information system (SSIS) built using Nuxt (Vue 3), Flask (Python), PostgreSQL, and Supabase Storage. It is made in accordance with the requirements of CCC181. 
 
 The name 'Sequence' comes from the fact that the data in this application is stored in a particular order, hence, a sequence.
 
@@ -12,8 +12,9 @@ Built with Nuxt 3 (Vue 3) for a fast, reactive single-page application. Styled u
 ### Backend
 Powered by Flask (Python 3.10+) to provide a RESTful API layer. Pipenv is used to manage dependencies and environments.
 
-### Database
-Data is stored in PostgreSQL, fully containerized using Docker for consistency across environments. pgAdmin is included for graphical database management.
+### Database & Storage
+- PostgreSQL: Stores structured application data, fully containerized using Docker. pgAdmin included for graphical database management.
+- Supabase Storage: Used to store user-uploaded images for student avatars, providing secure and scalable object storage.
 
 ### DevOps
 The application uses Docker to orchestrate containers and ensure reproducible development setups.
@@ -33,10 +34,11 @@ The application uses Docker to orchestrate containers and ensure reproducible de
 - Flask
 - Pipenv
 
-### Database
+### Database & Storage
 - Docker (for containerized PostgreSQL and pgAdmin)
 - PostgreSQL
 - pgAdmin
+- Supabase Bucket (to store user-uploaded images for student avatars)
 
 ## Features
 
@@ -51,6 +53,7 @@ The application uses Docker to orchestrate containers and ensure reproducible de
 - JWT-based user authentication (access + refresh tokens stored in cookies)
 - Single Page Application (SPA) for seamless user experience
 - Theme customization, with support for many colors, and light/dark mode
+- Students can have avatars; supports image upload, update, deletion, and storage using Supabase Storage
 
 ## Screenshots
 
@@ -58,6 +61,7 @@ The application uses Docker to orchestrate containers and ensure reproducible de
 |------|----------|
 | Login Page | ![Login Page Screenshot](assets/screenshots/login_page_screenshot.png) |
 | Manage Students Page | ![Manage Students Page Screenshot](assets/screenshots/manage_students_page.png) |
+| Manage Programs Page | ![Manage Students Page Screenshot](assets/screenshots/manage_programs_page.png) |
 | Statistics Page | ![Statistics Page Screenshot](assets/screenshots/statistics_page.png) |
 | About Page | ![About Page Screenshot](assets/screenshots/about_page.png) |
 | Light Mode | ![Light Mode Screenshot](assets/screenshots/light_mode.png) |
