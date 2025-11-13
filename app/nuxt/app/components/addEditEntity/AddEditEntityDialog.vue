@@ -24,9 +24,11 @@ const isOpen = computed({
 
 const toast = useToast();
 
-function isStudentFormState(
+const isSubmitting = ref(false);
+
+const isStudentFormState = (
   entity: StudentFormState | ProgramFormState | CollegeFormState,
-): entity is StudentFormState {
+): entity is StudentFormState => {
   return (
     entity &&
     typeof entity === 'object' &&
@@ -38,10 +40,12 @@ function isStudentFormState(
     'programCode' in entity &&
     'avatar' in entity
   );
-}
+};
 
 async function onSubmit(newEntity: StudentFormState | ProgramFormState | CollegeFormState) {
   try {
+    isSubmitting.value = true;
+
     let data: { message: string } = { message: '' };
 
     if (props.dialogType === 'add') {
@@ -129,6 +133,18 @@ async function onSubmitError() {
     color: 'error',
   });
 }
+
+watch(
+  () => props.isOpen,
+  async (newValue) => {
+    if (!newValue) {
+      // e.g. delay reset after modal closes
+      setTimeout(() => {
+        isSubmitting.value = false;
+      }, 300); // delay in ms
+    }
+  },
+);
 </script>
 
 <template>
@@ -136,7 +152,12 @@ async function onSubmitError() {
     <UModal
       v-model:open="isOpen"
       :ui="{
-        content: entityType === 'students' ? 'w-[50%]' : 'w-[25%]',
+        content: isSubmitting
+          ? 'max-w-lg h-[30%]'
+          : props.entityType === 'students'
+            ? 'max-w-2xl'
+            : 'max-w-lg',
+        body: isSubmitting ? 'flex items-center justify-center' : '',
       }"
     >
       <template #header>
@@ -156,7 +177,7 @@ async function onSubmitError() {
 
       <template #body>
         <AddEditEntityFormStudent
-          v-if="entityType === 'students'"
+          v-if="entityType === 'students' && !isSubmitting"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
           @on-submit="(newEntity) => onSubmit(newEntity)"
@@ -164,7 +185,7 @@ async function onSubmitError() {
           @on-submit-error="onSubmitError"
         />
         <AddEditEntityFormProgram
-          v-if="entityType === 'programs'"
+          v-if="entityType === 'programs' && !isSubmitting"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
           @on-submit="(newEntity) => onSubmit(newEntity)"
@@ -172,13 +193,21 @@ async function onSubmitError() {
           @on-submit-error="onSubmitError"
         />
         <AddEditEntityFormCollege
-          v-if="entityType === 'colleges'"
+          v-if="entityType === 'colleges' && !isSubmitting"
           :dialog-type="props.dialogType"
           :selected-entity="props.selectedEntity"
           @on-submit="(newEntity) => onSubmit(newEntity)"
           @on-close="isOpen = false"
           @on-submit-error="onSubmitError"
         />
+
+        <div v-if="isSubmitting" class="flex justify-center items-center">
+          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-accent" />
+          <span class="ml-2 text-primary"
+            >{{ capitalizeWords(props.dialogType) + 'ing' }}
+            {{ props.entityType.slice(0, -1) }}...</span
+          >
+        </div>
       </template>
     </UModal>
   </div>

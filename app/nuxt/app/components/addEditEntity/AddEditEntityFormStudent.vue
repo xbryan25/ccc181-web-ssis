@@ -217,7 +217,7 @@ onMounted(async () => {
 
     <div class="flex gap-4 w-full">
       <UFormField label="ID Number" name="idNumber" class="flex-1">
-        <UInput v-model="state.idNumber" />
+        <UInput v-model="state.idNumber" class="w-full" />
       </UFormField>
 
       <UFormField label="Year Level" name="yearLevel" class="flex-1">
@@ -226,12 +226,12 @@ onMounted(async () => {
     </div>
 
     <div class="flex gap-4">
-      <UFormField label="First Name" name="firstName">
-        <UInput v-model="state.firstName" />
+      <UFormField label="First Name" name="firstName" class="flex-1">
+        <UInput v-model="state.firstName" class="w-full" />
       </UFormField>
 
-      <UFormField label="Last Name" name="lastName">
-        <UInput v-model="state.lastName" />
+      <UFormField label="Last Name" name="lastName" class="flex-1">
+        <UInput v-model="state.lastName" class="w-full" />
       </UFormField>
     </div>
 

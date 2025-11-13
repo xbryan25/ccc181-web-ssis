@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { capitalizeWords } from '#imports';
+
 const props = defineProps<{
   entityType: string;
   isOpen: boolean;
@@ -19,9 +21,11 @@ const isOpen = computed({
 
 const toast = useToast();
 
+const isDeleting = ref(false);
+
 async function onDelete() {
   try {
-    isOpen.value = false;
+    isDeleting.value = true;
 
     const data: { message: string } = await useDeleteEntity(props.entityType, props.selectedEntity);
 
@@ -31,6 +35,7 @@ async function onDelete() {
       color: 'success',
     });
 
+    isOpen.value = false;
     emit('onDelete');
   } catch {
     toast.add({
@@ -40,6 +45,18 @@ async function onDelete() {
     });
   }
 }
+
+watch(
+  () => props.isOpen,
+  async (newValue) => {
+    if (!newValue) {
+      // e.g. delay reset after modal closes
+      setTimeout(() => {
+        isDeleting.value = false;
+      }, 300); // delay in ms
+    }
+  },
+);
 </script>
 
 <template>
@@ -47,7 +64,8 @@ async function onDelete() {
     <UModal
       v-model:open="isOpen"
       :ui="{
-        content: 'w-[30%]',
+        content: ['max-w-lg', isDeleting ? 'h-[30%]' : ''],
+        body: isDeleting ? 'flex items-center justify-center' : '',
       }"
     >
       <template #header>
@@ -60,7 +78,7 @@ async function onDelete() {
       </template>
 
       <template #body>
-        <div class="flex flex-col items-center">
+        <div v-if="!isDeleting" class="flex flex-col items-center">
           <UIcon
             name="material-symbols:warning-rounded"
             class="size-20 text-red-500 animate-bounce"
@@ -71,9 +89,14 @@ async function onDelete() {
             </p>
           </div>
         </div>
+
+        <div v-if="isDeleting" class="flex justify-center items-center">
+          <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-accent" />
+          <span class="ml-2 text-primary">Deleting {{ props.entityType.slice(0, -1) }}...</span>
+        </div>
       </template>
 
-      <template #footer>
+      <template v-if="!isDeleting" #footer>
         <div class="flex justify-end gap-2 w-full">
           <UButton
             size="md"
