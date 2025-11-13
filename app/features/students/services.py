@@ -123,11 +123,22 @@ class StudentServices:
     @staticmethod
     def delete_student_service(id_number: str) -> None:
         """
-        Delete a student record by its id_number.
+        Delete a student record and avatar by its id_number.
 
         Args:
             id_number (str): id_number of the student to be deleted.
         """
+
+        supabase: Client = create_client(
+                current_app.config.get("SUPABASE_URL", ""),
+                current_app.config.get("SUPABASE_SERVICE_KEY", ""),
+            )
+
+        bucket_name = current_app.config.get("SUPABASE_BUCKET_NAME", "avatars")
+
+        current_avatar_url = StudentRepository.get_avatar_url(id_number)['avatar_url']
+
+        delete_images_from_bucket(supabase, bucket_name, current_app.config.get("SUPABASE_URL", ""), current_avatar_url)
 
         StudentRepository.delete_student(id_number=id_number)
 
