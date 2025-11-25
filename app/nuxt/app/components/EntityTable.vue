@@ -17,6 +17,7 @@ const props = defineProps<{
   searchType: string;
   sortField: string;
   sortOrder: string;
+  rowsPerPage: number;
   createEntitySubmitRef: boolean;
   toggleAllRef: boolean | 'indeterminate';
 }>();
@@ -49,7 +50,7 @@ const emit = defineEmits<{
   ): void;
   (e: 'disableCreateEntitySubmit'): void;
   (e: 'update:externalCheckboxValue', val: boolean | 'indeterminate'): void;
-  (e: 'update:selectedRows' | 'update:totalDisplayedRows', val: number): void;
+  (e: 'update:selectedRows' | 'update:loadedRowsPerPage', val: number): void;
 }>();
 
 const openConfirmDeleteDialog = (row: Student | Program | College) => {
@@ -192,6 +193,8 @@ const loadEntities = async () => {
   entitiesData.value = data.entities;
 
   isLoading.value = false;
+
+  emit('update:loadedRowsPerPage', entitiesData.value.length);
 };
 
 const debouncedLoadEntities = useDebounceFn(async () => {
@@ -202,26 +205,28 @@ const debouncedLoadEntities = useDebounceFn(async () => {
 
 const totalEntityCount = ref(0);
 const pageNumber = ref(1);
-const reservedHeight = 300;
-const rowsPerPage = ref(0);
+const delayedPageNumber = ref(1);
 
-const updatePagination = () => {
-  calculateRows();
-  debouncedGetTotalEntityCount();
+const rowsPerPage = computed(() => props.rowsPerPage);
+const delayedRowsPerPage = ref(10);
+
+const updatePagination = async () => {
+  // calculateRows();
+  await debouncedGetTotalEntityCount();
 };
 
-const calculateRows = () => {
-  // const row = document.querySelector('table tbody tr');
-  // const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
+// const calculateRows = () => {
+//   // const row = document.querySelector('table tbody tr');
+//   // const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
 
-  const rowHeight = props.entityType === 'students' ? 81 : 64;
+//   const rowHeight = props.entityType === 'students' ? 81 : 64;
 
-  const availableHeight = window.innerHeight - reservedHeight;
+//   const availableHeight = window.innerHeight - reservedHeight;
 
-  rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
+//   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
 
-  emit('update:totalDisplayedRows', rowsPerPage.value);
-};
+//   emit('update:totalDisplayedRows', rowsPerPage.value);
+// };
 
 const getTotalEntityCount = async () => {
   const options = {
@@ -233,6 +238,8 @@ const getTotalEntityCount = async () => {
   const { totalCount }: { totalCount: number } = await useEntitiesCount(props.entityType, options);
 
   totalEntityCount.value = totalCount;
+
+  console.log(`updated here ${totalEntityCount.value}`);
 };
 
 const debouncedGetTotalEntityCount = useDebounceFn(async () => {
@@ -274,6 +281,9 @@ const validateUrlInput = () => {
   const allowedSearchType = ['Starts With', 'Contains', 'Ends With'];
 
   const allowedSortOrder = ['Ascending', 'Descending'];
+
+  console.log('toootal pages ' + pageNumber.value);
+  console.log('toootal pages val ' + totalPages);
 
   if (pageNumber.value > totalPages) {
     pageNumber.value = totalPages;
@@ -395,9 +405,16 @@ watch(
   },
 );
 
+watch(isLoading, (newVal) => {
+  if (!newVal) {
+    delayedPageNumber.value = pageNumber.value;
+    delayedRowsPerPage.value = rowsPerPage.value;
+  }
+});
+
 defineExpose({ toggleAll });
 
-onMounted(() => {
+onMounted(async () => {
   pageNumber.value = Number(route.query.page) || pageNumber.value;
 
   internalSearchValue.value = String(route.query.searchValue || internalSearchValue.value);
@@ -406,9 +423,9 @@ onMounted(() => {
   internalSortField.value = String(route.query.sortField || internalSortField.value);
   internalSortOrder.value = String(route.query.sortOrder || internalSortOrder.value);
 
-  validateUrlInput();
+  await updatePagination();
 
-  updatePagination();
+  validateUrlInput();
 
   // This watch function 'watches' any changes in table filters and pagination, doesn't include parent changes
   // nextTick ensures that watcher setup will be delayed after validation is done
@@ -497,7 +514,18 @@ onBeforeUnmount(() => {
     class="flex-1 overflow-y-hidden"
   />
 
-  <div class="flex justify-center">
+  <div v-if="entitiesData.length > 0" class="grid grid-cols-3 items-center mb-5">
+    <div v-if="entitiesData.length == 1" class="text-sm text-muted pl-3">
+      {{ delayedRowsPerPage * (delayedPageNumber - 1) + 1 }} of {{ totalEntityCount }}.
+    </div>
+    <div v-else class="text-sm text-muted pl-3">
+      {{ delayedRowsPerPage * (delayedPageNumber - 1) + 1 }}-{{
+        delayedRowsPerPage * delayedPageNumber > totalEntityCount
+          ? totalEntityCount
+          : delayedRowsPerPage * delayedPageNumber
+      }}
+      of {{ totalEntityCount }}.
+    </div>
     <UPagination
       v-model:page="pageNumber"
       :items-per-page="rowsPerPage"
@@ -505,6 +533,7 @@ onBeforeUnmount(() => {
       size="xl"
       :sibling-count="0"
       :total="totalEntityCount"
+      class="flex justify-center"
     />
   </div>
 

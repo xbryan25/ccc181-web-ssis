@@ -51,7 +51,8 @@ const onProceed = (localState: {
 
 const externalCheckboxValue = ref<boolean | 'indeterminate'>(false);
 const selectedRows = ref<number>(0);
-const totalDisplayedRows = ref<number>(0);
+const rowsPerPage = ref<number>(10);
+const loadedRowsPerPage = ref<number>(0);
 
 const toggleAllRef = ref<boolean | 'indeterminate'>(false);
 </script>
@@ -60,11 +61,11 @@ const toggleAllRef = ref<boolean | 'indeterminate'>(false);
   <div class="flex flex-col gap-10 h-full">
     <h1 class="font-bold text-5xl">{{ capitalizeWords(entity) }}</h1>
 
-    <div class="flex flex-col gap-5 h-full">
+    <div class="flex flex-col gap-5">
       <SearchAndSortHeader
         :external-checkbox-value="externalCheckboxValue"
         :selected-rows="selectedRows"
-        :total-displayed-rows="totalDisplayedRows"
+        :loaded-rows-per-page="loadedRowsPerPage"
         :entity-type="entity"
         :search-and-sort-state="searchAndSortState"
         @on-create-entity-submit="() => (createEntitySubmitRef = true)"
@@ -77,6 +78,7 @@ const toggleAllRef = ref<boolean | 'indeterminate'>(false);
           }) => onProceed(localState)
         "
         @update:search-value="(searchValue) => (searchAndSortState.searchValue = searchValue)"
+        @update:rows-per-page="(value: number) => (rowsPerPage = value)"
         @toggle-all="(value) => (toggleAllRef = value)"
       />
 
@@ -89,6 +91,7 @@ const toggleAllRef = ref<boolean | 'indeterminate'>(false);
         :sort-order="searchAndSortState.sortOrder"
         :create-entity-submit-ref="createEntitySubmitRef"
         :toggle-all-ref="toggleAllRef"
+        :rows-per-page="rowsPerPage"
         @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
         @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
         @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
@@ -102,7 +105,7 @@ const toggleAllRef = ref<boolean | 'indeterminate'>(false);
           (value: boolean | 'indeterminate') => (externalCheckboxValue = value)
         "
         @update:selected-rows="(value: number) => (selectedRows = value)"
-        @update:total-displayed-rows="(value: number) => (totalDisplayedRows = value)"
+        @update:loaded-rows-per-page="(value: number) => (loadedRowsPerPage = value)"
         @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
       />
     </div>

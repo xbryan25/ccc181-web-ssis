@@ -4,7 +4,7 @@ import { capitalizeWords } from '#imports';
 const props = defineProps<{
   externalCheckboxValue: boolean | 'indeterminate';
   selectedRows: number;
-  totalDisplayedRows: number;
+  loadedRowsPerPage: number;
   entityType: string;
   searchAndSortState: {
     searchValue: string;
@@ -26,8 +26,9 @@ const emit = defineEmits<{
     },
   ): void;
   (e: 'update:searchValue', value: string): void;
+  (e: 'update:rowsPerPage', value: number): void;
   (e: 'onCreateEntitySubmit'): void;
-  (e: 'toggleAll', val: boolean | 'indeterminate'): void;
+  (e: 'toggleAll', value: boolean | 'indeterminate'): void;
 }>();
 
 const isOpenAddDialog = ref(false);
@@ -62,8 +63,8 @@ const checkboxValue = computed({
       <UCheckbox v-model="checkboxValue" :ui="{ base: 'cursor-pointer' }" />
 
       <div class="text-sm text-muted">
-        {{ props.selectedRows }} of {{ props.totalDisplayedRows }}
-        {{ props.totalDisplayedRows === 1 ? 'row' : 'rows' }} selected
+        {{ props.selectedRows }} of {{ props.loadedRowsPerPage }}
+        {{ props.loadedRowsPerPage === 1 ? 'row' : 'rows' }} selected
       </div>
 
       <div v-if="externalCheckboxValue" class="flex gap-3">
@@ -114,7 +115,14 @@ const checkboxValue = computed({
         "
       />
 
-      <USelect v-model="rowsPerPage" :items="rowsPerPageItems" class="w-18" />
+      <UTooltip text="Max rows to show">
+        <USelect
+          v-model="rowsPerPage"
+          :items="rowsPerPageItems"
+          class="w-18"
+          @change="emit('update:rowsPerPage', rowsPerPage)"
+        />
+      </UTooltip>
     </div>
 
     <div class="flex-1 flex justify-end">
