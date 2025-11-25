@@ -7,41 +7,63 @@ import { getRowItems } from "#imports";
 export function getProgramsTableColumns(callbacks :{
   openEditDialog: (row: Program) => void;
   openConfirmDeleteDialog: (row: Program) => void;
- }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent }) { 
+  }, components: { UCheckbox: DefineComponent, UButton: DefineComponent; UDropdownMenu: DefineComponent }, isLoading: Ref<boolean>,
+  selectedRows: Ref<Set<string>>, onCheckboxToggle: (idNumber: string, value: boolean) => void) { 
 
-  const {UButton, UDropdownMenu} = components
+  const {UCheckbox, UButton, UDropdownMenu} = components
 
   return [
-  {
-    accessorKey: "programCode",
-    header: "Program Code",
-    meta: {
-      class: {
-        th: "w-42",
-        td: "w-42 text-md",
+    {
+      id: 'select',
+      cell: ({ row }: { row: Row<Program> }) =>
+        h(UCheckbox, {
+          ui: {
+            base: 'cursor-pointer',
+          },
+          disabled: isLoading.value,
+          modelValue: computed(() => selectedRows.value.has(row.original.programCode)).value,
+          'onUpdate:modelValue': (value: boolean) => {
+            onCheckboxToggle(row.original.programCode, value);
+          },
+          'aria-label': 'Select row',
+        }),
+      meta: {
+        class: {
+          th: 'w-12',
+          td: 'w-12',
+        },
       },
     },
-  },
-  {
-    accessorKey: "programName",
-    header: "Program Name",
-    meta: {
-      class: {
-        td: "text-md",
+    {
+      accessorKey: "programCode",
+      header: "Program Code",
+      meta: {
+        class: {
+          th: "w-42",
+          td: "w-42 text-md",
+        },
       },
     },
-  },
-  {
-    accessorKey: "collegeCode",
-    header: "College Code",
-    meta: {
-      class: {
-        th: "w-42",
-        td: "w-42 text-md",
+    {
+      accessorKey: "programName",
+      header: "Program Name",
+      meta: {
+        class: {
+          td: "text-md",
+        },
       },
     },
-  },
-  {
+    {
+      accessorKey: "collegeCode",
+      header: "College Code",
+      meta: {
+        class: {
+          th: "w-42",
+          td: "w-42 text-md",
+        },
+      },
+    },
+    {
       id: "actions",
       cell: ({ row }: { row: Row<Program> }) => {
         return h(
@@ -73,5 +95,6 @@ export function getProgramsTableColumns(callbacks :{
         },
       },
     },
-]};
+  ]
+};
 

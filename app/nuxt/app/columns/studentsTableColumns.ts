@@ -137,5 +137,6 @@ export function getStudentsTableColumns(callbacks :{
         },
       },
     },
-  ]};
+  ]
+};
 

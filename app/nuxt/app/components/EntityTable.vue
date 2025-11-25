@@ -149,6 +149,9 @@ const programsTableColumns = getProgramsTableColumns(
     openConfirmDeleteDialog: (row: Program) => openConfirmDeleteDialog(row),
   },
   tableButtons,
+  isLoading,
+  selectedRows,
+  toggleRow,
 );
 
 const collegesTableColumns = getCollegesTableColumns(
@@ -157,6 +160,9 @@ const collegesTableColumns = getCollegesTableColumns(
     openConfirmDeleteDialog: (row: College) => openConfirmDeleteDialog(row),
   },
   tableButtons,
+  isLoading,
+  selectedRows,
+  toggleRow,
 );
 
 const updateUrl = () => {
