@@ -48,6 +48,8 @@ const searchValue = computed({
 const checkboxValue = computed({
   get: () => props.externalCheckboxValue,
   set: () => {
+    console.log(props.externalCheckboxValue);
+
     const nextVal =
       props.externalCheckboxValue === true || props.externalCheckboxValue === 'indeterminate'
         ? false

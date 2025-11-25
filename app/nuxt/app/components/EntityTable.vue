@@ -88,8 +88,6 @@ const tableButtons = { UCheckbox, UButton, UDropdownMenu };
 
 const selectedRows = ref<Set<string>>(new Set());
 
-// const clickedRow = ref<Notification | null>(null);
-
 const isLoading = ref(true);
 
 const showAvatar = (avatarUrl: string) => {
@@ -207,6 +205,19 @@ const debouncedLoadEntities = useDebounceFn(async () => {
   isLoading.value = true;
 
   await loadEntities();
+
+  console.log(selectedRows.value);
+
+  selectedRows.value = new Set([...selectedRows.value].slice(0, entitiesData.value.length));
+
+  console.log(selectedRows.value);
+
+  emit(
+    'update:selectedRows',
+    entitiesData.value.length <= selectedRows.value.size
+      ? entitiesData.value.length
+      : selectedRows.value.size,
+  );
 }, 700); // 700ms debounce
 
 const totalEntityCount = ref(0);
@@ -217,22 +228,8 @@ const rowsPerPage = computed(() => props.rowsPerPage);
 const delayedRowsPerPage = ref(10);
 
 const updatePagination = async () => {
-  // calculateRows();
   await debouncedGetTotalEntityCount();
 };
-
-// const calculateRows = () => {
-//   // const row = document.querySelector('table tbody tr');
-//   // const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
-
-//   const rowHeight = props.entityType === 'students' ? 81 : 64;
-
-//   const availableHeight = window.innerHeight - reservedHeight;
-
-//   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
-
-//   emit('update:totalDisplayedRows', rowsPerPage.value);
-// };
 
 const getTotalEntityCount = async () => {
   const options = {
@@ -287,9 +284,6 @@ const validateUrlInput = () => {
   const allowedSearchType = ['Starts With', 'Contains', 'Ends With'];
 
   const allowedSortOrder = ['Ascending', 'Descending'];
-
-  console.log('toootal pages ' + pageNumber.value);
-  console.log('toootal pages val ' + totalPages);
 
   if (pageNumber.value > totalPages) {
     pageNumber.value = totalPages;
@@ -391,15 +385,16 @@ watch(
     if (newVal) {
       isLoading.value = true;
       debouncedLoadEntities();
-
-      selectedRows.value = new Set();
       debouncedGetTotalEntityCount();
       emit('disableCreateEntitySubmit');
     }
   },
 );
 
-watch(externalCheckboxValue, (val) => emit('update:externalCheckboxValue', val));
+watch(
+  externalCheckboxValue,
+  (val) => (console.log('update?'), emit('update:externalCheckboxValue', val)),
+);
 
 watch(
   () => props.toggleAllRef,

@@ -55,6 +55,11 @@ const rowsPerPage = ref<number>(10);
 const loadedRowsPerPage = ref<number>(0);
 
 const toggleAllRef = ref<boolean | 'indeterminate'>(false);
+
+watch(
+  () => selectedRows.value,
+  (newVal) => console.log('selectedRows val ' + newVal),
+);
 </script>
 
 <template>
@@ -104,7 +109,7 @@ const toggleAllRef = ref<boolean | 'indeterminate'>(false);
         @update:external-checkbox-value="
           (value: boolean | 'indeterminate') => (externalCheckboxValue = value)
         "
-        @update:selected-rows="(value: number) => (selectedRows = value)"
+        @update:selected-rows="(value: number) => (console.log('outside'), (selectedRows = value))"
         @update:loaded-rows-per-page="(value: number) => (loadedRowsPerPage = value)"
         @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
       />
