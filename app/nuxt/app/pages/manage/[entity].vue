@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type EntityTable from '~/components/EntityTable.vue';
 import SearchAndSortHeader from '~/components/SearchAndSortHeader.vue';
 import auth from '~/middleware/auth';
 import { capitalizeWords } from '~/utils/stringUtils';
@@ -47,6 +48,12 @@ const onProceed = (localState: {
   searchAndSortState.sortField = localState.sortField;
   searchAndSortState.sortOrder = localState.sortOrder;
 };
+
+const externalCheckboxValue = ref<boolean | 'indeterminate'>(false);
+const selectedRows = ref<number>(0);
+const totalDisplayedRows = ref<number>(0);
+
+const toggleAllRef = ref<boolean | 'indeterminate'>(false);
 </script>
 
 <template>
@@ -55,6 +62,9 @@ const onProceed = (localState: {
 
     <div class="flex flex-col gap-5 h-full">
       <SearchAndSortHeader
+        :external-checkbox-value="externalCheckboxValue"
+        :selected-rows="selectedRows"
+        :total-displayed-rows="totalDisplayedRows"
         :entity-type="entity"
         :search-and-sort-state="searchAndSortState"
         @on-create-entity-submit="() => (createEntitySubmitRef = true)"
@@ -67,6 +77,7 @@ const onProceed = (localState: {
           }) => onProceed(localState)
         "
         @update:search-value="(searchValue) => (searchAndSortState.searchValue = searchValue)"
+        @toggle-all="(value) => (toggleAllRef = value)"
       />
 
       <EntityTable
@@ -77,6 +88,7 @@ const onProceed = (localState: {
         :sort-field="searchAndSortState.sortField"
         :sort-order="searchAndSortState.sortOrder"
         :create-entity-submit-ref="createEntitySubmitRef"
+        :toggle-all-ref="toggleAllRef"
         @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
         @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
         @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
@@ -86,6 +98,11 @@ const onProceed = (localState: {
             searchAndSortState.sortOrder = value;
           }
         "
+        @update:external-checkbox-value="
+          (value: boolean | 'indeterminate') => (externalCheckboxValue = value)
+        "
+        @update:selected-rows="(value: number) => (selectedRows = value)"
+        @update:total-displayed-rows="(value: number) => (totalDisplayedRows = value)"
         @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
       />
     </div>

@@ -18,6 +18,7 @@ const props = defineProps<{
   sortField: string;
   sortOrder: string;
   createEntitySubmitRef: boolean;
+  toggleAllRef: boolean | 'indeterminate';
 }>();
 
 const router = useRouter();
@@ -47,6 +48,8 @@ const emit = defineEmits<{
     value: string,
   ): void;
   (e: 'disableCreateEntitySubmit'): void;
+  (e: 'update:externalCheckboxValue', val: boolean | 'indeterminate'): void;
+  (e: 'update:selectedRows' | 'update:totalDisplayedRows', val: number): void;
 }>();
 
 const openConfirmDeleteDialog = (row: Student | Program | College) => {
@@ -75,17 +78,56 @@ const openConfirmEditDialog = (row: Student | Program | College) => {
 
 const entitiesData = ref<Student[] | Program[] | College[]>([]);
 
+const UCheckbox = resolveComponent('UCheckbox') as DefineComponent;
 const UButton = resolveComponent('UButton') as DefineComponent;
 const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
 const UAvatar = resolveComponent('UAvatar') as DefineComponent;
 
-const tableButtons = { UButton, UDropdownMenu };
+const tableButtons = { UCheckbox, UButton, UDropdownMenu };
+
+const selectedRows = ref<Set<string>>(new Set());
+
+// const clickedRow = ref<Notification | null>(null);
+
+const isLoading = ref(true);
 
 const showAvatar = (avatarUrl: string) => {
   showImageModal.value = true;
 
   currentAvatarUrlToDisplay.value = avatarUrl ? avatarUrl : 'images/noAvatar.jpg';
 };
+
+function getId(r: Student | Program | College): string {
+  if ('idNumber' in r) return r.idNumber;
+  if ('programCode' in r) return r.programCode;
+  if ('collegeCode' in r) return r.collegeCode;
+  return '';
+}
+
+const externalCheckboxValue = computed<boolean | 'indeterminate'>(() => {
+  if (selectedRows.value.size === 0) return false;
+  if (selectedRows.value.size === entitiesData.value.length) return true;
+  return 'indeterminate';
+});
+
+// Handler for external checkbox
+function toggleAll(value: boolean | 'indeterminate') {
+  const val = value === 'indeterminate' ? true : value;
+  if (val) selectedRows.value = new Set<string>(entitiesData.value.map((r) => getId(r)));
+  else selectedRows.value = new Set();
+
+  emit('update:selectedRows', selectedRows.value.size);
+}
+
+// Row checkbox toggle
+function toggleRow(id: string, value: boolean) {
+  const newSet = new Set(selectedRows.value);
+  if (value) newSet.add(id);
+  else newSet.delete(id);
+  selectedRows.value = newSet;
+
+  emit('update:selectedRows', selectedRows.value.size);
+}
 
 const studentTableColumns = getStudentsTableColumns(
   {
@@ -95,6 +137,9 @@ const studentTableColumns = getStudentsTableColumns(
   tableButtons,
   UAvatar,
   showAvatar,
+  isLoading,
+  selectedRows,
+  toggleRow,
 );
 
 const programsTableColumns = getProgramsTableColumns(
@@ -128,8 +173,6 @@ const updateUrl = () => {
 
   return newQuery;
 };
-
-const isLoading = ref(true);
 
 const loadEntities = async () => {
   // isLoading.value = true;
@@ -176,6 +219,8 @@ const calculateRows = () => {
   const availableHeight = window.innerHeight - reservedHeight;
 
   rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
+
+  emit('update:totalDisplayedRows', rowsPerPage.value);
 };
 
 const getTotalEntityCount = async () => {
@@ -330,11 +375,27 @@ watch(
     if (newVal) {
       isLoading.value = true;
       debouncedLoadEntities();
+
+      selectedRows.value = new Set();
       debouncedGetTotalEntityCount();
       emit('disableCreateEntitySubmit');
     }
   },
 );
+
+watch(externalCheckboxValue, (val) => emit('update:externalCheckboxValue', val));
+
+watch(
+  () => props.toggleAllRef,
+  (newVal) => {
+    const val = newVal === 'indeterminate' ? true : newVal;
+    toggleAll(val);
+
+    emit('update:externalCheckboxValue', newVal);
+  },
+);
+
+defineExpose({ toggleAll });
 
 onMounted(() => {
   pageNumber.value = Number(route.query.page) || pageNumber.value;
