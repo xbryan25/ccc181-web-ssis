@@ -277,14 +277,16 @@ class ProgramController:
 
         try:
             new_program_data = {
-            'program_code': entity_details['entityDetails']['programCode'],
-            'program_name': entity_details['entityDetails']['programName'],
-            'college_code': entity_details['entityDetails']['collegeCode']
+            'program_code': entity_details['programCode'],
+            'program_name': entity_details['programName'],
+            'college_code': entity_details['collegeCode']['label']
             }
 
             validate_program_code(program_code)
 
             program_code = program_code.strip().upper()
+
+            print(new_program_data)
 
             # Check if program code exists or not
             ProgramServices.get_program_details_service(program_code)
