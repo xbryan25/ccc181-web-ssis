@@ -49,17 +49,28 @@ const onProceed = (localState: {
   searchAndSortState.sortOrder = localState.sortOrder;
 };
 
-const externalCheckboxValue = ref<boolean | 'indeterminate'>(false);
 const selectedRows = ref<number>(0);
 const rowsPerPage = ref<number>(10);
 const loadedRowsPerPage = ref<number>(0);
 
-const toggleAllRef = ref<boolean | 'indeterminate'>(false);
+const externalCheckboxValue = ref<boolean | 'indeterminate'>(false);
 
-watch(
-  () => selectedRows.value,
-  (newVal) => console.log('selectedRows val ' + newVal),
-);
+const toggleAllRef = ref<boolean | 'indeterminate'>(false);
+const toggleAllCounter = ref(0);
+
+function handleToggleAll(nextVal: boolean | 'indeterminate') {
+  // increment counter to ensure watcher triggers
+  toggleAllCounter.value++;
+
+  // optionally store state for Child2 visual
+  externalCheckboxValue.value = nextVal;
+}
+
+watch(selectedRows, (newSelectedRows) => {
+  if (newSelectedRows === 0) externalCheckboxValue.value = false;
+  else if (newSelectedRows === loadedRowsPerPage.value) externalCheckboxValue.value = true;
+  else externalCheckboxValue.value = 'indeterminate';
+});
 </script>
 
 <template>
@@ -84,7 +95,7 @@ watch(
         "
         @update:search-value="(searchValue) => (searchAndSortState.searchValue = searchValue)"
         @update:rows-per-page="(value: number) => (rowsPerPage = value)"
-        @toggle-all="(value) => (toggleAllRef = value)"
+        @toggle-all="(value) => handleToggleAll(value)"
       />
 
       <EntityTable
@@ -95,8 +106,9 @@ watch(
         :sort-field="searchAndSortState.sortField"
         :sort-order="searchAndSortState.sortOrder"
         :create-entity-submit-ref="createEntitySubmitRef"
-        :toggle-all-ref="toggleAllRef"
+        :toggle-all-counter="toggleAllCounter"
         :rows-per-page="rowsPerPage"
+        :external-checkbox-value="externalCheckboxValue"
         @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
         @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
         @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
@@ -109,8 +121,9 @@ watch(
         @update:external-checkbox-value="
           (value: boolean | 'indeterminate') => (externalCheckboxValue = value)
         "
-        @update:selected-rows="(value: number) => (console.log('outside'), (selectedRows = value))"
+        @update:selected-rows="(value: number) => (selectedRows = value)"
         @update:loaded-rows-per-page="(value: number) => (loadedRowsPerPage = value)"
+        @update:page-number="toggleAllRef = false"
         @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
       />
     </div>

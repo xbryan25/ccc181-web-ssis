@@ -46,17 +46,24 @@ const searchValue = computed({
 });
 
 const checkboxValue = computed({
-  get: () => props.externalCheckboxValue,
+  get: () => (
+    console.log('externalCheckboxValue in header ' + props.externalCheckboxValue),
+    props.externalCheckboxValue
+  ),
   set: () => {
-    console.log(props.externalCheckboxValue);
+    // console.log(props.selectedRows);
+    // console.log(props.externalCheckboxValue);
 
-    const nextVal =
-      props.externalCheckboxValue === true || props.externalCheckboxValue === 'indeterminate'
-        ? false
-        : true;
-    emit('toggleAll', nextVal);
+    if (props.selectedRows === 0) emit('toggleAll', true);
+    if (props.selectedRows === props.loadedRowsPerPage) emit('toggleAll', false);
+    else emit('toggleAll', true);
   },
 });
+
+watch(
+  () => props.selectedRows,
+  (val) => console.log(val),
+);
 </script>
 
 <template>

@@ -19,7 +19,8 @@ const props = defineProps<{
   sortOrder: string;
   rowsPerPage: number;
   createEntitySubmitRef: boolean;
-  toggleAllRef: boolean | 'indeterminate';
+  toggleAllCounter: number;
+  externalCheckboxValue: boolean | 'indeterminate';
 }>();
 
 const router = useRouter();
@@ -48,8 +49,8 @@ const emit = defineEmits<{
       | 'update:sortOrder',
     value: string,
   ): void;
-  (e: 'disableCreateEntitySubmit'): void;
-  (e: 'update:externalCheckboxValue', val: boolean | 'indeterminate'): void;
+  (e: 'disableCreateEntitySubmit' | 'update:pageNumber'): void;
+  // (e: 'update:externalCheckboxValue', val: boolean | 'indeterminate'): void;
   (e: 'update:selectedRows' | 'update:loadedRowsPerPage', val: number): void;
 }>();
 
@@ -103,11 +104,11 @@ function getId(r: Student | Program | College): string {
   return '';
 }
 
-const externalCheckboxValue = computed<boolean | 'indeterminate'>(() => {
-  if (selectedRows.value.size === 0) return false;
-  if (selectedRows.value.size === entitiesData.value.length) return true;
-  return 'indeterminate';
-});
+// const externalCheckboxValue = computed<boolean | 'indeterminate'>(() => {
+//   if (selectedRows.value.size === 0) return false;
+//   if (selectedRows.value.size === entitiesData.value.length) return true;
+//   return 'indeterminate';
+// });
 
 // Handler for external checkbox
 function toggleAll(value: boolean | 'indeterminate') {
@@ -206,18 +207,9 @@ const debouncedLoadEntities = useDebounceFn(async () => {
 
   await loadEntities();
 
-  console.log(selectedRows.value);
+  selectedRows.value = new Set();
 
-  selectedRows.value = new Set([...selectedRows.value].slice(0, entitiesData.value.length));
-
-  console.log(selectedRows.value);
-
-  emit(
-    'update:selectedRows',
-    entitiesData.value.length <= selectedRows.value.size
-      ? entitiesData.value.length
-      : selectedRows.value.size,
-  );
+  emit('update:selectedRows', 0);
 }, 700); // 700ms debounce
 
 const totalEntityCount = ref(0);
@@ -392,17 +384,13 @@ watch(
 );
 
 watch(
-  externalCheckboxValue,
-  (val) => (console.log('update?'), emit('update:externalCheckboxValue', val)),
-);
-
-watch(
-  () => props.toggleAllRef,
-  (newVal) => {
-    const val = newVal === 'indeterminate' ? true : newVal;
+  () => props.toggleAllCounter,
+  () => {
+    const val =
+      props.externalCheckboxValue === 'indeterminate' ? true : props.externalCheckboxValue;
     toggleAll(val);
 
-    emit('update:externalCheckboxValue', newVal);
+    // emit('update:externalCheckboxValue', newVal);
   },
 );
 
@@ -413,7 +401,7 @@ watch(isLoading, (newVal) => {
   }
 });
 
-defineExpose({ toggleAll });
+watch(pageNumber, () => emit('update:pageNumber'));
 
 onMounted(async () => {
   pageNumber.value = Number(route.query.page) || pageNumber.value;
