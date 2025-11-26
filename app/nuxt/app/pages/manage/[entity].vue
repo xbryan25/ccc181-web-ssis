@@ -50,7 +50,7 @@ const onProceed = (localState: {
 };
 
 const selectedRows = ref<number>(0);
-const rowsPerPage = ref<number>(10);
+const rowsPerPage = ref<number>(5);
 const loadedRowsPerPage = ref<number>(0);
 const isLoading = ref<boolean>(false);
 

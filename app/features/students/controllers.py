@@ -255,19 +255,25 @@ class StudentController:
             return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
-    def delete_student_controller(id_number: str) -> tuple[Response, int]:
-        """Delete a student record by its code."""
+    def delete_students_controller() -> tuple[Response, int]:
+        """Delete student record(s) given a single ID or a list of IDs."""
 
         try:
-            validate_id_number(id_number)
+            request_json = request.get_json()
+
+            id_numbers = request_json.get("entityIds", [])
+
+            for id_number in id_numbers:
+                validate_id_number(id_number)
+
+            # If all id numbers exist, delete it
+            StudentServices.delete_students_service(id_numbers)
+
+            if len(id_numbers) == 1:
+                return jsonify({"message": f"Student {id_numbers[0]} deleted successfully."}), 200
             
-            # Check if ID number exists or not
-            StudentServices.get_student_details_service(id_number.strip())
-
-            # If it exists, delete it
-            StudentServices.delete_student_service(id_number.strip())
-
-            return jsonify({"message": "Student deleted successfully."}), 200
+            else:
+                return jsonify({"message": f"{len(id_numbers)} students deleted successfully."}), 200
         
         except EntityNotFoundError as e:
             traceback.print_exc()

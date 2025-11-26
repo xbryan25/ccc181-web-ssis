@@ -91,15 +91,15 @@ class ProgramServices:
         ProgramRepository.create_program(program_data)
 
     @staticmethod
-    def delete_program_service(program_code: str) -> None:
+    def delete_programs_service(program_codes: list[str]) -> None:
         """
-        Delete a program record by its program_code.
+        Delete program records by its program_code.
 
         Args:
-            program_code (str): program_code of the program to be deleted.
+            program_codes (list[str]): A list of program_codes of the programs(s) to be deleted.
         """
 
-        ProgramRepository.delete_program(program_code)
+        ProgramRepository.delete_programs(program_codes)
 
     @staticmethod
     def edit_program_details_service(program_code: str, new_program_data) -> None:

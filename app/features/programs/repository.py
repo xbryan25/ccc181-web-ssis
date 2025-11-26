@@ -23,7 +23,7 @@ class ProgramRepository:
         return db.fetch_one(CommonQueries.GET_BY_ID.format(table="programs", pk="program_code"), (program_code, ))
 
     @staticmethod
-    def get_total_program_count(params) -> dict[str, str]:
+    def get_total_program_count(params) -> dict[str, int]:
         """
         Retrieve the total number of programs based on a specific filter.
 
@@ -130,17 +130,17 @@ class ProgramRepository:
                          (program_data["program_code"], program_data["program_name"], program_data["college_code"]))
 
     @staticmethod
-    def delete_program(program_code: str) -> None:
+    def delete_programs(program_codes: list[str]) -> None:
         """
-        Delete a program record from the database using their program code.
+        Delete program records from the database using their program codes.
 
         Args:
-            program_code (str): The unique program code of the program to delete.
+            program_codes (list[str]): A list of unique program codes of the programs to delete.
         """
 
         db = current_app.extensions['db']
 
-        db.execute_query(CommonQueries.DELETE_BY_ID.format(table="programs", pk="program_code"), (program_code, ))
+        db.execute_query(CommonQueries.DELETE_BY_ID.format(table="programs", pk="program_code"), (program_codes, ))
 
     @staticmethod
     def edit_program_details(program_code: str, new_program_data) -> None:

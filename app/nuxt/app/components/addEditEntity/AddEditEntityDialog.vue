@@ -123,6 +123,8 @@ async function onSubmit(newEntity: StudentFormState | ProgramFormState | College
       description: errorMessage,
       color: 'error',
     });
+
+    isSubmitting.value = false;
   }
 }
 

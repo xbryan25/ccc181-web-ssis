@@ -121,26 +121,28 @@ class StudentServices:
             
 
     @staticmethod
-    def delete_student_service(id_number: str) -> None:
+    def delete_students_service(id_numbers: list[str]) -> None:
         """
-        Delete a student record and avatar by its id_number.
+        Delete student records and avatars by its id_number.
 
         Args:
-            id_number (str): id_number of the student to be deleted.
+            id_numbers (list[str]): A list of id_numbers of the student(s) to be deleted.
         """
 
         supabase: Client = create_client(
-                current_app.config.get("SUPABASE_URL", ""),
-                current_app.config.get("SUPABASE_SERVICE_KEY", ""),
-            )
+            current_app.config.get("SUPABASE_URL", ""),
+            current_app.config.get("SUPABASE_SERVICE_KEY", ""),
+        )
 
         bucket_name = current_app.config.get("SUPABASE_BUCKET_NAME", "avatars")
 
-        current_avatar_url = StudentRepository.get_avatar_url(id_number)['avatar_url']
+        for id_number in id_numbers:
+            current_avatar_url = StudentRepository.get_avatar_url(id_number)['avatar_url']
 
-        delete_images_from_bucket(supabase, bucket_name, current_app.config.get("SUPABASE_URL", ""), current_avatar_url)
+            if current_avatar_url:
+                delete_images_from_bucket(supabase, bucket_name, current_app.config.get("SUPABASE_URL", ""), current_avatar_url)
 
-        StudentRepository.delete_student(id_number=id_number)
+        StudentRepository.delete_students(id_numbers=id_numbers)
 
     @staticmethod
     def edit_student_details_service(id_number: str, new_student_data, new_student_avatar) -> None:
@@ -190,7 +192,7 @@ class StudentServices:
 
 
     @staticmethod
-    def get_year_level_demographics_service(params) -> list[dict[str, int | str]]:
+    def get_year_level_demographics_service(params) -> list[dict[str, str]]:
         """
         Retrieve student year-level demographics.
         
@@ -213,7 +215,7 @@ class StudentServices:
         return formatted_year_level_demographics
     
     @staticmethod
-    def get_gender_demographics_service(params) -> list[dict[str, int | str]]:
+    def get_gender_demographics_service(params) -> list[dict[str, str]]:
         """
         Retrieve student gender demographics.
         

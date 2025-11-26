@@ -34,8 +34,8 @@ const emit = defineEmits<{
 
 const isOpenAddDialog = ref(false);
 
-const rowsPerPageItems = ref([10, 25, 50]);
-const rowsPerPage = ref(10);
+const rowsPerPageItems = ref([5, 10, 25, 50]);
+const rowsPerPage = ref(5);
 
 const openAddDialog = () => {
   isOpenAddDialog.value = true;
