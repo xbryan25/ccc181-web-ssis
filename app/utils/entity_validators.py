@@ -19,10 +19,10 @@ def validate_college_code(college_code: str, can_be_none: bool = False) -> None:
         return
 
     if not college_code:
-        raise ValidationError("College code cannot be blank.")
+        raise ValidationError("A college code cannot be blank.")
     
     if not isinstance(college_code, str):
-        raise ValidationError("College code must be a string.")
+        raise ValidationError("A college code must be a string.")
     
     college_code = college_code.strip().upper()
     
@@ -56,10 +56,10 @@ def validate_program_code(program_code: str, can_be_none: bool = False) -> None:
         return
 
     if not program_code:
-        raise ValidationError("Program code cannot be blank.")
+        raise ValidationError("A program code cannot be blank.")
     
     if not isinstance(program_code, str):
-        raise ValidationError("Program code must be a string.")
+        raise ValidationError("A program code must be a string.")
     
     program_code = program_code.strip().upper()
     
@@ -90,10 +90,10 @@ def validate_id_number(id_number: str) -> None:
     """Validates inputted ID number according to ID_NUMBER_REGEX."""
 
     if not id_number:
-        raise ValidationError("ID number cannot be blank.")
+        raise ValidationError(f"An ID number cannot be blank.")
     
     if not isinstance(id_number, str):
-        raise ValidationError("ID number must be a string.")
+        raise ValidationError(f"An ID number must be a string.")
     
     id_number = id_number.strip()
 

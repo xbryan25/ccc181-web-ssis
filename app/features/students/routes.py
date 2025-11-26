@@ -165,25 +165,21 @@ def create_student() -> tuple[Response, int]:
 
     return StudentController.create_student_controller()
 
-@student_bp.route("/<string:id_number>", methods=["DELETE"])
+@student_bp.route("/", methods=["DELETE"])
 @jwt_required()
-def delete_student(id_number: str) -> tuple[Response, int]:
+def delete_students() -> tuple[Response, int]:
     """
-    Delete a student record by its code.
+    Delete student record(s) given a single ID or a list of IDs.
 
     This endpoint requires authentication via a valid access token (HTTP-only cookie). It deletes a student entry from the database based on the provided ID number.
 
-    Request parameters:
-
-        id_number: The unique code identifying the student to be deleted.
-
     Request body:
 
-        None. This endpoint does not require any input data.
+        entityIds: A list of unique codes identifying the student(s) to be deleted.
 
     Response JSON:
 
-        message: A confirmation message indicating that the student was deleted successfully.
+        message: A confirmation message indicating that the student(s) was/were deleted successfully.
 
     Possible errors:
 
@@ -192,7 +188,7 @@ def delete_student(id_number: str) -> tuple[Response, int]:
         500 if an unexpected error occurs during processing.
     """
 
-    return StudentController.delete_student_controller(id_number)
+    return StudentController.delete_students_controller()
 
 @student_bp.route("/<string:id_number>", methods=["PATCH"])
 @jwt_required()

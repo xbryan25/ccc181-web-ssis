@@ -135,18 +135,18 @@ class StudentRepository:
                                                       student_data["year_level"], student_data["gender"], student_data["program_code"]))
 
     @staticmethod
-    def delete_student(id_number: str) -> None:
+    def delete_students(id_numbers: list[str]) -> None:
         """
-        Delete a student record from the database using their ID number.
+        Delete student records from the database using their ID numbers.
 
         Args:
-            id_number (str): The unique ID number of the student to delete.
+            id_numbers (list[str]): A list of unique ID numbers of the students to delete.
 
         """
 
         db = current_app.extensions['db']
 
-        db.execute_query(CommonQueries.DELETE_BY_ID.format(table="students", pk="id_number"), (id_number, ))
+        db.execute_query(CommonQueries.DELETE_BY_ID.format(table="students", pk="id_number"), (id_numbers, ))
 
     @staticmethod
     def edit_student_details(id_number: str, new_student_data) -> None:

@@ -140,25 +140,21 @@ def create_college() -> tuple[Response, int]:
 
     return CollegeController.create_college_controller()
 
-@college_bp.route("/<string:college_code>", methods=["DELETE"])
+@college_bp.route("/", methods=["DELETE"])
 @jwt_required()
-def delete_college(college_code: str) -> tuple[Response, int]:
+def delete_colleges() -> tuple[Response, int]:
     """
-    Delete a college record by its code.
+    Delete college record(s) given a single college code or a list of college codes.
 
     This endpoint requires authentication via a valid access token (HTTP-only cookie). It deletes a college entry from the database based on the provided college code.
 
-    Request parameters:
-
-        college_code": The unique code identifying the college to be deleted.
-
     Request body:
 
-        None. This endpoint does not require any input data.
+        entityIds: A list of unique codes identifying the colleges(s) to be deleted.
 
     Response JSON:
 
-        message: A confirmation message indicating that the college was deleted successfully.
+        message: A confirmation message indicating that the college(s) was/were deleted successfully.
 
     Possible errors:
 
@@ -167,7 +163,7 @@ def delete_college(college_code: str) -> tuple[Response, int]:
         500 if an unexpected error occurs during processing.
     """
 
-    return CollegeController.delete_college_controller(college_code)
+    return CollegeController.delete_colleges_controller()
 
 @college_bp.route("/<string:college_code>", methods=["PATCH"])
 @jwt_required()

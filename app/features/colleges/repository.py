@@ -120,17 +120,17 @@ class CollegeRepository:
                          (college_data["college_code"], college_data["college_name"]))
 
     @staticmethod
-    def delete_college(college_code: str) -> None:
+    def delete_colleges(college_codes: list[str]) -> None:
         """
-        Delete a college record from the database using their college code.
+        Delete college records from the database using their college codes.
 
         Args:
-            college_code (str): The unique college code of the college to delete.
+            college_codes (list[str]): A list of unique college codes of the colleges to delete.
         """
 
         db = current_app.extensions['db']
 
-        db.execute_query(CommonQueries.DELETE_BY_ID.format(table="colleges", pk="college_code"), (college_code, ))
+        db.execute_query(CommonQueries.DELETE_BY_ID.format(table="colleges", pk="college_code"), (college_codes, ))
 
     @staticmethod
     def edit_college_details(college_code: str, new_college_data) -> None:
