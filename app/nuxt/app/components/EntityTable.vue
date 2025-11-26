@@ -49,9 +49,9 @@ const emit = defineEmits<{
       | 'update:sortOrder',
     value: string,
   ): void;
-  (e: 'disableCreateEntitySubmit' | 'update:pageNumber'): void;
-  // (e: 'update:externalCheckboxValue', val: boolean | 'indeterminate'): void;
+  (e: 'disableCreateEntitySubmit'): void;
   (e: 'update:selectedRows' | 'update:loadedRowsPerPage', val: number): void;
+  (e: 'update:isLoading', value: boolean): void;
 }>();
 
 const openConfirmDeleteDialog = (row: Student | Program | College) => {
@@ -103,12 +103,6 @@ function getId(r: Student | Program | College): string {
   if ('collegeCode' in r) return r.collegeCode;
   return '';
 }
-
-// const externalCheckboxValue = computed<boolean | 'indeterminate'>(() => {
-//   if (selectedRows.value.size === 0) return false;
-//   if (selectedRows.value.size === entitiesData.value.length) return true;
-//   return 'indeterminate';
-// });
 
 // Handler for external checkbox
 function toggleAll(value: boolean | 'indeterminate') {
@@ -198,12 +192,14 @@ const loadEntities = async () => {
   entitiesData.value = data.entities;
 
   isLoading.value = false;
+  emit('update:isLoading', isLoading.value);
 
   emit('update:loadedRowsPerPage', entitiesData.value.length);
 };
 
 const debouncedLoadEntities = useDebounceFn(async () => {
   isLoading.value = true;
+  emit('update:isLoading', isLoading.value);
 
   await loadEntities();
 
@@ -376,6 +372,8 @@ watch(
   (newVal) => {
     if (newVal) {
       isLoading.value = true;
+      emit('update:isLoading', isLoading.value);
+
       debouncedLoadEntities();
       debouncedGetTotalEntityCount();
       emit('disableCreateEntitySubmit');
@@ -389,8 +387,6 @@ watch(
     const val =
       props.externalCheckboxValue === 'indeterminate' ? true : props.externalCheckboxValue;
     toggleAll(val);
-
-    // emit('update:externalCheckboxValue', newVal);
   },
 );
 
@@ -400,8 +396,6 @@ watch(isLoading, (newVal) => {
     delayedRowsPerPage.value = rowsPerPage.value;
   }
 });
-
-watch(pageNumber, () => emit('update:pageNumber'));
 
 onMounted(async () => {
   pageNumber.value = Number(route.query.page) || pageNumber.value;
@@ -432,6 +426,7 @@ onMounted(async () => {
       () => {
         router.replace({ query: updateUrl() });
         isLoading.value = true;
+        emit('update:isLoading', isLoading.value);
         debouncedLoadEntities();
         debouncedGetTotalEntityCount();
       },
@@ -456,6 +451,7 @@ onBeforeUnmount(() => {
     :selected-entity="selectedEntity"
     @on-submit="
       isLoading = true;
+      emit('update:isLoading', isLoading);
       debouncedLoadEntities();
       debouncedGetTotalEntityCount();
     "
@@ -468,6 +464,7 @@ onBeforeUnmount(() => {
     :selected-entity="selectedEntity"
     @on-delete="
       isLoading = true;
+      emit('update:isLoading', isLoading);
       debouncedLoadEntities();
       debouncedGetTotalEntityCount();
     "

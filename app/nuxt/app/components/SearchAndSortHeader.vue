@@ -13,6 +13,7 @@ const props = defineProps<{
     sortField: string;
     sortOrder: string;
   };
+  isLoading: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -51,11 +52,8 @@ const checkboxValue = computed({
     props.externalCheckboxValue
   ),
   set: () => {
-    // console.log(props.selectedRows);
-    // console.log(props.externalCheckboxValue);
-
     if (props.selectedRows === 0) emit('toggleAll', true);
-    if (props.selectedRows === props.loadedRowsPerPage) emit('toggleAll', false);
+    else if (props.selectedRows === props.loadedRowsPerPage) emit('toggleAll', false);
     else emit('toggleAll', true);
   },
 });
@@ -68,7 +66,10 @@ watch(
 
 <template>
   <div class="flex gap-[10px]">
-    <div class="flex-1 flex pl-3 items-center gap-3">
+    <div
+      v-if="!props.isLoading && props.loadedRowsPerPage > 0"
+      class="flex-1 flex pl-3 items-center gap-3"
+    >
       <UCheckbox v-model="checkboxValue" :ui="{ base: 'cursor-pointer' }" />
 
       <div class="text-sm text-muted">
@@ -86,6 +87,8 @@ watch(
         </UTooltip>
       </div>
     </div>
+
+    <div v-else class="flex-1 flex pl-3 items-center gap-3" />
 
     <div class="flex-[2] flex gap-3 justify-center">
       <UInput

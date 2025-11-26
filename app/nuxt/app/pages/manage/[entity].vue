@@ -52,17 +52,14 @@ const onProceed = (localState: {
 const selectedRows = ref<number>(0);
 const rowsPerPage = ref<number>(10);
 const loadedRowsPerPage = ref<number>(0);
+const isLoading = ref<boolean>(false);
 
 const externalCheckboxValue = ref<boolean | 'indeterminate'>(false);
 
-const toggleAllRef = ref<boolean | 'indeterminate'>(false);
 const toggleAllCounter = ref(0);
 
 function handleToggleAll(nextVal: boolean | 'indeterminate') {
-  // increment counter to ensure watcher triggers
   toggleAllCounter.value++;
-
-  // optionally store state for Child2 visual
   externalCheckboxValue.value = nextVal;
 }
 
@@ -84,6 +81,7 @@ watch(selectedRows, (newSelectedRows) => {
         :loaded-rows-per-page="loadedRowsPerPage"
         :entity-type="entity"
         :search-and-sort-state="searchAndSortState"
+        :is-loading="isLoading"
         @on-create-entity-submit="() => (createEntitySubmitRef = true)"
         @on-proceed="
           (localState: {
@@ -123,7 +121,7 @@ watch(selectedRows, (newSelectedRows) => {
         "
         @update:selected-rows="(value: number) => (selectedRows = value)"
         @update:loaded-rows-per-page="(value: number) => (loadedRowsPerPage = value)"
-        @update:page-number="toggleAllRef = false"
+        @update:is-loading="(value: boolean) => (isLoading = value)"
         @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
       />
     </div>
