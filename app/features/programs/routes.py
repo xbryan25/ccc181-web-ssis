@@ -146,25 +146,21 @@ def create_program() -> tuple[Response, int]:
 
     return ProgramController.create_program_controller()
 
-@program_bp.route("/<string:program_code>", methods=["DELETE"])
+@program_bp.route("/", methods=["DELETE"])
 @jwt_required()
-def delete_program(program_code: str) -> tuple[Response, int]:
+def delete_programs() -> tuple[Response, int]:
     """
-    Delete a program record by its code.
+    Delete program record(s) given a single program code or a list of program codes.
 
     This endpoint requires authentication via a valid access token (HTTP-only cookie). It deletes a program entry from the database based on the provided program code.
 
-    Request parameters:
-
-        program_code: The unique code identifying the program to be deleted.
-
     Request body:
 
-        None. This endpoint does not require any input data.
+        entityIds: A list of unique codes identifying the program(s) to be deleted.
 
     Response JSON:
 
-        message: A confirmation message indicating that the program was deleted successfully.
+        message: A confirmation message indicating that the program(s) was/were deleted successfully.
 
     Possible errors:
 
@@ -173,7 +169,7 @@ def delete_program(program_code: str) -> tuple[Response, int]:
         500 if an unexpected error occurs during processing.
     """
 
-    return ProgramController.delete_program_controller(program_code)
+    return ProgramController.delete_programs_controller()
 
 @program_bp.route("/<string:program_code>", methods=["PATCH"])
 @jwt_required()

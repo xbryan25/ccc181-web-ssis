@@ -232,19 +232,28 @@ class ProgramController:
             return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
-    def delete_program_controller(program_code: str) -> tuple[Response, int]:
-        """Delete a program record by its code."""
+    def delete_programs_controller() -> tuple[Response, int]:
+        """Delete program record(s) given a single program code or a list of program codes."""
 
         try:
-            validate_program_code(program_code)
+            request_json = request.get_json()
 
-            # Check if program code exists or not
-            ProgramServices.get_program_details_service(program_code.strip().upper())
+            program_codes = request_json.get("entityIds", [])
 
-            # If it exists, delete it
-            ProgramServices.delete_program_service(program_code.strip().upper())
+            program_codes_upper = []
 
-            return jsonify({"message": "Program deleted successfully."}), 200
+            for program_code in program_codes:
+                validate_program_code(program_code)
+                program_codes_upper.append(program_code.strip().upper())
+
+            # If all program codes exist, delete it
+            ProgramServices.delete_programs_service(program_codes_upper)
+
+            if len(program_codes_upper) == 1:
+                return jsonify({"message": f"Program {program_codes_upper[0]} deleted successfully."}), 200
+
+            else:
+                return jsonify({"message": f"{len(program_codes_upper)} programs deleted successfully."}), 200
         
         except EntityNotFoundError as e:
             traceback.print_exc()

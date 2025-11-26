@@ -1,16 +1,39 @@
 import type { Row } from "@tanstack/vue-table";
-import type { DefineComponent } from "vue";
+import type { DefineComponent, Ref } from "vue";
 import type { Student } from "~/types";
 import { getRowItems } from "#imports";
 
 export function getStudentsTableColumns(callbacks :{
   openEditDialog: (row: Student) => void;
   openConfirmDeleteDialog: (row: Student) => void;
- }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent}, UAvatar: DefineComponent, onAvatarClick: (avatarUrl: string) => void) { 
+  }, components: { UCheckbox: DefineComponent; UButton: DefineComponent; UDropdownMenu: DefineComponent},
+  UAvatar: DefineComponent, onAvatarClick: (avatarUrl: string) => void, isLoading: Ref<boolean>,
+  selectedRows: Ref<Set<string>>, onCheckboxToggle: (idNumber: string, value: boolean) => void) { 
 
-  const {UButton, UDropdownMenu} = components
+  const {UCheckbox, UButton, UDropdownMenu} = components
 
   return [
+    {
+      id: 'select',
+      cell: ({ row }: { row: Row<Student> }) =>
+        h(UCheckbox, {
+          ui: {
+            base: 'cursor-pointer',
+          },
+          disabled: isLoading.value,
+          modelValue: computed(() => selectedRows.value.has(row.original.idNumber)).value,
+          'onUpdate:modelValue': (value: boolean) => {
+            onCheckboxToggle(row.original.idNumber, value);
+          },
+          'aria-label': 'Select row',
+        }),
+      meta: {
+        class: {
+          th: 'w-12',
+          td: 'w-12',
+        },
+      },
+    },
     {
       id: "actions",
 
@@ -114,5 +137,6 @@ export function getStudentsTableColumns(callbacks :{
         },
       },
     },
-  ]};
+  ]
+};
 

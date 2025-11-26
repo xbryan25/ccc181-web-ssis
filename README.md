@@ -54,6 +54,7 @@ The application uses Docker to orchestrate containers and ensure reproducible de
 - Single Page Application (SPA) for seamless user experience
 - Theme customization, with support for many colors, and light/dark mode
 - Students can have avatars; supports image upload, update, deletion, and storage using Supabase Storage
+- Toggleable rows per page (5, 10, 25, 50) allowing dynamic table density and automatic pagination limit reflow.
 
 ## Screenshots
 

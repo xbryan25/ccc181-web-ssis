@@ -179,19 +179,28 @@ class CollegeController:
             return jsonify({"error": "An unexpected error occurred."}), 500
 
     @staticmethod
-    def delete_college_controller(college_code: str) -> tuple[Response, int]:
-        """Delete a college record by its code."""
+    def delete_colleges_controller() -> tuple[Response, int]:
+        """Delete college record(s) given a single college code or a list of college codes."""
 
         try:
-            validate_college_code(college_code)
+            request_json = request.get_json()
 
-            # Check if college code exists or not
-            CollegeServices.get_college_details_service(college_code.strip().upper())
+            college_codes = request_json.get("entityIds", [])
+
+            college_codes_upper = []
+
+            for college_code in college_codes:
+                validate_college_code(college_code.strip().upper())
+                college_codes_upper.append(college_code.strip().upper())
 
             # If it exists, delete it
-            CollegeServices.delete_college_service(college_code.strip().upper())
+            CollegeServices.delete_colleges_service(college_codes_upper)
 
-            return jsonify({"message": "College deleted successfully."}), 200
+            if len(college_codes_upper) == 1:
+                return jsonify({"message": f"College {college_codes_upper[0]} deleted successfully."}), 200
+
+            else:
+                return jsonify({"message": f"{len(college_codes_upper)} colleges deleted successfully."}), 200
         
         except EntityNotFoundError as e:
             traceback.print_exc()

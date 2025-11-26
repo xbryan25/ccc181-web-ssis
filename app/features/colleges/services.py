@@ -89,15 +89,15 @@ class CollegeServices:
         CollegeRepository.create_college(college_data)
 
     @staticmethod
-    def delete_college_service(college_code: str) -> None:
+    def delete_colleges_service(college_codes: list[str]) -> None:
         """
-        Delete a college record by its college_code.
+        Delete college records by its college_code.
 
         Args:
-            college_code (str): college_code of the college to be deleted.
+            college_codes (list[str]): A list of college_codes of the colleges(s) to be deleted.
         """
 
-        CollegeRepository.delete_college(college_code)
+        CollegeRepository.delete_colleges(college_codes)
 
     @staticmethod
     def edit_college_details_service(college_code: str, new_college_data) -> None:

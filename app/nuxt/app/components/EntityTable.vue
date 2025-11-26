@@ -17,7 +17,11 @@ const props = defineProps<{
   searchType: string;
   sortField: string;
   sortOrder: string;
+  rowsPerPage: number;
   createEntitySubmitRef: boolean;
+  toggleAllCounter: number;
+  externalCheckboxValue: boolean | 'indeterminate';
+  isOpenConfirmDeleteDialogMultipleRowsCounter: number;
 }>();
 
 const router = useRouter();
@@ -36,6 +40,20 @@ const internalSearchType = ref(props.searchType);
 const internalSortField = ref(props.sortField);
 const internalSortOrder = ref(props.sortOrder);
 
+const entitiesData = ref<Student[] | Program[] | College[]>([]);
+
+const UCheckbox = resolveComponent('UCheckbox') as DefineComponent;
+const UButton = resolveComponent('UButton') as DefineComponent;
+const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
+const UAvatar = resolveComponent('UAvatar') as DefineComponent;
+
+const tableButtons = { UCheckbox, UButton, UDropdownMenu };
+
+const selectedRows = ref<Set<string>>(new Set());
+const rowsToBeDeleted = ref<Set<string>>(new Set());
+
+const isLoading = ref(true);
+
 const emit = defineEmits<{
   (
     e:
@@ -47,18 +65,26 @@ const emit = defineEmits<{
     value: string,
   ): void;
   (e: 'disableCreateEntitySubmit'): void;
+  (e: 'update:selectedRows' | 'update:loadedRowsPerPage', val: number): void;
+  (e: 'update:isLoading', value: boolean): void;
 }>();
 
-const openConfirmDeleteDialog = (row: Student | Program | College) => {
+const openConfirmDeleteDialogSingleRow = (row: Student | Program | College) => {
   isOpenConfirmDeleteDialog.value = true;
 
   if (props.entityType === 'students') {
-    selectedEntity.value = (row as Student).idNumber;
+    rowsToBeDeleted.value = new Set<string>([(row as Student).idNumber]);
   } else if (props.entityType === 'programs') {
-    selectedEntity.value = (row as Program).programCode;
+    rowsToBeDeleted.value = new Set<string>([(row as Program).programCode]);
   } else {
-    selectedEntity.value = (row as College).collegeCode;
+    rowsToBeDeleted.value = new Set<string>([(row as College).collegeCode]);
   }
+};
+
+const openConfirmDeleteDialog = () => {
+  isOpenConfirmDeleteDialog.value = true;
+
+  rowsToBeDeleted.value = new Set(selectedRows.value);
 };
 
 const openConfirmEditDialog = (row: Student | Program | College) => {
@@ -73,44 +99,71 @@ const openConfirmEditDialog = (row: Student | Program | College) => {
   }
 };
 
-const entitiesData = ref<Student[] | Program[] | College[]>([]);
-
-const UButton = resolveComponent('UButton') as DefineComponent;
-const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
-const UAvatar = resolveComponent('UAvatar') as DefineComponent;
-
-const tableButtons = { UButton, UDropdownMenu };
-
 const showAvatar = (avatarUrl: string) => {
   showImageModal.value = true;
 
   currentAvatarUrlToDisplay.value = avatarUrl ? avatarUrl : 'images/noAvatar.jpg';
 };
 
+function getId(r: Student | Program | College): string {
+  if ('idNumber' in r) return r.idNumber;
+  if ('programCode' in r) return r.programCode;
+  if ('collegeCode' in r) return r.collegeCode;
+  return '';
+}
+
+// Handler for external checkbox
+function toggleAll(value: boolean | 'indeterminate') {
+  const val = value === 'indeterminate' ? true : value;
+  if (val) selectedRows.value = new Set<string>(entitiesData.value.map((r) => getId(r)));
+  else selectedRows.value = new Set();
+
+  emit('update:selectedRows', selectedRows.value.size);
+}
+
+// Row checkbox toggle
+function toggleRow(id: string, value: boolean) {
+  const newSet = new Set(selectedRows.value);
+  if (value) newSet.add(id);
+  else newSet.delete(id);
+  selectedRows.value = newSet;
+
+  emit('update:selectedRows', selectedRows.value.size);
+}
+
 const studentTableColumns = getStudentsTableColumns(
   {
     openEditDialog: (row: Student) => openConfirmEditDialog(row),
-    openConfirmDeleteDialog: (row: Student) => openConfirmDeleteDialog(row),
+    openConfirmDeleteDialog: (row: Student) => openConfirmDeleteDialogSingleRow(row),
   },
   tableButtons,
   UAvatar,
   showAvatar,
+  isLoading,
+  selectedRows,
+  toggleRow,
 );
 
 const programsTableColumns = getProgramsTableColumns(
   {
     openEditDialog: (row: Program) => openConfirmEditDialog(row),
-    openConfirmDeleteDialog: (row: Program) => openConfirmDeleteDialog(row),
+    openConfirmDeleteDialog: (row: Program) => openConfirmDeleteDialogSingleRow(row),
   },
   tableButtons,
+  isLoading,
+  selectedRows,
+  toggleRow,
 );
 
 const collegesTableColumns = getCollegesTableColumns(
   {
     openEditDialog: (row: College) => openConfirmEditDialog(row),
-    openConfirmDeleteDialog: (row: College) => openConfirmDeleteDialog(row),
+    openConfirmDeleteDialog: (row: College) => openConfirmDeleteDialogSingleRow(row),
   },
   tableButtons,
+  isLoading,
+  selectedRows,
+  toggleRow,
 );
 
 const updateUrl = () => {
@@ -128,8 +181,6 @@ const updateUrl = () => {
 
   return newQuery;
 };
-
-const isLoading = ref(true);
 
 const loadEntities = async () => {
   // isLoading.value = true;
@@ -149,33 +200,31 @@ const loadEntities = async () => {
   entitiesData.value = data.entities;
 
   isLoading.value = false;
+  emit('update:isLoading', isLoading.value);
+
+  emit('update:loadedRowsPerPage', entitiesData.value.length);
 };
 
 const debouncedLoadEntities = useDebounceFn(async () => {
   isLoading.value = true;
+  emit('update:isLoading', isLoading.value);
 
   await loadEntities();
+
+  selectedRows.value = new Set();
+
+  emit('update:selectedRows', 0);
 }, 700); // 700ms debounce
 
 const totalEntityCount = ref(0);
 const pageNumber = ref(1);
-const reservedHeight = 300;
-const rowsPerPage = ref(0);
+const delayedPageNumber = ref(1);
 
-const updatePagination = () => {
-  calculateRows();
-  debouncedGetTotalEntityCount();
-};
+const rowsPerPage = computed(() => props.rowsPerPage);
+const delayedRowsPerPage = ref(10);
 
-const calculateRows = () => {
-  // const row = document.querySelector('table tbody tr');
-  // const rowHeight = row?.clientHeight ? row?.clientHeight - 1 : 63;
-
-  const rowHeight = props.entityType === 'students' ? 81 : 64;
-
-  const availableHeight = window.innerHeight - reservedHeight;
-
-  rowsPerPage.value = Math.max(5, Math.floor(availableHeight / rowHeight));
+const updatePagination = async () => {
+  await debouncedGetTotalEntityCount();
 };
 
 const getTotalEntityCount = async () => {
@@ -329,6 +378,8 @@ watch(
   (newVal) => {
     if (newVal) {
       isLoading.value = true;
+      emit('update:isLoading', isLoading.value);
+
       debouncedLoadEntities();
       debouncedGetTotalEntityCount();
       emit('disableCreateEntitySubmit');
@@ -336,7 +387,28 @@ watch(
   },
 );
 
-onMounted(() => {
+watch(
+  () => props.toggleAllCounter,
+  () => {
+    const val =
+      props.externalCheckboxValue === 'indeterminate' ? true : props.externalCheckboxValue;
+    toggleAll(val);
+  },
+);
+
+watch(isLoading, (newVal) => {
+  if (!newVal) {
+    delayedPageNumber.value = pageNumber.value;
+    delayedRowsPerPage.value = rowsPerPage.value;
+  }
+});
+
+watch(
+  () => props.isOpenConfirmDeleteDialogMultipleRowsCounter,
+  () => openConfirmDeleteDialog(),
+);
+
+onMounted(async () => {
   pageNumber.value = Number(route.query.page) || pageNumber.value;
 
   internalSearchValue.value = String(route.query.searchValue || internalSearchValue.value);
@@ -345,9 +417,9 @@ onMounted(() => {
   internalSortField.value = String(route.query.sortField || internalSortField.value);
   internalSortOrder.value = String(route.query.sortOrder || internalSortOrder.value);
 
-  validateUrlInput();
+  await updatePagination();
 
-  updatePagination();
+  validateUrlInput();
 
   // This watch function 'watches' any changes in table filters and pagination, doesn't include parent changes
   // nextTick ensures that watcher setup will be delayed after validation is done
@@ -365,6 +437,7 @@ onMounted(() => {
       () => {
         router.replace({ query: updateUrl() });
         isLoading.value = true;
+        emit('update:isLoading', isLoading.value);
         debouncedLoadEntities();
         debouncedGetTotalEntityCount();
       },
@@ -389,6 +462,7 @@ onBeforeUnmount(() => {
     :selected-entity="selectedEntity"
     @on-submit="
       isLoading = true;
+      emit('update:isLoading', isLoading);
       debouncedLoadEntities();
       debouncedGetTotalEntityCount();
     "
@@ -398,9 +472,10 @@ onBeforeUnmount(() => {
     v-model:is-open="isOpenConfirmDeleteDialog"
     class="ml-auto hidden"
     :entity-type="props.entityType"
-    :selected-entity="selectedEntity"
+    :rows-to-be-deleted="rowsToBeDeleted"
     @on-delete="
       isLoading = true;
+      emit('update:isLoading', isLoading);
       debouncedLoadEntities();
       debouncedGetTotalEntityCount();
     "
@@ -436,7 +511,18 @@ onBeforeUnmount(() => {
     class="flex-1 overflow-y-hidden"
   />
 
-  <div class="flex justify-center">
+  <div v-if="entitiesData.length > 0" class="grid grid-cols-3 items-center mb-5">
+    <div v-if="entitiesData.length == 1" class="text-sm text-muted pl-3">
+      {{ delayedRowsPerPage * (delayedPageNumber - 1) + 1 }} of {{ totalEntityCount }}.
+    </div>
+    <div v-else class="text-sm text-muted pl-3">
+      {{ delayedRowsPerPage * (delayedPageNumber - 1) + 1 }}-{{
+        delayedRowsPerPage * delayedPageNumber > totalEntityCount
+          ? totalEntityCount
+          : delayedRowsPerPage * delayedPageNumber
+      }}
+      of {{ totalEntityCount }}.
+    </div>
     <UPagination
       v-model:page="pageNumber"
       :items-per-page="rowsPerPage"
@@ -444,6 +530,7 @@ onBeforeUnmount(() => {
       size="xl"
       :sibling-count="0"
       :total="totalEntityCount"
+      class="flex justify-center"
     />
   </div>
 

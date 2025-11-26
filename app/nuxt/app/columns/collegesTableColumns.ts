@@ -7,31 +7,53 @@ import { getRowItems } from "#imports";
 export function getCollegesTableColumns(callbacks :{
   openEditDialog: (row: College) => void;
   openConfirmDeleteDialog: (row: College) => void;
- }, components: { UButton: DefineComponent; UDropdownMenu: DefineComponent }) { 
+  }, components: { UCheckbox: DefineComponent; UButton: DefineComponent; UDropdownMenu: DefineComponent }, isLoading: Ref<boolean>,
+  selectedRows: Ref<Set<string>>, onCheckboxToggle: (idNumber: string, value: boolean) => void) { 
 
-  const {UButton, UDropdownMenu} = components
+  const {UCheckbox, UButton, UDropdownMenu} = components
 
   return [
-  {
-    accessorKey: "collegeCode",
-    header: "College Code",
-    meta: {
-      class: {
-        th: "w-42",
-        td: "w-42 text-md",
+    {
+      id: 'select',
+      cell: ({ row }: { row: Row<College> }) =>
+        h(UCheckbox, {
+          ui: {
+            base: 'cursor-pointer',
+          },
+          disabled: isLoading.value,
+          modelValue: computed(() => selectedRows.value.has(row.original.collegeCode)).value,
+          'onUpdate:modelValue': (value: boolean) => {
+            onCheckboxToggle(row.original.collegeCode, value);
+          },
+          'aria-label': 'Select row',
+        }),
+      meta: {
+        class: {
+          th: 'w-12',
+          td: 'w-12',
+        },
       },
     },
-  },
-  {
-    accessorKey: "collegeName",
-    header: "College Name",
-    meta: {
-      class: {
-        td: "text-md",
+    {
+      accessorKey: "collegeCode",
+      header: "College Code",
+      meta: {
+        class: {
+          th: "w-42",
+          td: "w-42 text-md",
+        },
       },
     },
-  },
-  {
+    {
+      accessorKey: "collegeName",
+      header: "College Name",
+      meta: {
+        class: {
+          td: "text-md",
+        },
+      },
+    },
+    {
       id: "actions",
       cell: ({ row }: { row: Row<College> }) => {
         return h(
@@ -63,5 +85,6 @@ export function getCollegesTableColumns(callbacks :{
         },
       },
     },
-]};
+  ]
+};
 

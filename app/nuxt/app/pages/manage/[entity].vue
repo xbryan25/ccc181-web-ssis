@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type EntityTable from '~/components/EntityTable.vue';
 import SearchAndSortHeader from '~/components/SearchAndSortHeader.vue';
 import auth from '~/middleware/auth';
 import { capitalizeWords } from '~/utils/stringUtils';
@@ -47,16 +48,41 @@ const onProceed = (localState: {
   searchAndSortState.sortField = localState.sortField;
   searchAndSortState.sortOrder = localState.sortOrder;
 };
+
+const selectedRows = ref<number>(0);
+const rowsPerPage = ref<number>(5);
+const loadedRowsPerPage = ref<number>(0);
+const isLoading = ref<boolean>(false);
+
+const externalCheckboxValue = ref<boolean | 'indeterminate'>(false);
+const isOpenConfirmDeleteDialogCounter = ref<number>(0);
+
+const toggleAllCounter = ref(0);
+
+function handleToggleAll(nextVal: boolean | 'indeterminate') {
+  toggleAllCounter.value++;
+  externalCheckboxValue.value = nextVal;
+}
+
+watch(selectedRows, (newSelectedRows) => {
+  if (newSelectedRows === 0) externalCheckboxValue.value = false;
+  else if (newSelectedRows === loadedRowsPerPage.value) externalCheckboxValue.value = true;
+  else externalCheckboxValue.value = 'indeterminate';
+});
 </script>
 
 <template>
   <div class="flex flex-col gap-10 h-full">
     <h1 class="font-bold text-5xl">{{ capitalizeWords(entity) }}</h1>
 
-    <div class="flex flex-col gap-5 h-full">
+    <div class="flex flex-col gap-5">
       <SearchAndSortHeader
+        :external-checkbox-value="externalCheckboxValue"
+        :selected-rows="selectedRows"
+        :loaded-rows-per-page="loadedRowsPerPage"
         :entity-type="entity"
         :search-and-sort-state="searchAndSortState"
+        :is-loading="isLoading"
         @on-create-entity-submit="() => (createEntitySubmitRef = true)"
         @on-proceed="
           (localState: {
@@ -67,6 +93,9 @@ const onProceed = (localState: {
           }) => onProceed(localState)
         "
         @update:search-value="(searchValue) => (searchAndSortState.searchValue = searchValue)"
+        @update:rows-per-page="(value: number) => (rowsPerPage = value)"
+        @toggle-all="(value) => handleToggleAll(value)"
+        @open-confirm-delete-dialog="() => isOpenConfirmDeleteDialogCounter++"
       />
 
       <EntityTable
@@ -77,6 +106,10 @@ const onProceed = (localState: {
         :sort-field="searchAndSortState.sortField"
         :sort-order="searchAndSortState.sortOrder"
         :create-entity-submit-ref="createEntitySubmitRef"
+        :toggle-all-counter="toggleAllCounter"
+        :rows-per-page="rowsPerPage"
+        :external-checkbox-value="externalCheckboxValue"
+        :is-open-confirm-delete-dialog-multiple-rows-counter="isOpenConfirmDeleteDialogCounter"
         @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
         @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
         @update:search-type="(value: string) => (searchAndSortState.searchType = value)"
@@ -86,6 +119,12 @@ const onProceed = (localState: {
             searchAndSortState.sortOrder = value;
           }
         "
+        @update:external-checkbox-value="
+          (value: boolean | 'indeterminate') => (externalCheckboxValue = value)
+        "
+        @update:selected-rows="(value: number) => (selectedRows = value)"
+        @update:loaded-rows-per-page="(value: number) => (loadedRowsPerPage = value)"
+        @update:is-loading="(value: boolean) => (isLoading = value)"
         @disable-create-entity-submit="() => (createEntitySubmitRef = false)"
       />
     </div>
