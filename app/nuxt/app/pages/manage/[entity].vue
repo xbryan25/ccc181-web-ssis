@@ -55,6 +55,7 @@ const loadedRowsPerPage = ref<number>(0);
 const isLoading = ref<boolean>(false);
 
 const externalCheckboxValue = ref<boolean | 'indeterminate'>(false);
+const isOpenConfirmDeleteDialogCounter = ref<number>(0);
 
 const toggleAllCounter = ref(0);
 
@@ -94,6 +95,7 @@ watch(selectedRows, (newSelectedRows) => {
         @update:search-value="(searchValue) => (searchAndSortState.searchValue = searchValue)"
         @update:rows-per-page="(value: number) => (rowsPerPage = value)"
         @toggle-all="(value) => handleToggleAll(value)"
+        @open-confirm-delete-dialog="() => isOpenConfirmDeleteDialogCounter++"
       />
 
       <EntityTable
@@ -107,6 +109,7 @@ watch(selectedRows, (newSelectedRows) => {
         :toggle-all-counter="toggleAllCounter"
         :rows-per-page="rowsPerPage"
         :external-checkbox-value="externalCheckboxValue"
+        :is-open-confirm-delete-dialog-multiple-rows-counter="isOpenConfirmDeleteDialogCounter"
         @update:search-value="(value: string) => (searchAndSortState.searchValue = value)"
         @update:search-by="(value: string) => (searchAndSortState.searchBy = value)"
         @update:search-type="(value: string) => (searchAndSortState.searchType = value)"

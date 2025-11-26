@@ -28,7 +28,7 @@ const emit = defineEmits<{
   ): void;
   (e: 'update:searchValue', value: string): void;
   (e: 'update:rowsPerPage', value: number): void;
-  (e: 'onCreateEntitySubmit'): void;
+  (e: 'onCreateEntitySubmit' | 'openConfirmDeleteDialog'): void;
   (e: 'toggleAll', value: boolean | 'indeterminate'): void;
 }>();
 
@@ -78,12 +78,13 @@ watch(
       </div>
 
       <div v-if="externalCheckboxValue" class="flex gap-3">
-        <UTooltip text="Edit">
-          <UButton icon="material-symbols:edit-outline" color="primary" class="cursor-pointer" />
-        </UTooltip>
-
         <UTooltip text="Delete">
-          <UButton icon="material-symbols:delete-outline" color="primary" class="cursor-pointer" />
+          <UButton
+            icon="material-symbols:delete-outline"
+            color="primary"
+            class="cursor-pointer"
+            @click="emit('openConfirmDeleteDialog')"
+          />
         </UTooltip>
       </div>
     </div>

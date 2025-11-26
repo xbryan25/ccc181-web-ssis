@@ -21,6 +21,7 @@ const props = defineProps<{
   createEntitySubmitRef: boolean;
   toggleAllCounter: number;
   externalCheckboxValue: boolean | 'indeterminate';
+  isOpenConfirmDeleteDialogMultipleRowsCounter: number;
 }>();
 
 const router = useRouter();
@@ -39,6 +40,20 @@ const internalSearchType = ref(props.searchType);
 const internalSortField = ref(props.sortField);
 const internalSortOrder = ref(props.sortOrder);
 
+const entitiesData = ref<Student[] | Program[] | College[]>([]);
+
+const UCheckbox = resolveComponent('UCheckbox') as DefineComponent;
+const UButton = resolveComponent('UButton') as DefineComponent;
+const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
+const UAvatar = resolveComponent('UAvatar') as DefineComponent;
+
+const tableButtons = { UCheckbox, UButton, UDropdownMenu };
+
+const selectedRows = ref<Set<string>>(new Set());
+const rowsToBeDeleted = ref<Set<string>>(new Set());
+
+const isLoading = ref(true);
+
 const emit = defineEmits<{
   (
     e:
@@ -54,16 +69,22 @@ const emit = defineEmits<{
   (e: 'update:isLoading', value: boolean): void;
 }>();
 
-const openConfirmDeleteDialog = (row: Student | Program | College) => {
+const openConfirmDeleteDialogSingleRow = (row: Student | Program | College) => {
   isOpenConfirmDeleteDialog.value = true;
 
   if (props.entityType === 'students') {
-    selectedEntity.value = (row as Student).idNumber;
+    rowsToBeDeleted.value = new Set<string>([(row as Student).idNumber]);
   } else if (props.entityType === 'programs') {
-    selectedEntity.value = (row as Program).programCode;
+    rowsToBeDeleted.value = new Set<string>([(row as Program).programCode]);
   } else {
-    selectedEntity.value = (row as College).collegeCode;
+    rowsToBeDeleted.value = new Set<string>([(row as College).collegeCode]);
   }
+};
+
+const openConfirmDeleteDialog = () => {
+  isOpenConfirmDeleteDialog.value = true;
+
+  rowsToBeDeleted.value = new Set(selectedRows.value);
 };
 
 const openConfirmEditDialog = (row: Student | Program | College) => {
@@ -77,19 +98,6 @@ const openConfirmEditDialog = (row: Student | Program | College) => {
     selectedEntity.value = (row as College).collegeCode;
   }
 };
-
-const entitiesData = ref<Student[] | Program[] | College[]>([]);
-
-const UCheckbox = resolveComponent('UCheckbox') as DefineComponent;
-const UButton = resolveComponent('UButton') as DefineComponent;
-const UDropdownMenu = resolveComponent('UDropdownMenu') as DefineComponent;
-const UAvatar = resolveComponent('UAvatar') as DefineComponent;
-
-const tableButtons = { UCheckbox, UButton, UDropdownMenu };
-
-const selectedRows = ref<Set<string>>(new Set());
-
-const isLoading = ref(true);
 
 const showAvatar = (avatarUrl: string) => {
   showImageModal.value = true;
@@ -126,7 +134,7 @@ function toggleRow(id: string, value: boolean) {
 const studentTableColumns = getStudentsTableColumns(
   {
     openEditDialog: (row: Student) => openConfirmEditDialog(row),
-    openConfirmDeleteDialog: (row: Student) => openConfirmDeleteDialog(row),
+    openConfirmDeleteDialog: (row: Student) => openConfirmDeleteDialogSingleRow(row),
   },
   tableButtons,
   UAvatar,
@@ -139,7 +147,7 @@ const studentTableColumns = getStudentsTableColumns(
 const programsTableColumns = getProgramsTableColumns(
   {
     openEditDialog: (row: Program) => openConfirmEditDialog(row),
-    openConfirmDeleteDialog: (row: Program) => openConfirmDeleteDialog(row),
+    openConfirmDeleteDialog: (row: Program) => openConfirmDeleteDialogSingleRow(row),
   },
   tableButtons,
   isLoading,
@@ -150,7 +158,7 @@ const programsTableColumns = getProgramsTableColumns(
 const collegesTableColumns = getCollegesTableColumns(
   {
     openEditDialog: (row: College) => openConfirmEditDialog(row),
-    openConfirmDeleteDialog: (row: College) => openConfirmDeleteDialog(row),
+    openConfirmDeleteDialog: (row: College) => openConfirmDeleteDialogSingleRow(row),
   },
   tableButtons,
   isLoading,
@@ -229,8 +237,6 @@ const getTotalEntityCount = async () => {
   const { totalCount }: { totalCount: number } = await useEntitiesCount(props.entityType, options);
 
   totalEntityCount.value = totalCount;
-
-  console.log(`updated here ${totalEntityCount.value}`);
 };
 
 const debouncedGetTotalEntityCount = useDebounceFn(async () => {
@@ -397,6 +403,11 @@ watch(isLoading, (newVal) => {
   }
 });
 
+watch(
+  () => props.isOpenConfirmDeleteDialogMultipleRowsCounter,
+  () => openConfirmDeleteDialog(),
+);
+
 onMounted(async () => {
   pageNumber.value = Number(route.query.page) || pageNumber.value;
 
@@ -461,7 +472,7 @@ onBeforeUnmount(() => {
     v-model:is-open="isOpenConfirmDeleteDialog"
     class="ml-auto hidden"
     :entity-type="props.entityType"
-    :selected-entity="selectedEntity"
+    :rows-to-be-deleted="rowsToBeDeleted"
     @on-delete="
       isLoading = true;
       emit('update:isLoading', isLoading);

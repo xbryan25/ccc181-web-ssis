@@ -4,7 +4,7 @@ import { capitalizeWords } from '#imports';
 const props = defineProps<{
   entityType: string;
   isOpen: boolean;
-  selectedEntity: string;
+  rowsToBeDeleted: Set<string>;
 }>();
 
 const emit = defineEmits<{
@@ -27,7 +27,10 @@ async function onDelete() {
   try {
     isDeleting.value = true;
 
-    const data: { message: string } = await useDeleteEntity(props.entityType, props.selectedEntity);
+    const data: { message: string } = await useDeleteEntity(
+      props.entityType,
+      props.rowsToBeDeleted,
+    );
 
     toast.add({
       title: 'Success',
@@ -55,6 +58,8 @@ watch(
         isDeleting.value = false;
       }, 300); // delay in ms
     }
+
+    console.log(props.rowsToBeDeleted);
   },
 );
 </script>
@@ -71,8 +76,13 @@ watch(
       <template #header>
         <div class="flex flex-col">
           <h2 class="text-3xl font-semibold">Confirm delete</h2>
-          <h3 class="text-md font-semibold text-stone-500">
-            {{ `${capitalizeWords(props.entityType.slice(0, -1))}: ${props.selectedEntity}` }}
+          <h3 v-if="props.rowsToBeDeleted.size == 1" class="text-md font-semibold text-stone-500">
+            {{
+              `${capitalizeWords(props.entityType.slice(0, -1))}: ${props.rowsToBeDeleted.values().next().value}`
+            }}
+          </h3>
+          <h3 v-else class="text-md font-semibold text-stone-500">
+            {{ `${props.rowsToBeDeleted.size} ${props.entityType}` }}
           </h3>
         </div>
       </template>
@@ -83,16 +93,29 @@ watch(
             name="material-symbols:warning-rounded"
             class="size-20 text-red-500 animate-bounce"
           />
-          <div>
+          <div v-if="props.rowsToBeDeleted.size == 1">
             <p>
               {{ `Are you sure you want to delete this ${props.entityType.slice(0, -1)}?` }}
+            </p>
+          </div>
+
+          <div v-else>
+            <p>
+              {{
+                `Are you sure you want to delete ${props.rowsToBeDeleted.size} ${props.entityType}?`
+              }}
             </p>
           </div>
         </div>
 
         <div v-if="isDeleting" class="flex justify-center items-center">
           <UIcon name="i-heroicons-arrow-path" class="w-8 h-8 animate-spin text-accent" />
-          <span class="ml-2 text-primary">Deleting {{ props.entityType.slice(0, -1) }}...</span>
+          <span v-if="props.rowsToBeDeleted.size == 1" class="ml-2 text-primary"
+            >Deleting {{ props.entityType.slice(0, -1) }}...</span
+          >
+          <span v-else class="ml-2 text-primary"
+            >Deleting {{ props.rowsToBeDeleted.size }} {{ props.entityType }}...</span
+          >
         </div>
       </template>
 
