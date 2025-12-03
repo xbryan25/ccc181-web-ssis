@@ -24,7 +24,7 @@ const selectedOption = computed({
 });
 
 const determineValueToGet = () => {
-  if (props.dialogType === 'filter') {
+  if (props.dialogType === 'searchFilter') {
     if (props.columnPosition === 'first') {
       return props.searchAndSortState.searchBy;
     } else {
@@ -40,7 +40,7 @@ const determineValueToGet = () => {
 };
 
 const determineEmitToReturn = (value: string) => {
-  if (props.dialogType === 'filter') {
+  if (props.dialogType === 'searchFilter') {
     if (props.columnPosition === 'first') {
       emit('update:searchBy', value);
     } else {

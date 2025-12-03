@@ -11,6 +11,9 @@ export function useEntities(entityType: string,
                                 searchValue?: string, 
                                 searchBy?: string, 
                                 searchType?: string, 
+                                filterByGender?: string,
+                                filterByYearLevel?: string,
+                                filterByProgramCode?: string,
                                 sortField?: string, 
                                 sortOrder?: string
                             }){

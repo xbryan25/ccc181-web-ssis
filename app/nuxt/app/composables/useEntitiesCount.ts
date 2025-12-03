@@ -8,6 +8,9 @@ export function useEntitiesCount(entityType: string,
                                     searchValue?: string, 
                                     searchBy?: string, 
                                     searchType?: string,
+                                    filterByGender?: string,
+                                    filterByYearLevel?: string,
+                                    filterByProgramCode?: string,
                                     filterBy?: Record<string, string | number>
                                 }){
 

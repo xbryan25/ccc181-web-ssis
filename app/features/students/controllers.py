@@ -60,6 +60,9 @@ class StudentController:
                 "search_value": request.args.get("searchValue"),
                 "search_by": request.args.get("searchBy"),
                 "search_type": request.args.get("searchType"),
+                "filter_by_gender": request.args.get("filterByGender"),
+                "filter_by_year_level": request.args.get("filterByYearLevel"),
+                "filter_by_program_code": request.args.get("filterByProgramCode"),
             }
 
             # Validate search_by and search_type parameters
@@ -144,6 +147,9 @@ class StudentController:
             "search_value": (request.args.get("searchValue") or "").strip(),
             "search_by": request.args.get("searchBy"),
             "search_type": request.args.get("searchType"),
+            "filter_by_gender": request.args.get("filterByGender"),
+            "filter_by_year_level": request.args.get("filterByYearLevel"),
+            "filter_by_program_code": request.args.get("filterByProgramCode"),
             "sort_field": request.args.get("sortField"),
             "sort_order":request.args.get("sortOrder")
             }

@@ -10,6 +10,9 @@ const props = defineProps<{
     searchValue: string;
     searchBy: string;
     searchType: string;
+    filterByGender: string;
+    filterByYearLevel: string;
+    filterByProgramCode: string;
     sortField: string;
     sortOrder: string;
   };
@@ -22,6 +25,9 @@ const emit = defineEmits<{
     localState: {
       searchBy: string;
       searchType: string;
+      filterByGender: string;
+      filterByYearLevel: string;
+      filterByProgramCode: string;
       sortField: string;
       sortOrder: string;
     },
@@ -91,7 +97,7 @@ watch(
 
     <div v-else class="flex-1 flex pl-3 items-center gap-3" />
 
-    <div class="flex-[2] flex gap-3 justify-center">
+    <div class="flex-[4] flex gap-3 justify-center">
       <UInput
         v-model="searchValue"
         icon="solar:magnifer-linear"
@@ -102,15 +108,36 @@ watch(
 
       <FilterSortDialog
         :entity-type="props.entityType"
+        :dialog-type="'searchFilter'"
+        :search-and-sort-state="props.searchAndSortState"
+        @on-proceed="
+          (localState: {
+            searchBy: string;
+            searchType: string;
+            filterByGender: string;
+            filterByYearLevel: string;
+            filterByProgramCode: string;
+            sortField: string;
+            sortOrder: string;
+          }) => emit('onProceed', localState)
+        "
+      />
+
+      <FilterSortDialog
+        v-if="entityType === 'students'"
+        :entity-type="props.entityType"
         :dialog-type="'filter'"
         :search-and-sort-state="props.searchAndSortState"
         @on-proceed="
           (localState: {
             searchBy: string;
             searchType: string;
+            filterByGender: string;
+            filterByYearLevel: string;
+            filterByProgramCode: string;
             sortField: string;
             sortOrder: string;
-          }) => emit('onProceed', localState)
+          }) => (console.log(localState), emit('onProceed', localState))
         "
       />
 
@@ -122,6 +149,9 @@ watch(
           (localState: {
             searchBy: string;
             searchType: string;
+            filterByGender: string;
+            filterByYearLevel: string;
+            filterByProgramCode: string;
             sortField: string;
             sortOrder: string;
           }) => emit('onProceed', localState)

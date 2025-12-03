@@ -31,6 +31,9 @@ const searchAndSortState = reactive({
   searchValue: '',
   searchBy: defaultField,
   searchType: 'Starts With',
+  filterByGender: '',
+  filterByYearLevel: '',
+  filterByProgramCode: '',
   sortField: defaultField,
   sortOrder: 'Ascending',
 });
@@ -40,13 +43,22 @@ const createEntitySubmitRef = ref(false);
 const onProceed = (localState: {
   searchBy: string;
   searchType: string;
+  filterByGender: string;
+  filterByYearLevel: string;
+  filterByProgramCode: string;
   sortField: string;
   sortOrder: string;
 }) => {
   searchAndSortState.searchBy = localState.searchBy;
   searchAndSortState.searchType = localState.searchType;
+  searchAndSortState.filterByGender = localState.filterByGender;
+  searchAndSortState.filterByYearLevel = localState.filterByYearLevel;
+  searchAndSortState.filterByProgramCode = localState.filterByProgramCode;
   searchAndSortState.sortField = localState.sortField;
   searchAndSortState.sortOrder = localState.sortOrder;
+
+  console.log('search and sort state');
+  console.log(searchAndSortState);
 };
 
 const selectedRows = ref<number>(0);
@@ -88,6 +100,9 @@ watch(selectedRows, (newSelectedRows) => {
           (localState: {
             searchBy: string;
             searchType: string;
+            filterByGender: string;
+            filterByYearLevel: string;
+            filterByProgramCode: string;
             sortField: string;
             sortOrder: string;
           }) => onProceed(localState)
@@ -103,6 +118,9 @@ watch(selectedRows, (newSelectedRows) => {
         :search-value="searchAndSortState.searchValue"
         :search-by="searchAndSortState.searchBy"
         :search-type="searchAndSortState.searchType"
+        :filter-by-gender="searchAndSortState.filterByGender"
+        :filter-by-year-level="searchAndSortState.filterByYearLevel"
+        :filter-by-program-code="searchAndSortState.filterByProgramCode"
         :sort-field="searchAndSortState.sortField"
         :sort-order="searchAndSortState.sortOrder"
         :create-entity-submit-ref="createEntitySubmitRef"

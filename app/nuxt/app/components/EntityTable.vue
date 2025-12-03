@@ -15,6 +15,9 @@ const props = defineProps<{
   searchValue: string;
   searchBy: string;
   searchType: string;
+  filterByGender: string;
+  filterByYearLevel: string;
+  filterByProgramCode: string;
   sortField: string;
   sortOrder: string;
   rowsPerPage: number;
@@ -37,6 +40,9 @@ const currentAvatarUrlToDisplay = ref('');
 const internalSearchValue = ref(props.searchValue);
 const internalSearchBy = ref(props.searchBy);
 const internalSearchType = ref(props.searchType);
+const internalFilterByGender = ref(props.filterByGender);
+const internalFilterByYearLevel = ref(props.filterByYearLevel);
+const internalFilterByProgramCode = ref(props.filterByProgramCode);
 const internalSortField = ref(props.sortField);
 const internalSortOrder = ref(props.sortOrder);
 
@@ -191,9 +197,14 @@ const loadEntities = async () => {
     searchValue: props.searchValue,
     searchBy: props.searchBy,
     searchType: props.searchType,
+    filterByGender: props.filterByGender,
+    filterByYearLevel: props.filterByYearLevel,
+    filterByProgramCode: props.filterByProgramCode,
     sortField: props.sortField,
     sortOrder: props.sortOrder,
   };
+
+  console.log(options);
 
   const data = await useEntities(props.entityType, options);
 
@@ -232,6 +243,9 @@ const getTotalEntityCount = async () => {
     searchValue: props.searchValue,
     searchBy: props.searchBy,
     searchType: props.searchType,
+    filterByGender: props.filterByGender,
+    filterByYearLevel: props.filterByYearLevel,
+    filterByProgramCode: props.filterByProgramCode,
   };
 
   const { totalCount }: { totalCount: number } = await useEntitiesCount(props.entityType, options);
@@ -360,6 +374,27 @@ watch(
 );
 
 watch(
+  () => props.filterByGender,
+  (newValue) => {
+    internalFilterByGender.value = newValue;
+  },
+);
+
+watch(
+  () => props.filterByYearLevel,
+  (newValue) => {
+    internalFilterByYearLevel.value = newValue;
+  },
+);
+
+watch(
+  () => props.filterByProgramCode,
+  (newValue) => {
+    internalFilterByProgramCode.value = newValue;
+  },
+);
+
+watch(
   () => props.sortField,
   (newValue) => {
     internalSortField.value = newValue;
@@ -431,10 +466,15 @@ onMounted(async () => {
         () => internalSearchValue.value,
         () => internalSearchBy.value,
         () => internalSearchType.value,
+        () => internalFilterByGender.value,
+        () => internalFilterByYearLevel.value,
+        () => internalFilterByProgramCode.value,
         () => internalSortField.value,
         () => internalSortOrder.value,
       ],
       () => {
+        console.log('loadddddddddd heree');
+
         router.replace({ query: updateUrl() });
         isLoading.value = true;
         emit('update:isLoading', isLoading.value);

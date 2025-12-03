@@ -52,8 +52,12 @@ class StudentRepository:
             else:
                 search_pattern = params["search_value"]
 
-            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT_WITH_SEARCH.format(table="students", search_by=f"{params["search_by"].lower().replace(' ', '_')}"),
-                                (search_pattern,))
+            gender = params["filter_by_gender"] or "%"
+            year = params["filter_by_year_level"] or "%"
+            program_code = params["filter_by_program_code"] or "%"
+
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT_WITH_SEARCH_STUDENTS.format(table="students", search_by=f"{params["search_by"].lower().replace(' ', '_')}"),
+                                (search_pattern, gender, year, program_code))
         
         elif params["program_code"]:
             return db.fetch_one(StudentQueries.GET_TOTAL_COUNT_FROM_PROGRAM_CODE, (params["program_code"],))
@@ -62,7 +66,17 @@ class StudentRepository:
             return db.fetch_one(StudentQueries.GET_TOTAL_COUNT_FROM_COLLEGE_CODE, (params["college_code"],))
 
         else:
-            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT.format(table="students"))
+
+            gender = params["filter_by_gender"] or "%"
+            year = params["filter_by_year_level"] or "%"
+            program_code = params["filter_by_program_code"] or "%"
+
+            print("----------------------------------")
+            print(gender)
+            print(year)
+            print(program_code)
+
+            return db.fetch_one(CommonQueries.GET_TOTAL_COUNT_STUDENTS.format(table="students"), (gender, year, program_code))
 
     @staticmethod
     def get_many_students(params) -> list[dict[str, str]]:
@@ -102,12 +116,17 @@ class StudentRepository:
 
         offset = 0 if params["page_number"] <= 0 else (params["page_number"] - 1) * params["rows_per_page"]
 
-        return db.fetch_all(CommonQueries.GET_MANY
+        gender = params["filter_by_gender"] or "%"
+        year = params["filter_by_year_level"] or "%"
+        program_code = params["filter_by_program_code"] or "%"
+
+
+        return db.fetch_all(CommonQueries.GET_MANY_STUDENTS
                             .format(table="students", 
                                     search_by=f"{params["search_by"].lower().replace(' ', '_')}",
                                     sort_field=f"{params["sort_field"].lower().replace(' ', '_')}",
                                     sort_order=sort_order),
-                            (search_pattern, params["rows_per_page"], offset))
+                            (search_pattern, gender, year, program_code, params["rows_per_page"], offset))
 
     @staticmethod
     def create_student(student_data) -> None:
